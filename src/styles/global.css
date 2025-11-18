@@ -11,7 +11,7 @@
     font-family: 'Manetta-Montserrat';
 
     /* 指向 public 目录下的字体文件 */
-    src: url('public/fonts/Montserrat-Light.ttf') format('truetype');
+    src: url('public/fonts/ElmsSans-Light.ttf') format('truetype');
 
     /* 建议设置 font-weight 和 font-style */
     font-weight: 300; /* Light 通常对应 300 */
