@@ -1,0 +1,498 @@
+---
+// 轮播图数据
+const carouselItems = [
+    { src: '/images/carousel/grid-7.png', alt: '产品细节特写 1' },
+    { src: '/images/carousel/grid-8.png', alt: '产品细节特写 2' },
+    { src: '/images/carousel/grid-2.png', alt: '产品细节特写 3' },
+];
+
+interface Props {
+    title: string; // 模块主标题
+    featureImage: string; // 左侧固定图片
+    featureAlt: string; // 左侧图片的 Alt 文本
+}
+
+const { title, featureImage, featureAlt } = Astro.props;
+
+// 唯一的 ID 用于 JS 交互
+const carouselId = `carousel-${Math.random().toString(36).substring(2, 9)}`;
+
+// 克隆第一张和最后一张图片用于模拟无限循环
+const firstItemClone = carouselItems[0];
+const totalOriginalItems = carouselItems.length;
+const lastItemClone = carouselItems[totalOriginalItems - 1];
+
+// 轨道总项目数：原始项 + 2个克隆项
+const totalTrackItems = totalOriginalItems + 2;
+---
+
+<section class="module-2-image-split">
+
+    <div class="module-2-image-inner">
+
+        <h2 class="module-title">
+            {title}
+        </h2>
+
+        <div class="content-split-wrapper">
+
+            <div class="split-column static-image-column">
+                <img
+                    src={featureImage}
+                    alt={featureAlt}
+                    class="static-img-element"
+                    loading="lazy"
+                    decoding="async"
+                >
+            </div>
+
+            <div id={carouselId} class="split-column carousel-slider-column carousel-track-wrapper">
+
+                <div class="carousel-inner-track">
+                    {/* 逻辑位置索引 0: 克隆最后一项 (从头向左滑) */}
+                    <div class="slide-item clone" data-index="-1" aria-hidden="true">
+                        <img
+                            src={lastItemClone.src}
+                            alt={lastItemClone.alt}
+                            class="slide-img"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </div>
+
+                    {/* 逻辑位置索引 1 到 totalOriginalItems: 原始项 */}
+                    {carouselItems.map((item, index) => (
+                        <div class="slide-item" data-index={index}>
+                            <img
+                                src={item.src}
+                                alt={item.alt}
+                                class="slide-img"
+                                loading="lazy"
+                                decoding="async"
+                            />
+                        </div>
+                    ))}
+                    {/* 逻辑位置索引 totalOriginalItems + 1: 克隆第一项 (从尾向右滑) */}
+                    <div class="slide-item clone" data-index={totalOriginalItems} aria-hidden="true">
+                        <img
+                            src={firstItemClone.src}
+                            alt={firstItemClone.alt}
+                            class="slide-img"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script define:vars={{ carouselId, totalOriginalItems, totalTrackItems }} is:inline>
+    // --- 常量配置 ---
+    const SLIDE_TRANSITION_TIME_MS = 800;
+    const AUTOPLAY_DELAY = 5000;
+    const SWIPE_THRESHOLD_PIXELS = 50;
+    const SLIDE_GAP = 30; // 与 CSS 中的 gap 保持一致
+
+    function initializeOptimizedCarousel() {
+        const wrapper = document.getElementById(carouselId);
+        if (!wrapper) return;
+        const innerTrack = wrapper.querySelector('.carousel-inner-track');
+
+        // --- 状态 ---
+        let isDragging = false;
+        let startX = 0;
+        let currentDragDistance = 0;
+        let lastTranslateX = 0;
+        let autoplayInterval;
+        let animationFrameId = null;
+        let currentIndex = 1;
+        let isTransitioning = false;
+
+        // --- 工具函数 ---
+        const getClientX = (evt) => (evt.touches ? evt.touches[0].clientX : evt.clientX);
+
+        // 计算单个项目应占据的完整宽度 (包括间隙)
+        const getItemFullWidth = () => {
+             // wrapper 宽度等于一个 slide-item 的宽度
+             // 实际上，一个 slide-item 的宽度是 wrapper 的宽度
+             // 所以 ItemFullWidth = slide-item.offsetWidth + gap
+            const item = innerTrack.querySelector('.slide-item');
+            if (!item) return 0;
+            return item.offsetWidth + SLIDE_GAP;
+        };
+
+        const applyTransform = (x) => {
+            innerTrack.style.transform = `translateX(${x}px)`;
+        };
+
+        const setTransition = (enabled) => {
+            innerTrack.style.transition = enabled ? `transform ${SLIDE_TRANSITION_TIME_MS}ms ease-out` : 'none';
+        };
+
+        // 动画更新循环 (rAF): 保证拖动流畅性
+        const updatePosition = () => {
+            if (!isDragging) return;
+            // 拖动时的位置 = 上次吸附位置 + 拖动距离
+            const newX = lastTranslateX + currentDragDistance;
+            applyTransform(newX);
+            animationFrameId = requestAnimationFrame(updatePosition);
+        };
+
+        // --- 核心操作 ---
+
+        /**
+         * 瞬间跳转到目标索引 (用于无限循环的重置)
+         * @param {number} targetIndex - 目标逻辑索引 (0 或 totalOriginalItems)
+         */
+        const instantMoveTo = (targetIndex) => {
+            isTransitioning = false;
+            const fullWidth = getItemFullWidth();
+            if (fullWidth === 0) return;
+
+            const newX = -targetIndex * fullWidth;
+            setTransition(false); // 移除过渡
+
+            requestAnimationFrame(() => {
+                applyTransform(newX);
+                lastTranslateX = newX;
+                currentIndex = targetIndex;
+            });
+        };
+
+        /**
+         * 平滑切换到目标索引 (基于 transitionend 事件)
+         * @param {number} targetIndex - 目标逻辑索引
+         */
+        const smoothMoveTo = (targetIndex) => {
+            if (isTransitioning) return; // 防止重复触发
+            isTransitioning = true;
+
+            const fullWidth = getItemFullWidth();
+            if (fullWidth === 0) return;
+
+            const newX = -targetIndex * fullWidth;
+
+            // 1. 设置过渡
+            setTransition(true);
+            requestAnimationFrame(() => {
+                applyTransform(newX);
+                lastTranslateX = newX;
+                currentIndex = targetIndex;
+            });
+
+            // 2. 监听过渡结束事件，执行瞬间跳转
+            const handleTransitionEnd = (event) => {
+                // 确保是 transform 属性的过渡结束事件
+                if (event.propertyName !== 'transform') return;
+
+                // 移除监听器，避免内存泄漏
+                innerTrack.removeEventListener('transitionend', handleTransitionEnd);
+
+                // 检查当前是否在克隆项上
+                if (targetIndex === 0) {
+                    instantMoveTo(totalOriginalItems); // 跳到最后一个原始项
+                } else if (targetIndex === totalTrackItems - 1) {
+                    instantMoveTo(1); // 跳到第一个原始项
+                }
+
+                isTransitioning = false; // 重置状态
+            };
+
+            // 只有当目标是克隆项时才需要监听 transitionend
+            if (targetIndex === 0 || targetIndex === totalTrackItems - 1) {
+                innerTrack.addEventListener('transitionend', handleTransitionEnd);
+            } else {
+                // 如果是普通切换，过渡结束后直接解除 transitioning 状态
+                 setTimeout(() => {
+                    isTransitioning = false;
+                 }, SLIDE_TRANSITION_TIME_MS + 50); // 增加少量冗余时间
+            }
+        };
+
+        // 自动播放逻辑
+        const nextSlide = () => {
+            const nextIndex = currentIndex + 1;
+            smoothMoveTo(nextIndex);
+        };
+
+        // --- 事件处理 ---
+
+        const handleStart = (evt) => {
+            // 拖动开始时，如果正在过渡，则停止并立即吸附
+            if (isTransitioning) {
+                // 强制结束当前的过渡，定位到正在过渡的最终目标位置
+                setTransition(false);
+                applyTransform(lastTranslateX);
+                isTransitioning = false;
+            }
+
+            stopAutoplay();
+
+            isDragging = true;
+            wrapper.style.cursor = 'grabbing';
+
+            startX = getClientX(evt);
+            currentDragDistance = 0;
+
+            if (animationFrameId === null) {
+                animationFrameId = requestAnimationFrame(updatePosition);
+            }
+
+            if (evt.type === 'mousedown') evt.preventDefault();
+        };
+
+        const handleMove = (evt) => {
+            if (!isDragging) return;
+            const x = getClientX(evt);
+            currentDragDistance = x - startX;
+        };
+
+        const handleEnd = (evt) => {
+            if (!isDragging) return;
+
+            isDragging = false;
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+
+            wrapper.style.cursor = 'grab';
+
+            const dragDistance = currentDragDistance;
+            const fullWidth = getItemFullWidth();
+            if (fullWidth === 0) return;
+
+            // 基于拖动结束时的最终位置计算最近的索引
+            const finalPosition = lastTranslateX + dragDistance;
+            const nearestIndex = Math.round(Math.abs(finalPosition) / fullWidth);
+            let targetIndex = nearestIndex;
+
+            // 判断是否超过切换阈值 (强制切换到上一张或下一张)
+            if (Math.abs(dragDistance) > SWIPE_THRESHOLD_PIXELS) {
+                targetIndex = dragDistance > 0 ? nearestIndex - 1 : nearestIndex + 1;
+            }
+
+            // 确保索引在轨道范围内 [0, totalTrackItems - 1]
+            targetIndex = Math.max(0, targetIndex);
+            targetIndex = Math.min(totalTrackItems - 1, targetIndex);
+
+            // 平滑吸附到目标位置
+            smoothMoveTo(targetIndex);
+
+            startAutoplay();
+        };
+
+        // 启动/停止自动播放
+        const startAutoplay = () => {
+            if (autoplayInterval) clearInterval(autoplayInterval);
+            autoplayInterval = setInterval(nextSlide, AUTOPLAY_DELAY);
+        };
+        const stopAutoplay = () => {
+            clearInterval(autoplayInterval);
+            autoplayInterval = null;
+        };
+
+
+        // --- 绑定事件 ---
+        wrapper.addEventListener('mousedown', handleStart);
+        wrapper.addEventListener('touchstart', handleStart, { passive: true });
+
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+
+        wrapper.addEventListener('touchmove', handleMove, { passive: true });
+        wrapper.addEventListener('touchend', handleEnd);
+
+        const handleResize = () => {
+            // 窗口大小变化后，重新计算宽度，并定位到当前显示的逻辑索引 (currentIndex)
+            instantMoveTo(currentIndex);
+        };
+        window.addEventListener('resize', handleResize);
+
+        // 初始化启动，定位到第一个真实项目 (索引 1)
+        instantMoveTo(1);
+        startAutoplay();
+        wrapper.style.cursor = 'grab';
+    }
+
+    initializeOptimizedCarousel();
+</script>
+
+<style>
+/* ------------------------------------- */
+/* 1. 模块基础样式和全宽 Hack (性能优化) */
+/* ------------------------------------- */
+
+.module-2-image-split {
+    content-visibility: auto;
+    contain: layout style;
+
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    z-index: 1;
+
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.module-2-image-inner {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+.module-2-image-split .module-title {
+    font-size: clamp(1.8em, 3vw, 2.5em);
+    margin-bottom: 40px;
+    color: #333;
+    margin-left: 64px;
+    margin-right: 64px;
+    text-align: left;
+}
+
+/* ------------------------------------- */
+/* 2. 左右分栏 Flex 布局 */
+/* ------------------------------------- */
+
+.content-split-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 10%;
+    margin-left: 64px;
+    margin-right: 64px;
+}
+
+.split-column {
+    flex: 0 0 45%;
+}
+
+/* 静态图片列 */
+.static-image-column {
+    /* 🚀 静态图片也强制 1:1 */
+    aspect-ratio: 1 / 1;
+}
+
+.static-img-element {
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* 🚀 保持 cover 以填充，或改为 contain 以完整显示 */
+    object-fit: cover;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+}
+
+/* 轮播容器 */
+.carousel-slider-column {
+    align-self: stretch;
+}
+
+/* 轨道容器：负责裁剪，移除所有滚动条相关样式 */
+.carousel-track-wrapper {
+    width: 100%;
+    /* 🚀 关键：高度由子元素的 aspect-ratio 决定，或者直接设置为 1:1 */
+    aspect-ratio: 1 / 1; /* 确保整个轮播区域也是 1:1 */
+    overflow: hidden;
+    border-radius: 8px;
+
+    cursor: grab;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.carousel-track-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* 轮播内部轨道 */
+.carousel-inner-track {
+    will-change: transform;
+
+    display: flex;
+    gap: 30px;
+    /* 🚀 关键：高度继承自父容器，确保内部 flex item 可以撑开 */
+    height: 100%;
+
+    /* 宽度由 JS 和 CSS 变量动态计算 */
+    width: calc(100% * var(--total-items));
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    transition: none; /* 默认不开启过渡，由 JS 动态控制 */
+}
+
+/* 单个轮播项 */
+.slide-item {
+    /* 🚀 关键：宽度计算 (100% / 单次显示的图片数量) - 间隙 */
+    /* 我们每次只显示一张图片，所以 flex-basis 是 100% / 1，再减去间隙 */
+    flex: 0 0 calc(100% - 30px); /* 100% 对应 wrapper 的宽度 */
+    box-sizing: border-box;
+    /* 🚀 关键：强制 1:1 比例 */
+    aspect-ratio: 1 / 1;
+    height: auto; /* 高度由 aspect-ratio 控制 */
+}
+
+.slide-img {
+    width: 100%;
+    height: 100%;
+    /* 🚀 保持 cover 填充 1:1 区域 (可能裁剪)，或改为 contain 完整显示 (可能留白) */
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+
+/* ------------------------------------- */
+/* 3. 响应式调整 */
+/* ------------------------------------- */
+
+@media (max-width: 1024px) {
+    .module-2-image-split .module-title,
+    .content-split-wrapper {
+        margin-left: 48px;
+        margin-right: 48px;
+    }
+    .content-split-wrapper {
+        gap: 20px;
+    }
+    .split-column {
+        flex: 0 0 45%;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-split-wrapper {
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 30px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .module-2-image-split .module-title {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .split-column {
+        flex: 0 0 100%;
+    }
+
+    .static-image-column {
+        aspect-ratio: 1 / 1; /* 手机端也保持 1:1 */
+    }
+
+    .carousel-slider-column {
+        align-self: auto;
+        aspect-ratio: 1 / 1; /* 手机端也保持 1:1 */
+    }
+}
+</style>

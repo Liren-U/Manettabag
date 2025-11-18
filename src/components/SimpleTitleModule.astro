@@ -1,0 +1,117 @@
+---
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<section class="simple-title-module">
+
+    <div class="module-inner">
+
+        <div class="content-split-wrapper">
+
+            <div class="split-column left-title-column">
+                <h2 class="module-main-title">
+                    {title}
+                </h2>
+            </div>
+
+            <div class="split-column right-empty-column" aria-hidden="true">
+                </div>
+
+        </div>
+
+    </div>
+</section>
+
+<style>
+/* ------------------------------------- */
+/* 1. 模块容器基础样式 */
+/* ------------------------------------- */
+.simple-title-module {
+    /* 保持模块全宽和居中 */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    z-index: 1;
+
+    padding-top: 80px;
+    padding-bottom: 80px;
+    background-color: #f7f7f7; /* 浅灰色背景方便区分 */
+}
+
+.module-inner {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+/* ------------------------------------- */
+/* 2. 左右分栏 Flex 布局 (核心布局) */
+/* ------------------------------------- */
+
+.content-split-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 10%; /* 与之前的模块保持一致的间隙 */
+
+    /* 电脑端边距：64px */
+    margin-left: 64px;
+    margin-right: 64px;
+}
+
+.split-column {
+    /* 左右各占据 45% 的宽度 */
+    flex: 0 0 45%;
+}
+
+/* ------------------------------------- */
+/* 3. 标题样式 */
+/* ------------------------------------- */
+
+.module-main-title {
+    font-size: clamp(2em, 3.5vw, 3em);
+    line-height: 1.2;
+    color: #333;
+    margin: 0; /* 移除默认的 H2 边距 */
+}
+
+
+/* ------------------------------------- */
+/* 4. 响应式调整 */
+/* ------------------------------------- */
+
+/* 平板端样式 (小于 1024px) */
+@media (max-width: 1024px) {
+    .content-split-wrapper {
+        margin-left: 48px;
+        margin-right: 48px;
+        gap: 20px;
+    }
+}
+
+/* 手机端样式 (小于 768px) */
+@media (max-width: 768px) {
+    .content-split-wrapper {
+        /* 手机端不再分栏，左侧标题占据全宽 */
+        flex-direction: column;
+        gap: 30px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .split-column {
+        flex: 0 0 100%;
+    }
+
+    /* 隐藏右侧占位区域，因为它不再需要保持布局 */
+    .right-empty-column {
+        display: none;
+    }
+}
+</style>

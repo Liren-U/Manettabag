@@ -1,0 +1,145 @@
+---
+const gridItems = [
+    { src: '/images/grid/grid-1.jpg', alt: '产品特性 1：模块化设计' },
+    { src: '/images/grid/grid-2.png', alt: '产品特性 2：防水面料' },
+    { src: '/images/grid/grid-3.jpg', alt: '产品特性 3：扩展空间' },
+    { src: '/images/grid/grid-4.jpg', alt: '场景 1：户外旅行' },
+    { src: '/images/grid/grid-5.jpg', alt: '场景 2：城市通勤' },
+    { src: '/images/grid/grid-6.jpg', alt: '场景 3：摄影装备' },
+    { src: '/images/grid/grid-7.png', alt: '细节 1：快拆卡扣' },
+    { src: '/images/grid/grid-8.png', alt: '细节 2：隐藏口袋' },
+    { src: '/images/grid/grid-9.jpg', alt: '细节 3：人体工学肩带' },
+];
+
+interface Props {
+    title: string;
+}
+const { title } = Astro.props;
+---
+
+<section class="image-grid-section">
+    <div class="container">
+        <h2 class="grid-title">{title}</h2>
+
+        <div class="image-grid">
+            {gridItems.map((item, index) => (
+                <div class="grid-item" data-index={index + 1}>
+                    <img
+                        src={item.src}
+                        alt={item.alt}
+                        loading="lazy"
+                        decoding="async"
+                    />
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+/*
+ * ==================================================
+ * ImageGrid - 纯 CSS 控制显示数量版本（无 JS）
+ * ==================================================
+ */
+
+.image-grid-section {
+    padding: 60px 0;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.grid-title {
+    text-align: left;
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+    margin-bottom: 40px;
+    color: #333;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Mobile base layout */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.grid-item {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    overflow: visible;
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out;
+    will-change: transform;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.grid-item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+}
+
+.grid-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+.grid-item:hover img {
+    transform: scale(1.05);
+}
+
+/* ------------------------------------------- */
+/* 🚀 纯 CSS 控制显示数量（移动端只显示前4张） */
+/* ------------------------------------------- */
+@media (max-width: 767px) {
+    .grid-item:nth-child(n + 5) {
+        display: none;
+    }
+}
+
+/* 平板端排列 (768 - 1024) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .grid-title {
+        padding: 0 48px;
+    }
+    .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        margin-left: 48px;
+        margin-right: 48px;
+    }
+
+    /* 平板和桌面端显示全部 9 张 */
+    .grid-item {
+        display: block;
+    }
+}
+
+/* 桌面端排列 */
+@media (min-width: 1025px) {
+    .grid-title {
+        padding: 0 64px;
+    }
+    .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-left: 64px;
+        margin-right: 64px;
+    }
+
+    .grid-item {
+        display: block;
+    }
+}
+</style>

@@ -1,0 +1,103 @@
+---
+interface Props {
+  /** Klaviyo 核心脚本使用的公共 API Key (Site ID)。 */
+  klaviyoApiKey: string;
+
+  /** 电脑端表单的 Form ID（例如：RxcZeJ）。 */
+  desktopFormId: string;
+
+  /** 手机端表单的 Form ID（可以和上面一样）。 */
+  mobileFormId: string;
+}
+
+const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
+---
+
+<section class="klaviyo-form-module">
+  <div class="klaviyo-form-inner">
+
+    {/* 桌面端表单，占位容器 */}
+    <div class="klaviyo-placeholder-wrapper desktop-form-wrapper">
+      <div
+        class={`klaviyo-form-${desktopFormId}`}
+        data-klaviyo-form={desktopFormId}
+      ></div>
+    </div>
+
+    {/* 手机端表单，占位容器 */}
+    <div class="klaviyo-placeholder-wrapper mobile-form-wrapper">
+      <div
+        class={`klaviyo-form-${mobileFormId}`}
+        data-klaviyo-form={mobileFormId}
+      ></div>
+    </div>
+
+  </div>
+</section>
+
+{klaviyoApiKey && (
+  <script
+    type="text/javascript"
+    src={`https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=${klaviyoApiKey}`}
+    async
+  ></script>
+)}
+
+<style>
+/* ------------------------------------- */
+/* 1. 模块容器基础样式 (全宽无边距) */
+/* ------------------------------------- */
+.klaviyo-form-module {
+  /* 全宽 hack */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  z-index: 1;
+  padding: 0;
+}
+
+.klaviyo-form-inner {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 占位符容器的样式 */
+.klaviyo-placeholder-wrapper {
+  width: 100%;
+  text-align: center;
+}
+
+/* ------------------------------------- */
+/* 2. 响应式显示/隐藏 (核心逻辑) */
+/* ------------------------------------- */
+
+/* 默认（电脑端 >= 769px）: 隐藏手机端表单 */
+.mobile-form-wrapper {
+  display: none;
+}
+
+/* 手机端样式 (<= 768px) */
+@media (max-width: 768px) {
+  /* 在手机端隐藏电脑端表单 */
+  .desktop-form-wrapper {
+    display: none;
+  }
+
+  /* 在手机端显示手机端表单 */
+  .mobile-form-wrapper {
+    display: block;
+  }
+}
+
+/* 确保 Klaviyo 注入的内容适应全宽 */
+.klaviyo-placeholder-wrapper :global(iframe),
+.klaviyo-placeholder-wrapper :global(div) {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+</style>

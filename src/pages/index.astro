@@ -1,16 +1,98 @@
 ---
+// src/pages/index.astro
+import Header from '../components/Header.astro';
+import HeroBanner from '../components/HeroBanner.astro';
+import ImageGrid from '../components/ImageGrid.astro';
+import ImageCarouselSplit from '../components/ImageCarouselSplit.astro';
+import ImageGridSix from '../components/ImageGridSix.astro';
+import SimpleTitleModule from '../components/SimpleTitleModule.astro';
+import FullWidthBanner from '../components/FullWidthBanner.astro';
+import KlaviyoFormModule from '../components/Klaviyo.astro';
 
+// 确保您的背景图文件存在于 public/images/ 目录下
+// 关键：这些变量必须在 head 中被使用，因此保持定义
+const DESKTOP_HERO_IMAGE = "/images/Manetta-hero-banner-bg-desktop.jpg";
+const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
 ---
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manetta Modular Bag 众筹预热页 - 智能收纳，无限拓展</title>
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+    <link
+        rel="preload"
+        href={DESKTOP_HERO_IMAGE}
+        as="image"
+        media="(min-width: 769px)"
+    />
+    <link
+        rel="preload"
+        href={MOBILE_HERO_IMAGE}
+        as="image"
+        media="(max-width: 768px)"
+    />
+
+    <link rel="stylesheet" href="src/styles/global.css">
+
+    <link rel="canonical" href="https://your-domain.com/" />
+</head>
+<body>
+
+    <Header />
+
+    <HeroBanner
+        title="Modular Camera Bag - 1 Bag, 3X the Space"
+        description="Modular Design | 3X Expandable Space | Waterproff Protection | Ergonormic Carrying System"
+        desktopImage={DESKTOP_HERO_IMAGE}
+        mobileImage={MOBILE_HERO_IMAGE}
+    />
+
+    <KlaviyoFormModule
+        klaviyoApiKey="X86W3s"
+        desktopFormId="RxcZeJ"
+        mobileFormId="RxcZeJ"
+    />
+
+
+    <ImageGrid title="探索 Manetta Bag 的多样功能与应用场景" />
+
+    <ImageCarouselSplit
+        title="精选产品细节特写"
+        featureImage="/images/grid/grid-7.png"
+        featureAlt="Manetta 包的正面视图"
+    />
+
+    <ImageGridSix title="探索 Manetta Bag 的多样功能与应用场景" />
+
+    <KlaviyoFormModule
+        klaviyoApiKey="X86W3s"
+        desktopFormId="RxcZeJ"
+        mobileFormId="RxcZeJ"
+    />
+
+    <SimpleTitleModule title="MANETTA exists to bring joy through creation and to unlock new possibilities for those who love photography" />
+
+    <FullWidthBanner
+        desktopImage="/images/full-w.png"
+        mobileImage="/images/full-w-mobile.jpg"
+        alt="这是一个响应式全宽横幅"
+        height="" // 可选，不填默认 400px
+    />
+
+    <KlaviyoFormModule
+        klaviyoApiKey="X86W3s"
+        desktopFormId="RxcZeJ"
+        mobileFormId="RxcZeJ"
+    />
+
+    <main>
+        {/* 其他众筹模块将在这里添加，这些模块可能需要宽度限制 */}
+    </main>
+
+    <footer>
+    </footer>
+
+</body>
 </html>

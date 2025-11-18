@@ -1,0 +1,96 @@
+---
+interface Props {
+    desktopImage: string; // 电脑端图片路径
+    mobileImage: string;  // 手机端图片路径
+    alt: string;          // 图片的 Alt 文本
+    height?: string;      // 可选：设置横幅高度 (例如 "300px", "50vh")
+}
+
+const { desktopImage, mobileImage, alt, height = '400px' } = Astro.props; // 默认高度 400px
+---
+
+<section class="full-width-banner" style={`--banner-height: ${height};`}>
+
+    <div class="banner-inner">
+        <picture>
+            <source srcset={mobileImage} media="(max-width: 768px)">
+            <img
+                src={desktopImage}
+                alt={alt}
+                class="banner-image"
+                loading="lazy"
+                decoding="async"
+            >
+        </picture>
+    </div>
+</section>
+
+<style>
+/* ------------------------------------- */
+/* 1. 模块容器基础样式 */
+/* ------------------------------------- */
+.full-width-banner {
+    /* 全宽 hack */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    z-index: 1;
+
+    /* 电脑端保持固定高度 */
+    height: var(--banner-height);
+
+    overflow: hidden;
+    background-color: #f0f0f0;
+
+    /* 性能优化 */
+    content-visibility: auto;
+    contain: layout style;
+}
+
+.banner-inner {
+    width: 100%;
+    height: 100%;
+}
+
+/* 电脑端默认样式 */
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 电脑端保持裁剪填充 */
+    display: block;
+}
+
+/* ------------------------------------- */
+/* 2. 响应式调整 (手机端 - 全宽且不裁剪) */
+/* ------------------------------------- */
+
+@media (max-width: 768px) {
+    .full-width-banner {
+        /* 🚀 关键 1: 移除固定高度，允许横幅高度由图片内容决定 */
+        height: auto;
+        padding: 0; /* 确保没有垂直和水平边距 */
+        max-height: none; /* 移除 max-height 限制 */
+
+        /* 移除 flex 布局，简化结构 */
+        display: block;
+    }
+
+    .banner-inner {
+        width: 100%;
+        /* 🚀 关键 2: 高度自适应 */
+        height: auto;
+        max-width: none; /* 移除 max-width 限制，确保全宽 */
+    }
+
+    .banner-image {
+        /* 🚀 关键 3: 使用 contain 保证图片不被裁剪，保持原图比例 */
+        object-fit: contain;
+        /* 关键 4: 确保高度 auto，宽度 100% */
+        height: auto;
+        width: 100%;
+    }
+}
+</style>

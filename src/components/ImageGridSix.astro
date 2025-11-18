@@ -1,0 +1,184 @@
+---
+// src/components/ImageGridSix.astro
+// 六宫格模块 (3x2 布局) - 最终全宽容器纯净版 + 性能优化
+
+// 模块数据：只使用 6 个图片
+const gridItems = [
+    { src: '/images/grid/grid-1.jpg', alt: '产品特性 1：模块化设计' },
+    { src: '/images/grid/grid-2.png', alt: '产品特性 2：防水面料' },
+    { src: '/images/grid/grid-3.jpg', alt: '产品特性 3：扩展空间' },
+    { src: '/images/grid/grid-4.jpg', alt: '场景 1：户外旅行' },
+    { src: '/images/grid/grid-5.jpg', alt: '场景 2：城市通勤' },
+    { src: '/images/grid/grid-6.jpg', alt: '场景 3：摄影装备' },
+];
+
+interface Props {
+    title: string; // 模块主标题
+}
+
+const { title } = Astro.props;
+
+const itemsToRender = gridItems;
+---
+
+<section class="manetta-image-grid-section">
+    <div class="manetta-container">
+        <h2 class="manetta-grid-title">{title}</h2>
+
+        <div class="manetta-image-grid">
+            {itemsToRender.map((item, index) => (
+                <div class="manetta-grid-item" data-index={index}>
+                    <div class="manetta-aspect-ratio-box">
+                        <img
+                            src={item.src}
+                            alt={item.alt}
+                            loading="lazy"
+                            decoding="async"
+                            width="600"
+                            height="600"
+                            />
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+/* * =======================================================
+ * ImageGridSix.astro 内部样式 (最终全宽容器纯净版 + 性能优化)
+ * =======================================================
+ */
+
+/* ------------------------------------- */
+/* 🎯 性能优化：Content Visibility */
+/* ------------------------------------- */
+.manetta-image-grid-section {
+    /* 默认/手机端边距 */
+    --padding-x: 20px;
+
+    padding: 60px 0;
+    text-align: left;
+    box-sizing: border-box;
+
+    /* 🚀 优化点 2: Content Visibility */
+    content-visibility: auto;
+    contain: layout style;
+
+    /* 模块全宽 */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+/* ------------------------------------- */
+/* 2. manetta-container (纯粹全宽，无 margin, 无 padding, 无 max-width) */
+/* ------------------------------------- */
+.manetta-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.manetta-grid-title {
+    text-align: left;
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+    margin-bottom: 40px;
+    color: #333;
+    box-sizing: border-box;
+
+    /* 标题现在自行设置 padding 来保证边距 */
+    padding: 0 var(--padding-x);
+}
+
+
+/* ------------------------------------- */
+/* 3. manetta-image-grid (全宽，内部 padding 约束内容) */
+/* ------------------------------------- */
+.manetta-image-grid {
+    display: grid;
+    /* 手机端默认：2 列 (3 行) */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+
+    /* Grid 容器本身没有 margin 需要，直接占据 100% 宽度 */
+    width: 100%;
+    margin: 0;
+
+    /* Grid 容器内部使用 padding 来约束图片内容 */
+    padding-left: var(--padding-x);
+    padding-right: var(--padding-x);
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+/* ------------------------------------- */
+/* 4. 1:1 比例 (Padding Hack) */
+/* ------------------------------------- */
+.manetta-aspect-ratio-box {
+    position: relative;
+    padding-bottom: 100%; /* 1:1 比例 */
+    height: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.manetta-aspect-ratio-box img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+}
+
+
+/* ------------------------------------- */
+/* 5. 响应式边距控制 */
+/* ------------------------------------- */
+
+/* 平板端 (≥ 768px) - 48px 边距 */
+@media (min-width: 768px) {
+    .manetta-image-grid-section {
+        /* 🎯 平板端边距：48px */
+        --padding-x: 48px;
+    }
+    .manetta-image-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+}
+
+/* 桌面端 (≥ 1025px) - 64px 边距 */
+@media (min-width: 1025px) {
+    .manetta-image-grid-section {
+        /* 🎯 桌面端边距：64px */
+        --padding-x: 64px;
+    }
+}
+
+/* 其他样式 (Grid Item 和 Hover 效果) */
+.manetta-grid-item {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out;
+    will-change: transform;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+}
+.manetta-grid-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+.manetta-grid-item:hover .manetta-aspect-ratio-box img {
+    transform: scale(1.05);
+}
+</style>

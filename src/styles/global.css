@@ -1,0 +1,45 @@
+/*
+ * =======================================================
+ * GLOBAL STYLESHEET (全局样式)
+ * 目的: CSS Reset (清除白边)、基础排版设置
+ * =======================================================
+ */
+
+/* 1. CSS Reset (解决全页面白边和不一致性问题) */
+* {
+    /* 统一使用盒模型 */
+    box-sizing: border-box;
+    /* 统一清除所有元素的默认外边距和内边距 */
+    margin: 0;
+    padding: 0;
+}
+
+/* 2. 核心 HTML/BODY 设置 (确保全宽和防止溢出) */
+html, body {
+    /* 确保页面宽度完全占满视口 */
+    width: 100%;
+    /* 关键：防止任何元素意外超出视口宽度，避免出现水平滚动条和白边 */
+    overflow-x: hidden;
+    /* 基础排版设置 */
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background-color: #ffffff;
+}
+
+/* 3. 基础元素美化 */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    line-height: 1.1;
+    font-weight: bold;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
