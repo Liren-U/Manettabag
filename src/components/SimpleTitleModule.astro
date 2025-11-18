@@ -7,22 +7,16 @@ const { title } = Astro.props;
 ---
 
 <section class="simple-title-module">
-
     <div class="module-inner">
-
         <div class="content-split-wrapper">
-
             <div class="split-column left-title-column">
                 <h2 class="module-main-title">
                     {title}
                 </h2>
             </div>
-
             <div class="split-column right-empty-column" aria-hidden="true">
-                </div>
-
+            </div>
         </div>
-
     </div>
 </section>
 
@@ -41,8 +35,9 @@ const { title } = Astro.props;
     z-index: 1;
 
     padding-top: 80px;
-    padding-bottom: 80px;
-    background-color: #f7f7f7; /* 浅灰色背景方便区分 */
+    /* 🚀 要求 1: 移除底部边距 */
+    padding-bottom: 0;
+    background-color: #f7f7f7;
 }
 
 .module-inner {
@@ -58,7 +53,7 @@ const { title } = Astro.props;
 .content-split-wrapper {
     display: flex;
     justify-content: center;
-    gap: 10%; /* 与之前的模块保持一致的间隙 */
+    gap: 10%; /* 默认间隙 */
 
     /* 电脑端边距：64px */
     margin-left: 64px;
@@ -66,8 +61,7 @@ const { title } = Astro.props;
 }
 
 .split-column {
-    /* 左右各占据 45% 的宽度 */
-    flex: 0 0 45%;
+    flex-grow: 1; /* 保证 Flex 容器内的基本行为 */
 }
 
 /* ------------------------------------- */
@@ -78,7 +72,7 @@ const { title } = Astro.props;
     font-size: clamp(2em, 3.5vw, 3em);
     line-height: 1.2;
     color: #333;
-    margin: 0; /* 移除默认的 H2 边距 */
+    margin: 0;
     font-family: 'Manetta-Montserrat', sans-serif;
     font-weight: 300;
 }
@@ -88,19 +82,49 @@ const { title } = Astro.props;
 /* 4. 响应式调整 */
 /* ------------------------------------- */
 
-/* 平板端样式 (小于 1024px) */
-@media (max-width: 1024px) {
+
+/* 🚀 修正平板端宽度 (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
     .content-split-wrapper {
         margin-left: 48px;
         margin-right: 48px;
-        gap: 20px;
+        gap: 5%; /* 调整间隙以适应宽度 */
+    }
+
+    .left-title-column {
+        /* 要求 2: 平板端左侧标题区域占据 70% 宽度 */
+        flex: 0 0 70%;
+    }
+    .right-empty-column {
+        /* 右侧留白区域占据 25% 宽度 (70% + 5% gap + 25% = 100%) */
+        flex: 0 0 25%;
     }
 }
+
+
+/* 🚀 修正桌面端宽度 (大于 1025px) */
+@media (min-width: 1025px) {
+    .content-split-wrapper {
+        margin-left: 64px;
+        margin-right: 64px;
+        gap: 5%; /* 调整间隙 */
+    }
+
+    .left-title-column {
+        /* 要求 3: 桌面端左侧标题区域占据 50% 宽度 */
+        flex: 0 0 50%;
+    }
+    .right-empty-column {
+        /* 右侧留白区域占据 45% 宽度 (50% + 5% gap + 45% = 100%) */
+        flex: 0 0 45%;
+    }
+}
+
 
 /* 手机端样式 (小于 768px) */
 @media (max-width: 768px) {
     .content-split-wrapper {
-        /* 手机端不再分栏，左侧标题占据全宽 */
+        /* 手机端不再分栏 */
         flex-direction: column;
         gap: 30px;
         margin-left: 20px;
@@ -111,7 +135,7 @@ const { title } = Astro.props;
         flex: 0 0 100%;
     }
 
-    /* 隐藏右侧占位区域，因为它不再需要保持布局 */
+    /* 隐藏右侧占位区域 */
     .right-empty-column {
         display: none;
     }
