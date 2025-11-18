@@ -5,6 +5,22 @@
  * =======================================================
  */
 
+/* 定义 Montserrat-Light 字体 */
+@font-face {
+    /* 为字体指定一个名称，例如 Manetta-Light */
+    font-family: 'Manetta-Montserrat';
+
+    /* 指向 public 目录下的字体文件 */
+    src: url('public/fonts/Montserrat-Light.ttf') format('truetype');
+
+    /* 建议设置 font-weight 和 font-style */
+    font-weight: 300; /* Light 通常对应 300 */
+    font-style: normal;
+
+    /* 优化字体加载 */
+    font-display: swap;
+}
+
 /* 1. CSS Reset (解决全页面白边和不一致性问题) */
 * {
     /* 统一使用盒模型 */
