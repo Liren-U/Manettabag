@@ -1,10 +1,9 @@
 ---
 // src/pages/vip-subscribe.astro
-// Assuming Header and Footer components are set up
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
-const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
+const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 ---
 
 <!DOCTYPE html>
@@ -23,57 +22,54 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
 
     <main class="checkout-page-main">
         <div class="checkout-container">
-            <h1>VIP Subscription Checkout</h1>
+            <h1>Secure VIP Subscription Checkout</h1>
 
-            <section class="plan-summary">
-                <h2>Your Subscription</h2>
-                <p>Manetta VIP Subscription: <strong id="plan-name">Annual Premium</strong></p>
-                <p>Price: <strong id="plan-price">$ 5.00 USD / Year</strong></p>
-                <a href="/offer">Change Offer</a>
-            </section>
+            <form id="payment-form" class="unified-checkout-form">
+                
+                <div class="price-summary-box">
+                    <h2>Total Amount Due</h2>
+                    <p class="price-tag">$ 5.00 USD</p>
+                    <p class="plan-info">Manetta VIP Subscription (Annual)</p>
+                </div>
 
-            <section class="payment-form-section">
-                <h2>Billing and Payment</h2>
-
-                <form id="payment-form">
-                    <div class="custom-form-fields">
-                        <div class="input-group">
-                            <label for="customer-email">Email Address</label>
-                            <input type="email" id="customer-email" required placeholder="Enter your email address">
-                        </div>
-                        <div class="input-group">
-                            <label for="customer-name">Full Name</label>
-                            <input type="text" id="customer-name" required placeholder="Enter your full name">
-                        </div>
+                <h3 class="section-title">1. Your Contact Details</h3>
+                <div class="custom-form-fields">
+                    <div class="input-group">
+                        <label for="customer-name">Full Name</label>
+                        <input type="text" id="customer-name" required placeholder="Enter your full name">
                     </div>
-
-                    <h3 class="card-details-title">Card Details</h3>
-                    
-                    <div id="payment-element-container">
-                        <p>Loading payment form...</p>
+                    <div class="input-group">
+                        <label for="customer-email">Email Address (for Receipt & Account)</label>
+                        <input type="email" id="customer-email" required placeholder="Enter your email address">
                     </div>
+                </div>
 
-                    <div id="payment-message" role="alert"></div>
+                <h3 class="section-title">2. Payment Information</h3>
+                <div id="payment-element-container" class="payment-card-box">
+                    <p>Loading card details...</p>
+                </div>
 
-                    <div class="terms-and-conditions">
-                        <input type="checkbox" id="agree-terms" required checked>
-                        <label for="agree-terms">I have read and agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</label>
-                    </div>
+                <div id="payment-message" role="alert"></div>
 
-                    <button id="submit-payment-btn">
-                        <span id="button-text">Confirm Payment $5.00</span>
-                    </button>
+                <div class="terms-and-conditions">
+                    <input type="checkbox" id="agree-terms" required checked>
+                    <label for="agree-terms">I have read and agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</label>
+                </div>
 
-                    <p class="security-info">Your transaction is secured with SSL encryption.</p>
-                </form>
-            </section>
-        </div>
+                <button id="submit-payment-btn">
+                    <span id="button-text">Pay $5.00 Now</span>
+                </button>
+
+                <p class="security-info">Securely processed by Stripe. SSL encryption.</p>
+            </form>
+            </div>
     </main>
 
     <Footer />
 
     <script is:inline>
-        // Use your provided Public Key (Test Key)
+        // --- SCRIPT LOGIC (REMAINS THE SAME) ---
+        // Public Key (Test Key retained)
         const stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
 
         let elements;
@@ -83,20 +79,16 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
         const messageContainer = document.getElementById('payment-message');
         const termsCheckbox = document.getElementById('agree-terms');
 
-        // New form field references
+        // Form field references
         const customerEmail = document.getElementById('customer-email');
         const customerName = document.getElementById('customer-name');
 
         const backendApiUrl = '/api/create-payment-intent';
 
-        // ----------------------------------------------------
-        // 1. Initialize Payment Flow
-        // ----------------------------------------------------
         initialize();
 
         async function initialize() {
             try {
-                // Call backend API to get clientSecret
                 const response = await fetch(backendApiUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -109,16 +101,15 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
                     return;
                 }
 
-                // Initialize Elements object
                 elements = stripe.elements({ clientSecret });
 
-                // 🚀 KEY CHANGE: Configure Payment Element to NOT collect name/email 
+                // Configure Payment Element to NOT collect name/email 
                 // We collect them in the custom HTML form instead.
                 const paymentElement = elements.create("payment", {
                     fields: {
                         billingDetails: {
-                            name: 'never', // We collect name manually
-                            email: 'never', // We collect email manually
+                            name: 'never',
+                            email: 'never',
                         }
                     }
                 });
@@ -137,9 +128,6 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
             }
         }
 
-        // ----------------------------------------------------
-        // 2. Form Submission Handling
-        // ----------------------------------------------------
         form.addEventListener("submit", handleSubmit);
 
         async function handleSubmit(e) {
@@ -152,12 +140,10 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
                 return;
             }
 
-            // Call Stripe API to confirm payment
             const { error } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
                     return_url: `${window.location.origin}/payment-success`,
-                    // 🚀 KEY CHANGE: Pass collected Name and Email from our custom fields
                     payment_method_data: {
                         billing_details: {
                             name: customerName.value,
@@ -167,7 +153,6 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
                 },
             });
 
-            // Handle errors
             if (error) {
                 if (error.type === "card_error" || error.type === "validation_error") {
                     messageContainer.textContent = error.message;
@@ -179,9 +164,6 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
             setLoading(false);
         }
 
-        // ----------------------------------------------------
-        // 3. Helper Functions
-        // ----------------------------------------------------
         function setLoading(isLoading) {
             const buttonText = document.getElementById("button-text");
             if (isLoading) {
@@ -189,7 +171,7 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
                 buttonText.textContent = "Processing...";
             } else {
                 submitButton.disabled = !termsCheckbox.checked;
-                buttonText.textContent = "Confirm Payment $5.00";
+                buttonText.textContent = "Pay $5.00 Now";
             }
         }
     </script>
@@ -199,51 +181,76 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
 
 <style>
 /* ------------------------------------- */
-/* BASE & FORM STYLES */
+/* BASE STYLES */
 /* ------------------------------------- */
     .checkout-page-main {
-        padding: 60px 20px;
-        min-height: 80vh;
-        background-color: #f9f9f9;
+        padding: 40px 20px;
+        min-height: 85vh;
+        background-color: #f0f2f5; /* Light background for contrast */
     }
 
     .checkout-container {
-        max-width: 600px;
+        max-width: 500px;
         margin: 0 auto;
-        padding: 30px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
+        font-size: 2em;
+        color: #333;
     }
     
-    .plan-summary, .payment-form-section {
-        margin-bottom: 30px;
-        padding: 20px;
-        border: 1px solid #eee;
-        border-radius: 6px;
+    .unified-checkout-form {
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+/* ------------------------------------- */
+/* PRICE SUMMARY BOX */
+/* ------------------------------------- */
+    .price-summary-box {
+        text-align: center;
+        padding: 15px 0 25px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+    }
+    
+    .price-summary-box h2 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .price-tag {
+        font-size: 2.5em;
+        font-weight: 700;
+        color: #1a73e8; /* Prominent color for the price */
+        margin: 0;
+    }
+    
+    .plan-info {
+        font-size: 0.9em;
+        color: #999;
+        margin-top: 5px;
     }
 
-    .plan-summary a {
-        display: block;
-        margin-top: 10px;
-        color: #007bff;
-        text-decoration: none;
-    }
-    
-    .card-details-title {
-        font-size: 1.2em;
+/* ------------------------------------- */
+/* FORM SECTIONS & INPUTS */
+/* ------------------------------------- */
+    .section-title {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #333;
         margin-top: 25px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #f0f0f0;
     }
 
-/* ------------------------------------- */
-/* CUSTOM INPUT STYLES */
-/* ------------------------------------- */
     .custom-form-fields .input-group {
         margin-bottom: 15px;
     }
@@ -258,44 +265,57 @@ const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
     
     .custom-form-fields input {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border: 1px solid #ccc;
-        border-radius: 4px;
+        border-radius: 6px;
         box-sizing: border-box;
+        font-size: 1em;
+    }
+    
+    .payment-card-box {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        min-height: 40px; /* Placeholder minimum height for loading */
     }
 
 /* ------------------------------------- */
 /* BUTTONS & MESSAGES */
 /* ------------------------------------- */
+    .terms-and-conditions {
+        margin: 25px 0 15px;
+        font-size: 0.9em;
+    }
+
     #submit-payment-btn {
         width: 100%;
-        padding: 12px;
-        background-color: #007bff;
+        padding: 14px;
+        background-color: #1a73e8; /* Google Blue */
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         font-size: 1.1em;
         cursor: pointer;
         transition: background-color 0.3s;
-        margin-top: 20px;
+        font-weight: 600;
     }
 
     #submit-payment-btn:disabled {
-        background-color: #ccc;
+        background-color: #99bfea;
         cursor: not-allowed;
     }
 
     #payment-message {
-        color: #cc0000;
+        color: #d93025; /* Error red */
         font-weight: bold;
-        margin-top: 10px;
+        margin-top: 15px;
         text-align: center;
     }
 
     .security-info {
         text-align: center;
         margin-top: 15px;
-        font-size: 0.85em;
-        color: #666;
+        font-size: 0.8em;
+        color: #888;
     }
 </style>
