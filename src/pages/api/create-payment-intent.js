@@ -2,21 +2,32 @@
 
 import Stripe from 'stripe';
 
-// Initializes Stripe using the secret key set in Cloudflare's environment variables.
-// Astro/Cloudflare 适配器会自动读取 process.env.STRIPE_SECRET_KEY
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+// 临时使用 'any' 以便在没有密钥的情况下也能编译，但运行时会失败
+const secretKey = process.env.STRIPE_SECRET_KEY;
+
+// ******************************************************
+// *** DEBUG: 检查密钥是否加载 ***
+// ******************************************************
+if (!secretKey) {
+    console.error('CRITICAL ERROR: STRIPE_SECRET_KEY environment variable is NOT set.');
+}
+// ******************************************************
+
+const stripe = new Stripe(secretKey as string, {
     apiVersion: '2023-10-16',
 });
 
-// Astro API 路由格式：使用 HTTP 方法（POST）命名导出
-// context 对象被解构，但我们实际上只需要它提供运行环境（如 process.env）
 export const POST = async ({ request }) => {
     try {
-        // 由于我们使用了 POST 导出，Astro 已经帮我们过滤了请求方法，
-        // 原始的 'if (context.request.method !== "POST")' 检查可以省略。
+        if (!secretKey) {
+            // 如果密钥缺失，返回一个更清晰的 500 响应
+            return new Response(
+                JSON.stringify({ error: 'Server configuration error: Stripe key is missing.' }),
+                { status: 500, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
 
-        // 定义支付金额 ($5.00 USD)，单位为分
-        const amount = 500;
+        const amount = 500; 
 
         // 1. Create the PaymentIntent with Stripe
         const paymentIntent = await stripe.paymentIntents.create({
@@ -26,16 +37,10 @@ export const POST = async ({ request }) => {
             description: 'Manetta VIP Subscription - $5 USD',
         });
 
-        // 2. Return the clientSecret to the frontend to authorize the form
-        // Astro 的 Response 遵循标准 Web API Response
+        // 2. Success Response
         return new Response(
             JSON.stringify({ clientSecret: paymentIntent.client_secret }),
-            {
-                status: 200,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
         );
 
     } catch (error) {
@@ -43,13 +48,8 @@ export const POST = async ({ request }) => {
 
         // 错误响应
         return new Response(
-            JSON.stringify({ error: 'Failed to create payment intent.' }),
-            {
-                status: 500,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
+            JSON.stringify({ error: 'Failed to create payment intent. Check server logs for details.' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
         );
     }
 }
