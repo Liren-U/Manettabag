@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.11",
+    "@stripe/stripe-js": "^8.5.2",
     "astro": "^5.15.5",
     "stripe": "^20.0.0"
   }
