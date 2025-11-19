@@ -1,13 +1,14 @@
 ---
 // src/pages/vip-subscribe.astro
+// Assuming Header and Footer components are set up
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
-const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
+const PAGE_TITLE = "VIP Subscription Checkout - Manetta Bag";
 ---
 
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,35 +23,48 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
 
     <main class="checkout-page-main">
         <div class="checkout-container">
-            <h1>VIP 订阅结账</h1>
+            <h1>VIP Subscription Checkout</h1>
 
             <section class="plan-summary">
-                <h2>您的订阅方案</h2>
-                <p>Manetta VIP 订阅：<strong id="plan-name">年度尊享版</strong></p>
-                <p>价格：<strong id="plan-price">$ 5.00 USD / 年</strong></p>
-                <a href="/offer">返回优惠页修改</a>
+                <h2>Your Subscription</h2>
+                <p>Manetta VIP Subscription: <strong id="plan-name">Annual Premium</strong></p>
+                <p>Price: <strong id="plan-price">$ 5.00 USD / Year</strong></p>
+                <a href="/offer">Change Offer</a>
             </section>
 
             <section class="payment-form-section">
-                <h2>选择支付方式</h2>
+                <h2>Billing and Payment</h2>
 
                 <form id="payment-form">
+                    <div class="custom-form-fields">
+                        <div class="input-group">
+                            <label for="customer-email">Email Address</label>
+                            <input type="email" id="customer-email" required placeholder="Enter your email address">
+                        </div>
+                        <div class="input-group">
+                            <label for="customer-name">Full Name</label>
+                            <input type="text" id="customer-name" required placeholder="Enter your full name">
+                        </div>
+                    </div>
+
+                    <h3 class="card-details-title">Card Details</h3>
+                    
                     <div id="payment-element-container">
-                        <p>正在加载支付组件...</p>
+                        <p>Loading payment form...</p>
                     </div>
 
                     <div id="payment-message" role="alert"></div>
 
                     <div class="terms-and-conditions">
                         <input type="checkbox" id="agree-terms" required checked>
-                        <label for="agree-terms">我已阅读并同意 <a href="/terms" target="_blank">服务条款</a> 和 <a href="/privacy" target="_blank">隐私政策</a>。</label>
+                        <label for="agree-terms">I have read and agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</label>
                     </div>
 
                     <button id="submit-payment-btn">
-                        <span id="button-text">确认支付 $5.00</span>
+                        <span id="button-text">Confirm Payment $5.00</span>
                     </button>
 
-                    <p class="security-info">您的交易安全受到 SSL 加密保护。</p>
+                    <p class="security-info">Your transaction is secured with SSL encryption.</p>
                 </form>
             </section>
         </div>
@@ -59,7 +73,7 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
     <Footer />
 
     <script is:inline>
-        // 🚨 替换为您的 Stripe Public Key (pk_live_xxxx 或 pk_test_xxxx)
+        // Use your provided Public Key (Test Key)
         const stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
 
         let elements;
@@ -69,52 +83,62 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
         const messageContainer = document.getElementById('payment-message');
         const termsCheckbox = document.getElementById('agree-terms');
 
-        // 这是步骤 1 中创建的 Cloudflare Functions API 路由
+        // New form field references
+        const customerEmail = document.getElementById('customer-email');
+        const customerName = document.getElementById('customer-name');
+
         const backendApiUrl = '/api/create-payment-intent';
 
         // ----------------------------------------------------
-        // 1. 初始化支付流程
+        // 1. Initialize Payment Flow
         // ----------------------------------------------------
         initialize();
 
         async function initialize() {
             try {
-                // 调用后端 API 获取 clientSecret
+                // Call backend API to get clientSecret
                 const response = await fetch(backendApiUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    // Body 可以为空，因为金额已在后端固定为 500
                 });
 
                 const { clientSecret, error: apiError } = await response.json();
 
                 if (apiError || !clientSecret) {
-                    messageContainer.textContent = apiError || "无法启动支付流程。请检查后端配置。";
+                    messageContainer.textContent = apiError || "Could not start payment process. Please check backend config.";
                     return;
                 }
 
-                // 初始化 Elements 对象
+                // Initialize Elements object
                 elements = stripe.elements({ clientSecret });
 
-                const paymentElement = elements.create("payment");
+                // 🚀 KEY CHANGE: Configure Payment Element to NOT collect name/email 
+                // We collect them in the custom HTML form instead.
+                const paymentElement = elements.create("payment", {
+                    fields: {
+                        billingDetails: {
+                            name: 'never', // We collect name manually
+                            email: 'never', // We collect email manually
+                        }
+                    }
+                });
                 paymentElement.mount(paymentElementContainer);
 
-                // 监听条款勾选框并启用/禁用按钮
+                // Listener for terms checkbox
                 const updateButtonState = () => {
                     submitButton.disabled = !termsCheckbox.checked;
                 };
                 termsCheckbox.addEventListener('change', updateButtonState);
-
-                updateButtonState(); // 初始化按钮状态
+                updateButtonState();
 
             } catch (error) {
                 console.error("Error fetching client secret:", error);
-                messageContainer.textContent = "支付初始化失败。请检查网络或配置。";
+                messageContainer.textContent = "Payment initialization failed. Check network or configuration.";
             }
         }
 
         // ----------------------------------------------------
-        // 2. 表单提交处理
+        // 2. Form Submission Handling
         // ----------------------------------------------------
         form.addEventListener("submit", handleSubmit);
 
@@ -123,52 +147,60 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
             setLoading(true);
 
             if (!termsCheckbox.checked) {
-                messageContainer.textContent = "请先同意服务条款。";
+                messageContainer.textContent = "Please agree to the terms of service.";
                 setLoading(false);
                 return;
             }
 
-            // 调用 Stripe API 确认支付
+            // Call Stripe API to confirm payment
             const { error } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
-                    // 支付成功后重定向到此 URL
                     return_url: `${window.location.origin}/payment-success`,
+                    // 🚀 KEY CHANGE: Pass collected Name and Email from our custom fields
+                    payment_method_data: {
+                        billing_details: {
+                            name: customerName.value,
+                            email: customerEmail.value,
+                        },
+                    },
                 },
             });
 
-            // 只有在发生错误时才会执行到这里
+            // Handle errors
             if (error) {
                 if (error.type === "card_error" || error.type === "validation_error") {
                     messageContainer.textContent = error.message;
                 } else {
-                    messageContainer.textContent = "发生未知错误。请稍后重试。";
+                    messageContainer.textContent = "An unknown error occurred. Please try again.";
                 }
             }
-            // 如果成功，用户将被重定向到 return_url
 
             setLoading(false);
         }
 
         // ----------------------------------------------------
-        // 3. 辅助函数
+        // 3. Helper Functions
         // ----------------------------------------------------
         function setLoading(isLoading) {
             const buttonText = document.getElementById("button-text");
             if (isLoading) {
                 submitButton.disabled = true;
-                buttonText.textContent = "处理中...";
+                buttonText.textContent = "Processing...";
             } else {
                 submitButton.disabled = !termsCheckbox.checked;
-                buttonText.textContent = "确认支付 $5.00";
+                buttonText.textContent = "Confirm Payment $5.00";
             }
         }
     </script>
-    </body>
+    
+</body>
 </html>
 
 <style>
-    /* 针对支付页面的基础样式 */
+/* ------------------------------------- */
+/* BASE & FORM STYLES */
+/* ------------------------------------- */
     .checkout-page-main {
         padding: 60px 20px;
         min-height: 80vh;
@@ -188,7 +220,7 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
         text-align: center;
         margin-bottom: 30px;
     }
-
+    
     .plan-summary, .payment-form-section {
         margin-bottom: 30px;
         padding: 20px;
@@ -200,8 +232,41 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
         display: block;
         margin-top: 10px;
         color: #007bff;
+        text-decoration: none;
+    }
+    
+    .card-details-title {
+        font-size: 1.2em;
+        margin-top: 25px;
+        margin-bottom: 10px;
     }
 
+/* ------------------------------------- */
+/* CUSTOM INPUT STYLES */
+/* ------------------------------------- */
+    .custom-form-fields .input-group {
+        margin-bottom: 15px;
+    }
+    
+    .custom-form-fields label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 0.9em;
+        color: #555;
+    }
+    
+    .custom-form-fields input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+/* ------------------------------------- */
+/* BUTTONS & MESSAGES */
+/* ------------------------------------- */
     #submit-payment-btn {
         width: 100%;
         padding: 12px;
@@ -221,9 +286,10 @@ const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
     }
 
     #payment-message {
-        color: red;
+        color: #cc0000;
         font-weight: bold;
         margin-top: 10px;
+        text-align: center;
     }
 
     .security-info {
