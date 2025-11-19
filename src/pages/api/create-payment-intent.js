@@ -2,20 +2,25 @@
 
 import Stripe from 'stripe';
 
-const secretKey = process.env.STRIPE_SECRET_KEY;
+// 移除顶层的 const secretKey = process.env.STRIPE_SECRET_KEY;
 
 export const POST = async ({ request }) => {
+    // *** 1. 在请求处理函数内部读取变量 ***
+    // 这样做可以确保在变量被注入 Worker 运行时后才尝试访问它。
+    const secretKey = process.env.STRIPE_SECRET_KEY; 
+
     try {
-        // *** 1. 明确检查密钥是否存在 ***
+        // 明确检查密钥是否存在
         if (!secretKey) {
-            console.error('DEBUG: STRIPE_SECRET_KEY is undefined or empty!');
+            // 尽管它可能现在能读到，但保持检查是良好的做法。
+            console.error('DEBUG: STRIPE_SECRET_KEY is undefined or empty! (Inside POST)');
             return new Response(
                 JSON.stringify({ error: 'Server Config Error: Stripe Secret Key is missing from ENV.' }),
                 { status: 500, headers: { 'Content-Type': 'application/json' } }
             );
         }
 
-        // *** 2. 只有密钥存在时才初始化 Stripe ***
+        // 只有密钥存在时才初始化 Stripe
         const stripe = new Stripe(secretKey, {
             apiVersion: '2023-10-16',
         });
@@ -36,7 +41,7 @@ export const POST = async ({ request }) => {
         );
 
     } catch (error) {
-        // 如果 Stripe 初始化成功但 PaymentIntent 创建失败，会在这里捕获
+        // ... (错误处理保持不变)
         console.error('Stripe PaymentIntent Creation Error:', error);
 
         return new Response(

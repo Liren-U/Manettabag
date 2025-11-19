@@ -23,7 +23,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
             <h1>Secure VIP Subscription Checkout</h1>
 
             <form id="payment-form" class="unified-checkout-form">
-                
+
                 <div class="price-summary-box">
                     <h2>Total Amount Due</h2>
                     <p class="price-tag">$ 5.00 USD</p>
@@ -64,16 +64,16 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     </main>
 
     <Footer />
-    
-    <script src="https://js.stripe.com/v3/"></script> 
+
+    <script src="https://js.stripe.com/v3/"></script>
 
     <script>
         // 告诉 TypeScript 编译器全局存在 Stripe 对象
-        declare var Stripe: any; 
+        declare var Stripe: any;
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            // Public Key 
+            // Public Key
             const stripe = Stripe('pk_live_51QkM6jJrrVdgshd2SopK4pf9x8DeLu8ocJWJNtbGNveVkQcnRQcAM3TQbTohIchI0HqCT6lh474GILSFKfLxUtrj00XeN0aHoY');
 
             // 使用类型断言，解决所有 VS Code 警告
@@ -120,7 +120,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
                     elements = stripe.elements({ clientSecret });
 
-                    // Configure Payment Element to NOT collect name/email 
+                    // Configure Payment Element to NOT collect name/email
                     const paymentElement = elements.create("payment", {
                         fields: {
                             billingDetails: {
@@ -146,7 +146,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
             form.addEventListener("submit", handleSubmit as (event: Event) => void);
 
-            async function handleSubmit(e: SubmitEvent) { 
+            async function handleSubmit(e: SubmitEvent) {
                 e.preventDefault();
                 setLoading(true);
 
@@ -180,7 +180,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                 setLoading(false);
             }
 
-            function setLoading(isLoading: boolean) { 
+            function setLoading(isLoading: boolean) {
                 const buttonText = document.getElementById("button-text") as HTMLSpanElement;
                 if (isLoading) {
                     submitButton.disabled = true;
@@ -193,7 +193,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
         }); // DOMContentLoaded 结束
     </script>
-    
+
 </body>
 </html>
 
@@ -218,14 +218,14 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         font-size: 2em;
         color: #333;
     }
-    
+
     .unified-checkout-form {
         padding: 30px;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     }
-    
+
 /* ------------------------------------- */
 /* PRICE SUMMARY BOX */
 /* ------------------------------------- */
@@ -235,21 +235,21 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         border-bottom: 1px solid #eee;
         margin-bottom: 20px;
     }
-    
+
     .price-summary-box h2 {
         font-size: 1.1em;
         font-weight: 500;
         color: #666;
         margin-bottom: 5px;
     }
-    
+
     .price-tag {
         font-size: 2.5em;
         font-weight: 700;
         color: #1a73e8; /* Prominent color for the price */
         margin: 0;
     }
-    
+
     .plan-info {
         font-size: 0.9em;
         color: #999;
@@ -272,7 +272,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     .custom-form-fields .input-group {
         margin-bottom: 15px;
     }
-    
+
     .custom-form-fields label {
         display: block;
         margin-bottom: 5px;
@@ -280,7 +280,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         font-size: 0.9em;
         color: #555;
     }
-    
+
     .custom-form-fields input {
         width: 100%;
         padding: 12px;
@@ -289,7 +289,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         box-sizing: border-box;
         font-size: 1em;
     }
-    
+
     .payment-card-box {
         padding: 10px;
         border: 1px solid #ddd;
