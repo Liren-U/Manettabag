@@ -1,0 +1,76 @@
+---
+// src/components/Footer.astro
+
+// 获取当前年份，用于版权信息
+const currentYear = new Date().getFullYear();
+const siteName = "Manetta Bag";
+const siteDomain = "manettabag.com";
+---
+
+<footer class="main-footer">
+    <div class="footer-container">
+        <p class="copyright-text">
+            &copy; {currentYear} {siteName}. All Rights Reserved.
+            | <a href={`https://${siteDomain}`} target="_blank" rel="noopener noreferrer">{siteDomain}</a>
+        </p>
+
+        <div class="footer-links">
+            <a href="/privacy">隐私政策</a>
+            <span aria-hidden="true">|</span>
+            <a href="/terms">服务条款</a>
+        </div>
+    </div>
+</footer>
+
+<style>
+.main-footer {
+    width: 100%;
+    padding: 30px 20px;
+    background-color: #333; /* 深色背景，与主体内容区分 */
+    color: #fff; /* 白色文字 */
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* 元素间距 */
+}
+
+.copyright-text a,
+.footer-links a {
+    color: #ccc; /* 浅灰色链接 */
+    transition: color 0.3s ease;
+}
+
+.copyright-text a:hover,
+.footer-links a:hover {
+    color: #fff; /* 悬停时变亮 */
+}
+
+.footer-links {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-links span {
+    color: #666; /* 分隔符颜色 */
+}
+
+/* 移动端优化 */
+@media (max-width: 600px) {
+    .main-footer {
+        padding: 20px 10px;
+    }
+    .footer-links {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+</style>
