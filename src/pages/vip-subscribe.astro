@@ -1,0 +1,235 @@
+---
+// src/pages/vip-subscribe.astro
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const PAGE_TITLE = "VIP 订阅结账 - Manetta Bag";
+---
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{PAGE_TITLE}</title>
+    <link rel="stylesheet" href="/global.css" />
+
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+    <Header />
+
+    <main class="checkout-page-main">
+        <div class="checkout-container">
+            <h1>VIP 订阅结账</h1>
+
+            <section class="plan-summary">
+                <h2>您的订阅方案</h2>
+                <p>Manetta VIP 订阅：<strong id="plan-name">年度尊享版</strong></p>
+                <p>价格：<strong id="plan-price">$ 5.00 USD / 年</strong></p>
+                <a href="/offer">返回优惠页修改</a>
+            </section>
+
+            <section class="payment-form-section">
+                <h2>选择支付方式</h2>
+
+                <form id="payment-form">
+                    <div id="payment-element-container">
+                        <p>正在加载支付组件...</p>
+                    </div>
+
+                    <div id="payment-message" role="alert"></div>
+
+                    <div class="terms-and-conditions">
+                        <input type="checkbox" id="agree-terms" required checked>
+                        <label for="agree-terms">我已阅读并同意 <a href="/terms" target="_blank">服务条款</a> 和 <a href="/privacy" target="_blank">隐私政策</a>。</label>
+                    </div>
+
+                    <button id="submit-payment-btn">
+                        <span id="button-text">确认支付 $5.00</span>
+                    </button>
+
+                    <p class="security-info">您的交易安全受到 SSL 加密保护。</p>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <Footer />
+
+    <script is:inline>
+        // 🚨 替换为您的 Stripe Public Key (pk_live_xxxx 或 pk_test_xxxx)
+        const stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
+
+        let elements;
+        const form = document.getElementById('payment-form');
+        const paymentElementContainer = document.getElementById('payment-element-container');
+        const submitButton = document.getElementById('submit-payment-btn');
+        const messageContainer = document.getElementById('payment-message');
+        const termsCheckbox = document.getElementById('agree-terms');
+
+        // 这是步骤 1 中创建的 Cloudflare Functions API 路由
+        const backendApiUrl = '/api/create-payment-intent';
+
+        // ----------------------------------------------------
+        // 1. 初始化支付流程
+        // ----------------------------------------------------
+        initialize();
+
+        async function initialize() {
+            try {
+                // 调用后端 API 获取 clientSecret
+                const response = await fetch(backendApiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    // Body 可以为空，因为金额已在后端固定为 500
+                });
+
+                const { clientSecret, error: apiError } = await response.json();
+
+                if (apiError || !clientSecret) {
+                    messageContainer.textContent = apiError || "无法启动支付流程。请检查后端配置。";
+                    return;
+                }
+
+                // 初始化 Elements 对象
+                elements = stripe.elements({ clientSecret });
+
+                const paymentElement = elements.create("payment");
+                paymentElement.mount(paymentElementContainer);
+
+                // 监听条款勾选框并启用/禁用按钮
+                const updateButtonState = () => {
+                    submitButton.disabled = !termsCheckbox.checked;
+                };
+                termsCheckbox.addEventListener('change', updateButtonState);
+
+                updateButtonState(); // 初始化按钮状态
+
+            } catch (error) {
+                console.error("Error fetching client secret:", error);
+                messageContainer.textContent = "支付初始化失败。请检查网络或配置。";
+            }
+        }
+
+        // ----------------------------------------------------
+        // 2. 表单提交处理
+        // ----------------------------------------------------
+        form.addEventListener("submit", handleSubmit);
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            setLoading(true);
+
+            if (!termsCheckbox.checked) {
+                messageContainer.textContent = "请先同意服务条款。";
+                setLoading(false);
+                return;
+            }
+
+            // 调用 Stripe API 确认支付
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    // 支付成功后重定向到此 URL
+                    return_url: `${window.location.origin}/payment-success`,
+                },
+            });
+
+            // 只有在发生错误时才会执行到这里
+            if (error) {
+                if (error.type === "card_error" || error.type === "validation_error") {
+                    messageContainer.textContent = error.message;
+                } else {
+                    messageContainer.textContent = "发生未知错误。请稍后重试。";
+                }
+            }
+            // 如果成功，用户将被重定向到 return_url
+
+            setLoading(false);
+        }
+
+        // ----------------------------------------------------
+        // 3. 辅助函数
+        // ----------------------------------------------------
+        function setLoading(isLoading) {
+            const buttonText = document.getElementById("button-text");
+            if (isLoading) {
+                submitButton.disabled = true;
+                buttonText.textContent = "处理中...";
+            } else {
+                submitButton.disabled = !termsCheckbox.checked;
+                buttonText.textContent = "确认支付 $5.00";
+            }
+        }
+    </script>
+    </body>
+</html>
+
+<style>
+    /* 针对支付页面的基础样式 */
+    .checkout-page-main {
+        padding: 60px 20px;
+        min-height: 80vh;
+        background-color: #f9f9f9;
+    }
+
+    .checkout-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .plan-summary, .payment-form-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 6px;
+    }
+
+    .plan-summary a {
+        display: block;
+        margin-top: 10px;
+        color: #007bff;
+    }
+
+    #submit-payment-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+
+    #submit-payment-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    #payment-message {
+        color: red;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .security-info {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 0.85em;
+        color: #666;
+    }
+</style>
