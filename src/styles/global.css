@@ -5,16 +5,16 @@
  * =======================================================
  */
 
-/* 定义 Montserrat-Light 字体 */
+/* 🚀 修改点 1 & 2: 定义 ElmsSans-Light 字体 */
 @font-face {
-    /* 为字体指定一个名称，例如 Manetta-Light */
-    font-family: 'Manetta-Montserrat';
+    /* 更改为新的字体族名称 */
+    font-family: 'Manetta-ElmsSans';
 
-    /* 指向 public 目录下的字体文件 */
-    src: url('public/fonts/ElmsSans-Light.ttf') format('truetype');
+    /* 更改为新的字体文件名 ElmsSans-Light.ttf */
+    src: url('/fonts/ElmsSans-Light.ttf') format('truetype'); 
 
-    /* 建议设置 font-weight 和 font-style */
-    font-weight: 300; /* Light 通常对应 300 */
+    /* Light 字体通常设置为 300 */
+    font-weight: 300; 
     font-style: normal;
 
     /* 优化字体加载 */
