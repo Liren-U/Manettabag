@@ -127,6 +127,9 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
           elements = stripe.elements({ clientSecret: clientSecret });
 
           var paymentElement = elements.create('payment', {
+            wallets: {
+                link: 'never'   // ❌ 禁用 Stripe Link 快速结账
+            },
             fields: {
               billingDetails: {
                 name: 'never',
