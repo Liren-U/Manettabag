@@ -1,0 +1,181 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{PAGE_TITLE}</title>
+</head>
+<body>
+
+  <Header />
+
+  <main class="reservation-page">
+
+    <section class="reservation-hero">
+
+      <!-- 左侧大图 -->
+      <div class="hero-left">
+        <img src="/images/grid-4.jpg" alt="Product Image" class="hero-main-img"/>
+      </div>
+
+      <!-- 右侧内容 -->
+      <div class="hero-right">
+        <h1 class="main-title">Save 40% when you reserve your xxx today!</h1>
+
+        <p class="desc-box">
+          To receive this order, simply place $1 deposit and you will qualify for exclusive VIP discount.<br/><br/>
+          Putting down $1 now locks in a discount of $折扣价 off our MSRP of $原价
+        </p>
+
+        <a href="/vip-subscribe" class="reserve-btn">Reserve Now</a>
+      </div>
+
+    </section>
+
+    <!-- 下方三个保证 -->
+    <section class="guarantee-section">
+
+      <div class="guarantee-item">
+        <img src="/images/grid/grid-2.png" class="round-icon" alt="Refund Guarantee"/>
+        <div>
+          <h3>100% Refund Guarantee</h3>
+          <p>"If you're not satisfied, we’ll offer a full refund at any time before the project moves into production. Your satisfaction is our priority."</p>
+        </div>
+      </div>
+
+      <div class="guarantee-item">
+        <img src="/images/grid/grid-8.png" class="round-icon" alt="Transparency Guarantee"/>
+        <div>
+          <h3>Transparency Guarantee</h3>
+          <p>"We’ll keep you informed about the progress of our project throughout the entire campaign."</p>
+        </div>
+      </div>
+
+      <div class="guarantee-item">
+        <img src="/images/grid/grid-7.png" class="round-icon" alt="Secure Payment"/>
+        <div>
+          <h3>Secure Payment</h3>
+          <p>"All transactions are processed through a secure network. Your credit card information is never stored, and we respect your privacy."</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <Footer />
+
+</body>
+</html>
+
+<style>
+
+/* 整体布局 */
+.reservation-page {
+  padding: 50px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 顶部左右布局 */
+.reservation-hero {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 左侧大图 */
+.hero-left {
+  flex: 1 1 50%;
+}
+
+.hero-main-img {
+  width: 100%;
+  border-radius: 8px;
+  background: #ddd;
+}
+
+/* 右侧内容 */
+.hero-right {
+  flex: 1 1 50%;
+}
+
+.main-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.desc-box {
+  font-size: 1rem;
+  padding: 20px;
+  background: #f7f7f7;
+  border-radius: 6px;
+  margin-bottom: 30px;
+  border: 1px solid #ccc;
+}
+
+/* 按钮 */
+.reserve-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #777;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 18px;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.reserve-btn:hover {
+  background-color: #333;
+}
+
+/* 下方保证栏 */
+.guarantee-section {
+  margin-top: 50px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.guarantee-item {
+  flex: 1 1 30%;
+  display: flex;
+  gap: 15px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.round-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eee;
+  object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .reservation-hero {
+    flex-direction: column;
+  }
+
+  .guarantee-item {
+    flex: 1 1 100%;
+  }
+}
+
+</style>
