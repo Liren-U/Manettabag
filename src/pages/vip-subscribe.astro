@@ -154,7 +154,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         var result = await stripe.confirmPayment({
           elements: elements,
           confirmParams: {
-            return_url: window.location.origin + '/payment-success',
+            return_url: 'https://manettabag.com/thankyou',
             payment_method_data: {
               billing_details: {
                 name: customerName ? customerName.value : '',
