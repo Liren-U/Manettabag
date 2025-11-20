@@ -20,50 +20,63 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
     <main class="checkout-page-main">
         <div class="checkout-container">
-            <h1>Secure VIP Subscription Checkout</h1>
+            <!-- 左侧图片区域 -->
+            <div class="checkout-column checkout-visual">
+                <!-- 这里的 src 换成你自己的图片地址 -->
+                <img
+                  src="/images/Manetta-Logo.png"
+                  alt="Manetta VIP Subscription"
+                  class="checkout-image"
+                />
+            </div>
 
-            <form id="payment-form" class="unified-checkout-form">
+            <!-- 右侧表单区域 -->
+            <div class="checkout-column checkout-form-column">
+                <h1>Secure VIP Subscription Checkout</h1>
 
-                <div class="price-summary-box">
-                    <h2>Total Amount Due</h2>
-                    <p class="price-tag">$ 5.00 USD</p>
-                    <p class="plan-info">Manetta VIP Subscription</p>
-                </div>
+                <form id="payment-form" class="unified-checkout-form">
 
-                <h3 class="section-title">1. Your Contact Details</h3>
-                <div class="custom-form-fields">
-                    <div class="input-group">
-                        <label for="customer-name">Full Name</label>
-                        <input type="text" id="customer-name" required placeholder="Enter your full name">
+                    <div class="price-summary-box">
+                        <h2>Total Amount Due</h2>
+                        <p class="price-tag">$ 5.00 USD</p>
+                        <p class="plan-info">Manetta VIP Subscription</p>
                     </div>
-                    <div class="input-group">
-                        <label for="customer-email">Email</label>
-                        <input type="email" id="customer-email" required placeholder="Enter your email address">
+
+                    <h3 class="section-title">1. Your Contact Details</h3>
+                    <div class="custom-form-fields">
+                        <div class="input-group">
+                            <label for="customer-name">Full Name</label>
+                            <input type="text" id="customer-name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="input-group">
+                            <label for="customer-email">Email</label>
+                            <input type="email" id="customer-email" required placeholder="Enter your email address">
+                        </div>
                     </div>
-                </div>
 
-                <h3 class="section-title">2. Payment Information</h3>
-                <div id="payment-element-container" class="payment-card-box">
-                    <p>Loading card details...</p>
-                </div>
+                    <h3 class="section-title">2. Payment Information</h3>
+                    <div id="payment-element-container" class="payment-card-box">
+                        <p>Loading card details...</p>
+                    </div>
 
-                <div id="payment-message" role="alert"></div>
+                    <div id="payment-message" role="alert"></div>
 
-                <div class="terms-and-conditions">
-                    <p>
-                        By paying, you agree to the
-                        <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-                        and
-                        <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
-                    </p>
-                </div>
+                    <div class="terms-and-conditions">
+                        <p>
+                            By paying, you agree to the
+                            <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+                            and
+                            <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+                        </p>
+                    </div>
 
-                <button id="submit-payment-btn">
-                    <span id="button-text">Pay Now</span>
-                </button>
+                    <button id="submit-payment-btn">
+                        <span id="button-text">Pay $5.00 Now</span>
+                    </button>
 
-                <p class="security-info">Securely processed by Stripe. SSL encryption.</p>
-            </form>
+                    <p class="security-info">Securely processed by Stripe. SSL encryption.</p>
+                </form>
+            </div>
         </div>
     </main>
 
@@ -74,7 +87,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     // @ts-nocheck  告诉 VSCode/TS 对这个脚本不要做类型检查
 
     document.addEventListener('DOMContentLoaded', function () {
-      // 建议开发时先用 pk_test，正式再换回 pk_live
+      // 开发用测试 Key，上线时记得换成 pk_live
       var stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
 
       var elements;
@@ -123,12 +136,13 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
             return;
           }
 
-          // 初始化 Stripe Elements
+          // 初始化 Stripe Elements，关闭 Link 快速结账
           elements = stripe.elements({ clientSecret: clientSecret });
 
           var paymentElement = elements.create('payment', {
             wallets: {
-                link: 'never'   // ❌ 禁用 Stripe Link 快速结账
+              link: 'never' // 关闭 Link
+              // 如果将来也不想要 Apple/Google Pay，可以加：applePay: 'never', googlePay: 'never'
             },
             fields: {
               billingDetails: {
@@ -157,6 +171,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         var result = await stripe.confirmPayment({
           elements: elements,
           confirmParams: {
+            // 支付完成后跳转到 thankyou 页面
             return_url: 'https://manettabag.com/thankyou',
             payment_method_data: {
               billing_details: {
@@ -209,12 +224,40 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     }
 
     .checkout-container {
-        max-width: 500px;
+        max-width: 1100px;
         margin: 0 auto;
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+        flex-wrap: wrap; /* 防止极窄屏溢出 */
+    }
+
+    .checkout-column {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .checkout-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .checkout-image {
+        width: 100%;
+        max-width: 520px;
+        border-radius: 16px;
+        object-fit: cover;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .checkout-form-column {
+        max-width: 520px;
+        width: 100%;
     }
 
     h1 {
-        text-align: center;
+        text-align: left;
         margin-bottom: 25px;
         font-size: 2em;
         color: #333;
@@ -304,6 +347,11 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     .terms-and-conditions {
         margin: 25px 0 15px;
         font-size: 0.9em;
+        color: #555;
+    }
+
+    .terms-and-conditions a {
+        text-decoration: underline;
     }
 
     #submit-payment-btn {
@@ -315,13 +363,19 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         border-radius: 6px;
         font-size: 1.1em;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, transform 0.1s;
         font-weight: 600;
+    }
+
+    #submit-payment-btn:hover:not(:disabled) {
+        background-color: #1559b5;
+        transform: translateY(-1px);
     }
 
     #submit-payment-btn:disabled {
         background-color: #99bfea;
         cursor: not-allowed;
+        transform: none;
     }
 
     #payment-message {
@@ -336,5 +390,23 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         margin-top: 15px;
         font-size: 0.8em;
         color: #888;
+    }
+
+/* ------------------------------------- */
+/* RESPONSIVE */
+/* ------------------------------------- */
+    @media (max-width: 900px) {
+        .checkout-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .checkout-form-column {
+            max-width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+        }
     }
 </style>
