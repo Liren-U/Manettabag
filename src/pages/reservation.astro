@@ -77,7 +77,6 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 </html>
 
 <style>
-
 /* 整体布局 */
 .reservation-page {
   padding: 50px 20px;
@@ -85,17 +84,17 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   margin: 0 auto;
 }
 
-/* 顶部左右布局 */
+/* 顶部左右布局：Grid，左 50% 右 50% */
 .reservation-hero {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 两列各占 50% */
   gap: 40px;
   align-items: center;
-  flex-wrap: wrap;
 }
 
 /* 左侧大图 */
 .hero-left {
-  flex: 1 1 50%;
+  width: 100%;
 }
 
 .hero-main-img {
@@ -106,7 +105,7 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 
 /* 右侧内容 */
 .hero-right {
-  flex: 1 1 50%;
+  width: 100%;
 }
 
 .main-title {
@@ -170,12 +169,11 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 /* Responsive */
 @media (max-width: 900px) {
   .reservation-hero {
-    flex-direction: column;
+    grid-template-columns: 1fr; /* 小屏改成一列 */
   }
 
   .guarantee-item {
     flex: 1 1 100%;
   }
 }
-
 </style>
