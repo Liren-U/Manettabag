@@ -85,7 +85,6 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 </html>
 
 <style>
-
 /* 整体布局 */
 .reservation-page {
   padding: 50px 20px;
@@ -125,10 +124,9 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   margin-top: 10px;
 }
 
-/* 电脑端按钮全宽 */
+/* 按钮基础样式（默认：宽度自适应，方便手机端） */
 .reserve-btn {
   display: inline-block;
-  width: 100%;        /* ← 新增：按钮在桌面端全宽 */
   padding: 14px 28px;
   background: #777;
   color: #fff;
@@ -151,11 +149,10 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 /* 去掉背景色 和 边框 */
 .desc-box {
   font-size: 1rem;
-  padding: 20px;
+  padding: 0px;
   margin-bottom: 20px;
-
-  background: none !important; /* ← 去掉背景 */
-  border: none !important;     /* ← 去掉边框 */
+  background: none;
+  border: none;
 }
 
 /* 下方保证栏 */
@@ -185,7 +182,15 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   background: #eee;
 }
 
-/* Responsive (手机端) */
+/* 桌面端：按钮全宽 */
+@media (min-width: 901px) {
+  .reserve-btn {
+    display: block;
+    width: 100%;
+  }
+}
+
+/* 手机端 */
 @media (max-width: 900px) {
 
   /* 手机端隐藏大图 */
@@ -198,16 +203,8 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
     grid-template-columns: 1fr;
   }
 
-  /* 手机端按钮恢复为自动宽度 */
-  .reserve-btn {
-    width: auto !important;   /* ← 手机端按钮变回原大小 */
-    padding: 12px 28px;
-  }
-
   .guarantee-item {
     flex: 1 1 100%;
   }
 }
-
-
 </style>
