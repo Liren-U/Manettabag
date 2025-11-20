@@ -20,17 +20,19 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
     <main class="checkout-page-main">
         <div class="checkout-container">
-            <h1>Secure VIP Subscription Checkout</h1>
+            <!-- 外层 H1 已删除 -->
 
             <form id="payment-form" class="unified-checkout-form">
 
                 <div class="price-summary-box">
-                    <h2>Total Amount Due</h2>
+                    <!-- H1 移到这里，并作为表单内部主标题 -->
+                    <h1 class="checkout-title">Secure VIP Subscription Checkout</h1>
                     <p class="price-tag">$ 5.00 USD</p>
-                    <p class="plan-info">Manetta VIP Subscription</p>
+                    <!-- 原来的 Manetta VIP Subscription 已删除 -->
                 </div>
 
-                <h3 class="section-title">1. Your Contact Details</h3>
+                <!-- 原来的 “1. Your Contact Details” 已删除 -->
+
                 <div class="custom-form-fields">
                     <div class="input-group">
                         <label for="customer-name">Full Name</label>
@@ -42,7 +44,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                     </div>
                 </div>
 
-                <h3 class="section-title">2. Payment Information</h3>
+                <h3 class="section-title">1. Payment Information</h3>
                 <div id="payment-element-container" class="payment-card-box">
                     <p>Loading card details...</p>
                 </div>
@@ -128,7 +130,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
           var paymentElement = elements.create('payment', {
             wallets: {
-                link: 'never'   // ❌ 禁用 Stripe Link 快速结账
+                link: 'never'   // 禁用 Stripe Link 快速结账
             },
             fields: {
               billingDetails: {
@@ -213,10 +215,11 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         margin: 0 auto;
     }
 
-    h1 {
+    /* 现在页面上只有表单内部这个 H1 */
+    .checkout-title {
         text-align: center;
-        margin-bottom: 25px;
-        font-size: 2em;
+        margin-bottom: 10px;
+        font-size: 1.8em;
         color: #333;
     }
 
@@ -232,16 +235,9 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 /* ------------------------------------- */
     .price-summary-box {
         text-align: center;
-        padding: 15px 0 25px;
+        padding: 10px 0 20px;
         border-bottom: 1px solid #eee;
         margin-bottom: 20px;
-    }
-
-    .price-summary-box h2 {
-        font-size: 1.1em;
-        font-weight: 500;
-        color: #666;
-        margin-bottom: 5px;
     }
 
     .price-tag {
@@ -249,12 +245,6 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         font-weight: 700;
         color: #1a73e8; /* Prominent color for the price */
         margin: 0;
-    }
-
-    .plan-info {
-        font-size: 0.9em;
-        color: #999;
-        margin-top: 5px;
     }
 
 /* ------------------------------------- */
