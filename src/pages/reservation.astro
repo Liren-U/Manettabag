@@ -35,7 +35,9 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
           Putting down $1 now locks in a discount of $折扣价 off our MSRP of $原价
         </p>
 
-        <a href="/vip-subscribe" class="reserve-btn">Reserve Now</a>
+        <div class="btn-wrapper">
+          <a href="/vip-subscribe" class="reserve-btn">Reserve Now</a>
+        </div>
       </div>
 
     </section>
@@ -47,7 +49,9 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
         <img src="/images/grid/grid-2.png" class="round-icon" alt="Refund Guarantee"/>
         <div>
           <h3>100% Refund Guarantee</h3>
-          <p>"If you're not satisfied, we’ll offer a full refund at any time before the project moves into production. Your satisfaction is our priority."</p>
+          <p>
+            "If you're not satisfied, we’ll offer a full refund at any time before the project moves into production. Your satisfaction is our priority."
+          </p>
         </div>
       </div>
 
@@ -55,7 +59,9 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
         <img src="/images/grid/grid-8.png" class="round-icon" alt="Transparency Guarantee"/>
         <div>
           <h3>Transparency Guarantee</h3>
-          <p>"We’ll keep you informed about the progress of our project throughout the entire campaign."</p>
+          <p>
+            "We’ll keep you informed about the progress of our project throughout the entire campaign."
+          </p>
         </div>
       </div>
 
@@ -63,7 +69,9 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
         <img src="/images/grid/grid-7.png" class="round-icon" alt="Secure Payment"/>
         <div>
           <h3>Secure Payment</h3>
-          <p>"All transactions are processed through a secure network. Your credit card information is never stored, and we respect your privacy."</p>
+          <p>
+            "All transactions are processed through a secure network. Your credit card information is never stored, and we respect your privacy."
+          </p>
         </div>
       </div>
 
@@ -77,6 +85,7 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 </html>
 
 <style>
+
 /* 整体布局 */
 .reservation-page {
   padding: 50px 20px;
@@ -87,7 +96,7 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 /* 顶部左右布局：Grid，左 50% 右 50% */
 .reservation-hero {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 两列各占 50% */
+  grid-template-columns: 1fr 1fr;
   gap: 40px;
   align-items: center;
 }
@@ -101,6 +110,7 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   width: 100%;
   border-radius: 8px;
   background: #ddd;
+  display: block;
 }
 
 /* 右侧内容 */
@@ -108,6 +118,29 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   width: 100%;
 }
 
+/* 按钮外层容器 - 居中 */
+.btn-wrapper {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.reserve-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #777;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.reserve-btn:hover {
+  background-color: #333;
+}
+
+/* 标题 & 内容 */
 .main-title {
   font-size: 2rem;
   margin-bottom: 20px;
@@ -118,25 +151,8 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   padding: 20px;
   background: #f7f7f7;
   border-radius: 6px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   border: 1px solid #ccc;
-}
-
-/* 按钮 */
-.reserve-btn {
-  display: inline-block;
-  padding: 12px 28px;
-  background: #777;
-  color: #fff;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 18px;
-  text-align: center;
-  transition: 0.2s;
-}
-
-.reserve-btn:hover {
-  background-color: #333;
 }
 
 /* 下方保证栏 */
@@ -162,18 +178,26 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #eee;
   object-fit: cover;
+  background: #eee;
 }
 
-/* Responsive */
+/* Responsive (手机端) */
 @media (max-width: 900px) {
+
+  /* 手机端隐藏大图 */
+  .hero-left {
+    display: none;
+  }
+
+  /* 右侧内容独占一整行 */
   .reservation-hero {
-    grid-template-columns: 1fr; /* 小屏改成一列 */
+    grid-template-columns: 1fr;
   }
 
   .guarantee-item {
     flex: 1 1 100%;
   }
 }
+
 </style>
