@@ -27,7 +27,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                 <div class="price-summary-box">
                     <h2>Total Amount Due</h2>
                     <p class="price-tag">$ 5.00 USD</p>
-                    <p class="plan-info">Manetta VIP Subscription (Annual)</p>
+                    <p class="plan-info">Manetta VIP Subscription</p>
                 </div>
 
                 <h3 class="section-title">1. Your Contact Details</h3>
@@ -37,7 +37,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                         <input type="text" id="customer-name" required placeholder="Enter your full name">
                     </div>
                     <div class="input-group">
-                        <label for="customer-email">Email Address (for Receipt & Account)</label>
+                        <label for="customer-email">Email</label>
                         <input type="email" id="customer-email" required placeholder="Enter your email address">
                     </div>
                 </div>
@@ -59,7 +59,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                 </div>
 
                 <button id="submit-payment-btn">
-                    <span id="button-text">Pay $5.00 Now</span>
+                    <span id="button-text">Pay Now</span>
                 </button>
 
                 <p class="security-info">Securely processed by Stripe. SSL encryption.</p>
@@ -75,7 +75,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
     document.addEventListener('DOMContentLoaded', function () {
       // 建议开发时先用 pk_test，正式再换回 pk_live
-      var stripe = Stripe('pk_live_51QkM6jJrrVdgshd2SopK4pf9x8DeLu8ocJWJNtbGNveVkQcnRQcAM3TQbTohIchI0HqCT6lh474GILSFKfLxUtrj00XeN0aHoY');
+      var stripe = Stripe('sk_test_51QkM6jJrrVdgshd2U9yFplfisGoPtk87OEKP0d1cZaRFgjZuTp4XquG8eOC69wbDu3zulNyWe8cLr7YqkEiq9C7o00QxZa8ZAE');
 
       var elements;
       var form = document.getElementById('payment-form');
