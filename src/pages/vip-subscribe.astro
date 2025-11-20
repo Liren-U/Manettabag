@@ -66,133 +66,127 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     <Footer />
 
     <script src="https://js.stripe.com/v3/"></script>
+<script>
+    // @ts-nocheck  <-- 这一行是关键，告诉 TS 对这个脚本不要做类型检查
+  document.addEventListener('DOMContentLoaded', function () {
+    // Public Key（先建议用 pk_test 测试，正式再换回 live）
+    var stripe = Stripe('pk_live_51QkM6jJrrVdgshd2SopK4pf9x8DeLu8ocJWJNtbGNveVkQcnRQcAM3TQbTohIchI0HqCT6lh474GILSFKfLxUtrj00XeN0aHoY');
 
-    <script>
-        // 告诉 TypeScript 编译器全局存在 Stripe 对象
-        declare var Stripe: any;
+    var elements;
+    var form = document.getElementById('payment-form');
+    var paymentElementContainer = document.getElementById('payment-element-container');
+    var submitButton = document.getElementById('submit-payment-btn');
+    var messageContainer = document.getElementById('payment-message');
+    var termsCheckbox = document.getElementById('agree-terms');
 
-        document.addEventListener('DOMContentLoaded', () => {
+    var customerEmail = document.getElementById('customer-email');
+    var customerName = document.getElementById('customer-name');
 
-            // Public Key
-            const stripe = Stripe('pk_live_51QkM6jJrrVdgshd2SopK4pf9x8DeLu8ocJWJNtbGNveVkQcnRQcAM3TQbTohIchI0HqCT6lh474GILSFKfLxUtrj00XeN0aHoY');
+    var backendApiUrl = '/api/create-payment-intent';
 
-            // 使用类型断言，解决所有 VS Code 警告
-            let elements: any;
-            const form = document.getElementById('payment-form') as HTMLFormElement;
-            const paymentElementContainer = document.getElementById('payment-element-container') as HTMLElement;
-            const submitButton = document.getElementById('submit-payment-btn') as HTMLButtonElement;
-            const messageContainer = document.getElementById('payment-message') as HTMLElement;
-            const termsCheckbox = document.getElementById('agree-terms') as HTMLInputElement;
+    // 防止 Stripe SDK 没加载成功
+    if (typeof Stripe === 'undefined') {
+      messageContainer.textContent = 'Error: Stripe SDK failed to load.';
+      return;
+    }
 
-            // Form field references
-            const customerEmail = document.getElementById('customer-email') as HTMLInputElement;
-            const customerName = document.getElementById('customer-name') as HTMLInputElement;
+    initialize();
 
-            const backendApiUrl = '/api/create-payment-intent';
+    async function initialize() {
+      try {
+        var response = await fetch(backendApiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
 
-            // 检查 Stripe 是否已加载，防止罕见的浏览器加载时序问题
-            if (typeof Stripe === 'undefined') {
-                messageContainer.textContent = "Error: Stripe SDK failed to load.";
-                return;
+        if (!response.ok) {
+          messageContainer.textContent = 'Server error fetching client secret: Status ' + response.status;
+          return;
+        }
+
+        var json = await response.json();
+        var clientSecret = json.clientSecret;
+        var apiError = json.error;
+
+        if (apiError || !clientSecret) {
+          messageContainer.textContent = apiError || 'Could not start payment process. Check backend config or logs.';
+          return;
+        }
+
+        // 初始化 Stripe Elements
+        elements = stripe.elements({ clientSecret: clientSecret });
+
+        var paymentElement = elements.create('payment', {
+          fields: {
+            billingDetails: {
+              name: 'never',
+              email: 'never'
             }
+          }
+        });
+        paymentElement.mount(paymentElementContainer);
 
-            initialize();
+        // 勾选条款才能点按钮
+        var updateButtonState = function () {
+          submitButton.disabled = !termsCheckbox.checked;
+        };
+        termsCheckbox.addEventListener('change', updateButtonState);
+        updateButtonState();
+      } catch (error) {
+        console.error('Error fetching client secret:', error);
+        messageContainer.textContent = 'Payment initialization failed. Check network or configuration.';
+      }
+    }
 
-            async function initialize() {
-                try {
-                    const response = await fetch(backendApiUrl, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                    });
+    form.addEventListener('submit', handleSubmit);
 
-                    // 检查响应状态码是否成功（例如 200）
-                    if (!response.ok) {
-                        messageContainer.textContent = `Server error fetching client secret: Status ${response.status}`;
-                        return;
-                    }
+    async function handleSubmit(e) {
+      e.preventDefault();
+      setLoading(true);
 
-                    const { clientSecret, error: apiError } = await response.json();
+      if (!termsCheckbox.checked) {
+        messageContainer.textContent = 'Please agree to the terms of service.';
+        setLoading(false);
+        return;
+      }
 
-                    if (apiError || !clientSecret) {
-                        messageContainer.textContent = apiError || "Could not start payment process. Check backend config or logs.";
-                        return;
-                    }
-
-                    elements = stripe.elements({ clientSecret });
-
-                    // Configure Payment Element to NOT collect name/email
-                    const paymentElement = elements.create("payment", {
-                        fields: {
-                            billingDetails: {
-                                name: 'never',
-                                email: 'never',
-                            }
-                        }
-                    });
-                    paymentElement.mount(paymentElementContainer);
-
-                    // Listener for terms checkbox
-                    const updateButtonState = () => {
-                        submitButton.disabled = !termsCheckbox.checked;
-                    };
-                    termsCheckbox.addEventListener('change', updateButtonState);
-                    updateButtonState();
-
-                } catch (error) {
-                    console.error("Error fetching client secret:", error);
-                    messageContainer.textContent = "Payment initialization failed. Check network or configuration.";
-                }
+      var result = await stripe.confirmPayment({
+        elements: elements,
+        confirmParams: {
+          return_url: window.location.origin + '/payment-success',
+          payment_method_data: {
+            billing_details: {
+              name: customerName.value,
+              email: customerEmail.value
             }
+          }
+        }
+      });
 
-            form.addEventListener("submit", handleSubmit as (event: Event) => void);
+      if (result.error) {
+        if (result.error.type === 'card_error' || result.error.type === 'validation_error') {
+          messageContainer.textContent = result.error.message;
+        } else {
+          messageContainer.textContent = 'An unknown error occurred. Please try again.';
+        }
+      }
 
-            async function handleSubmit(e: SubmitEvent) {
-                e.preventDefault();
-                setLoading(true);
+      setLoading(false);
+    }
 
-                if (!termsCheckbox.checked) {
-                    messageContainer.textContent = "Please agree to the terms of service.";
-                    setLoading(false);
-                    return;
-                }
+    function setLoading(isLoading) {
+      var buttonText = document.getElementById('button-text');
+      if (isLoading) {
+        submitButton.disabled = true;
+        buttonText.textContent = 'Processing...';
+      } else {
+        submitButton.disabled = !termsCheckbox.checked;
+        buttonText.textContent = 'Pay $5.00 Now';
+      }
+    }
+  });
+</script>
 
-                const { error } = await stripe.confirmPayment({
-                    elements,
-                    confirmParams: {
-                        return_url: `${window.location.origin}/payment-success`,
-                        payment_method_data: {
-                            billing_details: {
-                                name: customerName.value,
-                                email: customerEmail.value,
-                            },
-                        },
-                    },
-                });
-
-                if (error) {
-                    if (error.type === "card_error" || error.type === "validation_error") {
-                        messageContainer.textContent = error.message;
-                    } else {
-                        messageContainer.textContent = "An unknown error occurred. Please try again.";
-                    }
-                }
-
-                setLoading(false);
-            }
-
-            function setLoading(isLoading: boolean) {
-                const buttonText = document.getElementById("button-text") as HTMLSpanElement;
-                if (isLoading) {
-                    submitButton.disabled = true;
-                    buttonText.textContent = "Processing...";
-                } else {
-                    submitButton.disabled = !termsCheckbox.checked;
-                    buttonText.textContent = "Pay $5.00 Now";
-                }
-            }
-
-        }); // DOMContentLoaded 结束
-    </script>
 
 </body>
 </html>

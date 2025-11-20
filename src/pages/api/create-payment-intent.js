@@ -1,52 +1,54 @@
-// 文件路径：src/pages/api/create-payment-intent.js
+// src/pages/api/create-payment-intent.js
 
-import Stripe from 'stripe';
+export const POST = async () => {
+  // Cloudflare Pages + Astro 推荐用 import.meta.env 读取环境变量
+  const secretKey = import.meta.env.STRIPE_SECRET_KEY;
 
-// 移除顶层的 const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('STRIPE_SECRET_KEY is missing');
+    return new Response(
+      JSON.stringify({ error: 'Server config error: STRIPE_SECRET_KEY is missing.' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
 
-export const POST = async ({ request }) => {
-    // *** 1. 在请求处理函数内部读取变量 ***
-    // 这样做可以确保在变量被注入 Worker 运行时后才尝试访问它。
-    const secretKey = process.env.STRIPE_SECRET_KEY; 
+  try {
+    // 这里用 Stripe 官方 REST API，而不是 node SDK
+    const params = new URLSearchParams({
+      amount: '500', // 单位“分”
+      currency: 'usd',
+      'automatic_payment_methods[enabled]': 'true',
+      description: 'Manetta VIP Subscription - $5 USD',
+    });
 
-    try {
-        // 明确检查密钥是否存在
-        if (!secretKey) {
-            // 尽管它可能现在能读到，但保持检查是良好的做法。
-            console.error('DEBUG: STRIPE_SECRET_KEY is undefined or empty! (Inside POST)');
-            return new Response(
-                JSON.stringify({ error: 'Server Config Error: Stripe Secret Key is missing from ENV.' }),
-                { status: 500, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+    const stripeRes = await fetch('https://api.stripe.com/v1/payment_intents', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
 
-        // 只有密钥存在时才初始化 Stripe
-        const stripe = new Stripe(secretKey, {
-            apiVersion: '2023-10-16',
-        });
+    const data = await stripeRes.json();
 
-        const amount = 500;
-
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount,
-            currency: 'usd',
-            payment_method_types: ['card'],
-            description: 'Manetta VIP Subscription - $5 USD',
-        });
-
-        // Success Response
-        return new Response(
-            JSON.stringify({ clientSecret: paymentIntent.client_secret }),
-            { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-
-    } catch (error) {
-        // ... (错误处理保持不变)
-        console.error('Stripe PaymentIntent Creation Error:', error);
-
-        return new Response(
-            JSON.stringify({ error: 'Failed to create payment intent. Check server logs for details.' }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
+    if (!stripeRes.ok) {
+      console.error('Stripe API error:', data);
+      return new Response(
+        JSON.stringify({ error: data.error?.message || 'Stripe API error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
     }
-}
+
+    return new Response(
+      JSON.stringify({ clientSecret: data.client_secret }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  } catch (err) {
+    console.error('Payment intent create failed:', err);
+    return new Response(
+      JSON.stringify({ error: 'Failed to create payment intent.' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+};
