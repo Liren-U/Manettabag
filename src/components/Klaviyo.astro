@@ -46,52 +46,63 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
 
     {/* 2）监听 Klaviyo 表单提交事件，把 email/first_name 写入 localStorage */}
     <script is:inline>
-      {`
-        window.addEventListener('klaviyoForms', function (e) {
-          try {
-            if (!e || !e.detail) return;
+      window.addEventListener('klaviyoForms', function (e) {
+        try {
+          if (!e || !e.detail) return;
 
-            // 只处理提交成功事件
-            if (e.detail.type !== 'submit') return;
+          // 先把整个 detail 打出来，看真实结构
+          console.log('[Klaviyo] klaviyoForms event detail:', e.detail);
 
-            var meta = e.detail.meta || {};
-
-            // 尝试多种常见字段名去拿 email
-            var email =
-              meta.email ||
-              meta.$email ||
-              (meta.fields && (meta.fields.email || meta.fields.$email)) ||
-              '';
-
-            // 尝试多种常见字段名去拿 first_name
-            var firstName =
-              meta.first_name ||
-              meta.firstName ||
-              meta.$first_name ||
-              (meta.fields &&
-                (meta.fields.first_name ||
-                 meta.fields.firstName ||
-                 meta.fields.$first_name)) ||
-              '';
-
-            if (email) {
-              console.log('[Klaviyo] captured email:', email);
-              localStorage.setItem('manetta_email', email);
-            }
-            if (firstName) {
-              console.log('[Klaviyo] captured first name:', firstName);
-              localStorage.setItem('manetta_name', firstName);
-            }
-          } catch (err) {
-            if (console && console.warn) {
-              console.warn('Klaviyo form listener error:', err);
-            }
+          // 有的账号用 submit，有的用 success，这里全部放行
+          if (
+            e.detail.type !== 'submit' &&
+            e.detail.type !== 'success' &&
+            e.detail.type !== 'formSubmitted'
+          ) {
+            return;
           }
-        });
-      `}
+
+          // 最常见：meta 或 data 里带字段
+          var meta = e.detail.meta || e.detail.data || {};
+          var fields = meta.fields || meta;
+
+          // 多种常见字段名里找 email
+          var email =
+            fields.email ||
+            fields.$email ||
+            fields.Email ||
+            fields['email'] ||
+            fields['$email'] ||
+            '';
+
+          // 多种常见字段名里找 first_name
+          var firstName =
+            fields.first_name ||
+            fields.firstName ||
+            fields.$first_name ||
+            fields['first_name'] ||
+            fields['First Name'] ||
+            '';
+
+          if (email) {
+            console.log('[Klaviyo] captured email:', email);
+            localStorage.setItem('manetta_email', email);
+          } else {
+            console.warn('[Klaviyo] no email found in event fields:', fields);
+          }
+
+          if (firstName) {
+            console.log('[Klaviyo] captured first name:', firstName);
+            localStorage.setItem('manetta_name', firstName);
+          }
+        } catch (err) {
+          console.warn('Klaviyo form listener error:', err);
+        }
+      });
     </script>
   </>
 )}
+
 
 <style>
 /* ------------------------------------- */
