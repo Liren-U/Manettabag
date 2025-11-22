@@ -44,23 +44,34 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
       async
     ></script>
 
-    {/* 监听 Klaviyo 表单提交，保存邮箱/姓名到 localStorage */}
+    {/* 监听 Klaviyo 表单提交/成功，保存邮箱/姓名到 localStorage */}
     <script>
       {`
       window.addEventListener('klaviyoForms', function(e) {
         try {
           if (!e || !e.detail) return;
 
-          // 只关心表单提交完成事件
-          if (e.detail.type !== 'submit') return;
+          var type = e.detail.type;
+          // 只关心 submit / success 两种事件
+          if (type !== 'submit' && type !== 'success') return;
 
           var meta = e.detail.meta || {};
-          var email = meta.email || '';
-          var firstName = meta.first_name || meta.firstName || '';
+          // 尽可能多兼容不同字段名
+          var email =
+            meta.email ||
+            meta.$email ||
+            meta['$email'] ||
+            (meta.fields && (meta.fields.email || meta.fields.$email || meta.fields['$email']));
+
+          var firstName =
+            meta.first_name ||
+            meta.firstName ||
+            meta.$first_name ||
+            (meta.fields && (meta.fields.first_name || meta.fields.$first_name));
 
           if (email) {
-            // 存到 localStorage，方便后续 Stripe 页面自动读取
             localStorage.setItem('manetta_email', email);
+            console.log('[Klaviyo] saved manetta_email:', email);
           }
           if (firstName) {
             localStorage.setItem('manetta_name', firstName);
