@@ -56,13 +56,14 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
 
             var meta = e.detail.meta || {};
 
-            // Klaviyo 一般会把字段塞在 meta 里：
+            // 尝试多种常见字段名去拿 email
             var email =
               meta.email ||
               meta.$email ||
               (meta.fields && (meta.fields.email || meta.fields.$email)) ||
               '';
 
+            // 尝试多种常见字段名去拿 first_name
             var firstName =
               meta.first_name ||
               meta.firstName ||
@@ -74,9 +75,11 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
               '';
 
             if (email) {
+              console.log('[Klaviyo] captured email:', email);
               localStorage.setItem('manetta_email', email);
             }
             if (firstName) {
+              console.log('[Klaviyo] captured first name:', firstName);
               localStorage.setItem('manetta_name', firstName);
             }
           } catch (err) {
