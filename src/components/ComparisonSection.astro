@@ -62,34 +62,57 @@ const {
 </section>
 
 <style>
+  /* 整个 section 全宽 */
   .comparison-section {
-    padding: 60px 16px;
+    width: 100%;
+    padding: 60px 0; /* 上下间距，不含左右 */
   }
 
+  /*
+   * 内部容器，控制两种内容：
+   * 1. 标题区域
+   * 2. 图片 grid
+   * 并且根据设备设置外边距
+   */
   .comparison-inner {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1600px; /* 足够宽保证视觉舒适 */
     margin: 0 auto;
+
+    /* 电脑端左右 64px 外边距 */
+    padding: 0 64px;
+    box-sizing: border-box;
   }
 
+  /* 顶部标题区域靠右 */
   .comparison-header {
-    text-align: center;
+    text-align: right;
     margin-bottom: 40px;
   }
 
+  /* 标题 — 使用你要求的字体与尺寸 */
   .comparison-title {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 12px;
+    text-align: right;
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+    margin-bottom: 40px;
+    color: #333;
+    padding: 0 20px;
+    font-family: 'Manetta-ElmsSans', sans-serif;
+    font-weight: 400;
   }
 
+  /* 副标题靠右，但保持原来字体不变 */
   .comparison-subtitle {
+    text-align: right;
     max-width: 760px;
-    margin: 0 auto;
-    line-height: 1.6;
+    margin-left: auto;
     font-size: 16px;
+    line-height: 1.6;
     color: #444;
+    padding: 0 20px;
   }
 
+  /* GRID 两张图 */
   .comparison-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -100,30 +123,40 @@ const {
     border: 1px solid #e5e5e5;
     border-radius: 8px;
     padding: 24px;
-    background-color: #fff;
-    /* 为图片留出一点内边距，整体效果更像你给的截图 */
+    background: #fff;
   }
 
   .comparison-image {
     width: 100%;
     height: auto;
-    display: block;
     object-fit: contain;
+    display: block;
   }
 
-  /* 手机端堆叠显示 */
+  /* ========= 平板端 ========= */
+  @media (max-width: 1024px) {
+    .comparison-inner {
+      padding: 0 48px; /* ⭐ 平板端左右 48px */
+    }
+  }
+
+  /* ========= 手机端 ========= */
   @media (max-width: 768px) {
     .comparison-section {
-      padding: 40px 16px;
+      padding: 40px 0;
+    }
+
+    .comparison-inner {
+      padding: 0 24px; /* ⭐ 手机端左右 24px */
     }
 
     .comparison-grid {
       grid-template-columns: 1fr;
-      gap: 16px;
     }
 
     .comparison-title {
-      font-size: 22px;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      margin-bottom: 20px;
     }
 
     .comparison-subtitle {
