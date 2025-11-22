@@ -1,115 +1,159 @@
 // src/pages/api/klaviyo-vip-subscribe.js
 
 export const POST = async (context) => {
-  // 1. Cloudflare 运行时环境里的变量（线上）
+  // 1. Cloudflare 运行时 env（线上）
   const runtimeEnv = context?.locals?.runtime?.env;
 
-  // 2. 优先用 Cloudflare 的 env，其次用本地的 import.meta.env（本地 dev 时用）
-  const klaviyoApiKey =
-    (runtimeEnv && runtimeEnv.KLAVIYO_API_KEY_PRIVATE) ||
-    import.meta.env.KLAVIYO_API_KEY_PRIVATE;
+  // 2. 先用 Cloudflare env，其次用本地 import.meta.env（dev）
+  const apiKey =
+    (runtimeEnv && runtimeEnv.KLAVIYO_API_KEY) || import.meta.env.KLAVIYO_API_KEY;
 
-  const klaviyoVipListId =
+  const vipListId =
     (runtimeEnv && runtimeEnv.KLAVIYO_VIP_LIST_ID) ||
     import.meta.env.KLAVIYO_VIP_LIST_ID;
 
-  if (!klaviyoApiKey || !klaviyoVipListId) {
+  if (!apiKey || !vipListId) {
     console.error(
-      'KLAVIYO_API_KEY_PRIVATE or KLAVIYO_VIP_LIST_ID is missing (Cloudflare runtime & import.meta.env both empty)'
+      "KLAVIYO_API_KEY or KLAVIYO_VIP_LIST_ID is missing (Cloudflare runtime & import.meta.env both empty)"
     );
     return new Response(
       JSON.stringify({
         success: false,
-        error:
-          'Server config error: KLAVIYO_API_KEY_PRIVATE or KLAVIYO_VIP_LIST_ID is missing.',
+        error: "Server config error: missing KLAVIYO_API_KEY or KLAVIYO_VIP_LIST_ID.",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 
-  // 3. 解析前端传来的 email / name
-  let jsonBody = null;
+  let body;
   try {
-    jsonBody = await context.request.json();
-  } catch (_) {
-    jsonBody = null;
+    body = await context.request.json();
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Invalid JSON body" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
   }
 
-  const rawEmail = jsonBody?.email || '';
-  const rawName = jsonBody?.name || '';
-
-  const email = String(rawEmail).trim().toLowerCase();
-  const name = String(rawName).trim();
+  const email = (body.email || "").trim().toLowerCase();
+  const name = (body.name || "").trim();
 
   if (!email) {
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'Missing email in request body.',
-      }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ success: false, error: "Email is required" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
 
-  // 4. 组装 Klaviyo API 请求
-  const apiUrl = `https://a.klaviyo.com/api/v2/list/${encodeURIComponent(
-    klaviyoVipListId
-  )}/members?api_key=${encodeURIComponent(klaviyoApiKey)}`;
+  // Klaviyo 新 API base URL
+  const BASE_URL = "https://a.klaviyo.com/api";
 
-  // v2 List Members API 需要 profiles 数组
-  const payload = {
-    profiles: [
-      {
-        email,
-        $first_name: name || undefined,
-        properties: {
-          vip_source: 'stripe_vip_checkout',
-          vip_created_at: new Date().toISOString(),
-        },
-      },
-    ],
+  // 公共请求头（新 API 要求）
+  const commonHeaders = {
+    Authorization: `KLV ${apiKey}`,
+    "Content-Type": "application/json",
+    revision: "2023-10-15",
   };
 
   try {
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    // 1）创建或更新 Profile
+    //    使用 /api/profiles/ 的 create-or-update 语义
+    const profilePayload = {
+      data: {
+        type: "profile",
+        attributes: {
+          email: email,
+          ...(name && { first_name: name }),
+          // 你可以顺便打个标记，方便在 Klaviyo 里筛选
+          properties: {
+            vip_deposit: true,
+            vip_deposit_amount: 5,
+            vip_deposit_currency: "USD",
+          },
+        },
       },
-      body: JSON.stringify(payload),
+    };
+
+    const createProfileRes = await fetch(`${BASE_URL}/profiles/`, {
+      method: "POST",
+      headers: commonHeaders,
+      body: JSON.stringify(profilePayload),
     });
 
-    let data = null;
-    try {
-      data = await res.json();
-    } catch (_) {
-      data = null;
-    }
+    const profileData = await createProfileRes.json();
 
-    if (!res.ok) {
-      console.error('Klaviyo API error:', res.status, data);
+    if (!createProfileRes.ok) {
+      console.error("Klaviyo create profile error:", profileData);
       return new Response(
         JSON.stringify({
           success: false,
-          error: data?.message || data?.detail || 'Klaviyo API error',
+          error:
+            profileData?.errors?.[0]?.detail ||
+            "Failed to create/update Klaviyo profile",
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // 成功：不需要把 Klaviyo 原始数据暴露给前端，简单返回 success
+    const profileId = profileData?.data?.id;
+    if (!profileId) {
+      console.error("Klaviyo: no profile id returned:", profileData);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Klaviyo did not return profile ID",
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 2）把这个 profile 加入 VIP list
+    const listPayload = {
+      data: [
+        {
+          type: "profile",
+          id: profileId,
+        },
+      ],
+    };
+
+    const addToListRes = await fetch(
+      `${BASE_URL}/lists/${vipListId}/relationships/profiles/`,
+      {
+        method: "POST",
+        headers: commonHeaders,
+        body: JSON.stringify(listPayload),
+      }
+    );
+
+    const addToListData = await addToListRes.json().catch(() => ({}));
+
+    if (!addToListRes.ok) {
+      console.error("Klaviyo add to list error:", addToListData);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error:
+            addToListData?.errors?.[0]?.detail ||
+            "Failed to add profile to VIP list",
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 成功
     return new Response(
       JSON.stringify({ success: true }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (err) {
-    console.error('Klaviyo VIP subscribe failed:', err);
+    console.error("Klaviyo VIP subscribe unexpected error:", err);
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Request to Klaviyo failed.',
+        error: "Unexpected server error when calling Klaviyo",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
