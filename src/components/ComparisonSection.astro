@@ -62,92 +62,81 @@ const {
 </section>
 
 <style>
-  /* 整个 section 全宽 */
+  /* Section 本身全宽 */
   .comparison-section {
     width: 100%;
-    padding: 60px 0; /* 上下间距，不含左右 */
+    padding: 60px 0;
   }
 
-  /*
-   * 内部容器，控制两种内容：
-   * 1. 标题区域
-   * 2. 图片 grid
-   * 并且根据设备设置外边距
-   */
+  /* Inner 现在变为完全 full width，不再限制 max-width */
   .comparison-inner {
     width: 100%;
-    max-width: 1600px; /* 足够宽保证视觉舒适 */
-    margin: 0 auto;
-
-    /* 电脑端左右 64px 外边距 */
-    padding: 0 64px;
+    padding: 0 64px; /* 桌面端左右 */
     box-sizing: border-box;
   }
 
-  /* 顶部标题区域靠右 */
+  /* 顶部标题靠右 */
   .comparison-header {
     text-align: right;
     margin-bottom: 40px;
   }
 
-  /* 标题 — 使用你要求的字体与尺寸 */
   .comparison-title {
     text-align: right;
     font-size: clamp(1.8rem, 2.5vw, 2.5rem);
     margin-bottom: 40px;
-    color: #333;
     padding: 0 20px;
+    color: #333;
     font-family: 'Manetta-ElmsSans', sans-serif;
     font-weight: 400;
   }
 
-  /* 副标题靠右，但保持原来字体不变 */
   .comparison-subtitle {
     text-align: right;
     max-width: 760px;
     margin-left: auto;
+    padding: 0 20px;
     font-size: 16px;
     line-height: 1.6;
     color: #444;
-    padding: 0 20px;
   }
 
-  /* GRID 两张图 */
+  /* Grid */
   .comparison-grid {
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
   }
 
   .comparison-card {
+    background: #fff;
+    padding: 24px;
     border: 1px solid #e5e5e5;
     border-radius: 8px;
-    padding: 24px;
-    background: #fff;
   }
 
   .comparison-image {
     width: 100%;
-    height: auto;
-    object-fit: contain;
     display: block;
+    object-fit: contain;
   }
 
-  /* ========= 平板端 ========= */
+  /* 平板端 */
   @media (max-width: 1024px) {
     .comparison-inner {
-      padding: 0 48px; /* ⭐ 平板端左右 48px */
+      padding: 0 48px;
     }
   }
 
-  /* ========= 手机端 ========= */
+  /* 手机端 */
   @media (max-width: 768px) {
     .comparison-section {
       padding: 40px 0;
     }
 
     .comparison-inner {
-      padding: 0 24px; /* ⭐ 手机端左右 24px */
+      padding: 0 24px;
     }
 
     .comparison-grid {
