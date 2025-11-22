@@ -36,11 +36,42 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
 </section>
 
 {klaviyoApiKey && (
-  <script
-    type="text/javascript"
-    src={`https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=${klaviyoApiKey}`}
-    async
-  ></script>
+  <>
+    {/* Klaviyo 官方脚本 */}
+    <script
+      type="text/javascript"
+      src={`https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=${klaviyoApiKey}`}
+      async
+    ></script>
+
+    {/* 监听 Klaviyo 表单提交，保存邮箱/姓名到 localStorage */}
+    <script>
+      {`
+      window.addEventListener('klaviyoForms', function(e) {
+        try {
+          if (!e || !e.detail) return;
+
+          // 只关心表单提交完成事件
+          if (e.detail.type !== 'submit') return;
+
+          var meta = e.detail.meta || {};
+          var email = meta.email || '';
+          var firstName = meta.first_name || meta.firstName || '';
+
+          if (email) {
+            // 存到 localStorage，方便后续 Stripe 页面自动读取
+            localStorage.setItem('manetta_email', email);
+          }
+          if (firstName) {
+            localStorage.setItem('manetta_name', firstName);
+          }
+        } catch (err) {
+          console.warn('Klaviyo form listener error:', err);
+        }
+      });
+      `}
+    </script>
+  </>
 )}
 
 <style>
@@ -72,10 +103,6 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
   text-align: center;
 }
 
-/* ------------------------------------- */
-/* 2. 响应式显示/隐藏 (核心逻辑) */
-/* ------------------------------------- */
-
 /* 默认（电脑端 >= 769px）: 隐藏手机端表单 */
 .mobile-form-wrapper {
   display: none;
@@ -83,12 +110,10 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
 
 /* 手机端样式 (<= 768px) */
 @media (max-width: 768px) {
-  /* 在手机端隐藏电脑端表单 */
   .desktop-form-wrapper {
     display: none;
   }
 
-  /* 在手机端显示手机端表单 */
   .mobile-form-wrapper {
     display: block;
   }

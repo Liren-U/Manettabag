@@ -39,7 +39,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                         <input type="text" id="customer-name" required placeholder="Enter your full name">
                     </div>
                     <div class="input-group">
-                        <label for="customer-email">Email</label>
+                        <label for="customer-email">Subscribe Email</label>
                         <input type="email" id="customer-email" required placeholder="Enter your email address">
                     </div>
                 </div>
@@ -87,6 +87,20 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
       var customerEmail = document.getElementById('customer-email');
       var customerName = document.getElementById('customer-name');
+
+      /* ----------------------------------------------------
+         从 localStorage 读取订阅邮箱，自动填入并锁定
+         这个值由 Klaviyo 组件写入：localStorage.manetta_email
+      ---------------------------------------------------- */
+      try {
+        var savedEmail = localStorage.getItem('manetta_email');
+        if (savedEmail && customerEmail) {
+          customerEmail.value = savedEmail;
+          customerEmail.readOnly = true;            // ✅ 只锁定邮箱
+        }
+      } catch (err) {
+        console.warn('Cannot read localStorage:', err);
+      }
 
       var backendApiUrl = '/api/create-payment-intent';
 
@@ -279,6 +293,12 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         border-radius: 6px;
         box-sizing: border-box;
         font-size: 1em;
+    }
+
+    /* 只对 readonly 的输入框做视觉区分（锁定邮箱时） */
+    .custom-form-fields input[readonly] {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
     }
 
     .payment-card-box {
