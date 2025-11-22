@@ -46,62 +46,103 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
 
     {/* 2）监听 Klaviyo 表单提交事件，把 email/first_name 写入 localStorage */}
     <script is:inline>
-      window.addEventListener('klaviyoForms', function (e) {
-        try {
-          if (!e || !e.detail) return;
+      // 用一个 IIFE 防止变量污染
+      (function () {
+        function pickEmailFrom(obj) {
+          if (!obj) return '';
 
-          // 先把整个 detail 打出来，看真实结构
-          console.log('[Klaviyo] klaviyoForms event detail:', e.detail);
+          var candidates = [
+            obj.$email,
+            obj.email,
+            obj.Email,
+            obj['email'],
+            obj['$email'],
+            obj['Email'],
+          ];
 
-          // 有的账号用 submit，有的用 success，这里全部放行
-          if (
-            e.detail.type !== 'submit' &&
-            e.detail.type !== 'success' &&
-            e.detail.type !== 'formSubmitted'
-          ) {
-            return;
+          for (var i = 0; i < candidates.length; i++) {
+            var v = candidates[i];
+            if (
+              typeof v === 'string' &&
+              v.indexOf('@') !== -1 &&         // 要有 @
+              v.indexOf('{{') === -1 &&       // 不能包含 {{ 占位符
+              v.indexOf('}}') === -1
+            ) {
+              return v;
+            }
           }
-
-          // 最常见：meta 或 data 里带字段
-          var meta = e.detail.meta || e.detail.data || {};
-          var fields = meta.fields || meta;
-
-          // 多种常见字段名里找 email
-          var email =
-            fields.email ||
-            fields.$email ||
-            fields.Email ||
-            fields['email'] ||
-            fields['$email'] ||
-            '';
-
-          // 多种常见字段名里找 first_name
-          var firstName =
-            fields.first_name ||
-            fields.firstName ||
-            fields.$first_name ||
-            fields['first_name'] ||
-            fields['First Name'] ||
-            '';
-
-          if (email) {
-            console.log('[Klaviyo] captured email:', email);
-            localStorage.setItem('manetta_email', email);
-          } else {
-            console.warn('[Klaviyo] no email found in event fields:', fields);
-          }
-
-          if (firstName) {
-            console.log('[Klaviyo] captured first name:', firstName);
-            localStorage.setItem('manetta_name', firstName);
-          }
-        } catch (err) {
-          console.warn('Klaviyo form listener error:', err);
+          return '';
         }
-      });
+
+        window.addEventListener('klaviyoForms', function (e) {
+          try {
+            if (!e || !e.detail) return;
+
+            // 打印整个 detail 看真实结构（方便你在 Console 里检查）
+            console.log('[Klaviyo] klaviyoForms event detail:', e.detail);
+
+            // 只处理典型的成功事件类型
+            var type = e.detail.type;
+            if (
+              type !== 'submit' &&
+              type !== 'success' &&
+              type !== 'formSubmitted'
+            ) {
+              return;
+            }
+
+            var meta = e.detail.meta || e.detail.data || {};
+            var fields = meta.fields || meta;
+            var profile = e.detail.profile || meta.profile || {};
+
+            // 先从 meta / fields / profile 中“挑”一个真正的邮箱
+            var email =
+              pickEmailFrom(meta) ||
+              pickEmailFrom(fields) ||
+              pickEmailFrom(profile);
+
+            if (!email && profile && typeof profile.email === 'string') {
+              // 再兜底一次
+              var v = profile.email;
+              if (v.indexOf('@') !== -1 && v.indexOf('{{') === -1) {
+                email = v;
+              }
+            }
+
+            if (email) {
+              console.log('[Klaviyo] final captured email:', email);
+              localStorage.setItem('manetta_email', email);
+            } else {
+              console.warn(
+                '[Klaviyo] no valid email found, meta/fields/profile =',
+                meta,
+                fields,
+                profile
+              );
+            }
+
+            // 可选：first_name 逻辑，如果你以后要用可以保留
+            var firstName =
+              fields.first_name ||
+              fields.firstName ||
+              fields.$first_name ||
+              profile.first_name ||
+              profile.firstName ||
+              '';
+
+            if (firstName) {
+              console.log('[Klaviyo] captured first name:', firstName);
+              localStorage.setItem('manetta_name', firstName);
+            }
+          } catch (err) {
+            console.warn('Klaviyo form listener error:', err);
+          }
+        });
+      })();
     </script>
   </>
 )}
+
 
 
 <style>
