@@ -1,0 +1,257 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+const PAGE_TITLE = "Thank you - You're a VIP | Manetta Bag";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>{PAGE_TITLE}</title>
+  </head>
+  <body>
+    <Header />
+
+    <main class="thankyou-page-main">
+      <div class="thankyou-container">
+        <!-- 左侧图片：桌面/平板可见，手机隐藏 -->
+        <div class="thankyou-visual">
+          <img
+            src="/images/thankyou-vip-placeholder.png"
+            alt="Manetta VIP illustration"
+            class="thankyou-image"
+            loading="lazy"
+          />
+        </div>
+
+        <!-- 右侧内容 -->
+        <div class="thankyou-content">
+          <h1 class="thankyou-title">Congrats! You&apos;re a VIP</h1>
+
+          <!-- 结账订阅信息卡片 -->
+          <section class="thankyou-card">
+            <h2 class="thankyou-card-title">VIP Reservation Details</h2>
+            <p class="thankyou-card-text">
+              We&apos;ve received your VIP deposit and saved your spot for
+              the MANETTA modular camera bag launch.
+            </p>
+
+            <p class="thankyou-card-line">
+              Email:
+              <span id="vip-email" class="thankyou-highlight">
+                (checking…)
+              </span>
+            </p>
+            <p class="thankyou-card-line">
+              Name:
+              <span id="vip-name" class="thankyou-highlight">
+                (optional)
+              </span>
+            </p>
+            <p class="thankyou-card-line">
+              Deposit:
+              <span class="thankyou-highlight">$5.00 USD</span>
+            </p>
+
+            <p class="thankyou-card-note">
+              You&apos;ll receive VIP updates and an exclusive early-bird
+              discount link in your inbox before we go live on Kickstarter.
+            </p>
+          </section>
+
+          <!-- 跳转按钮 -->
+          <a
+            href="https://www.kickstarter.com" 
+            class="thankyou-cta-btn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            FOLLOW US ON KICKSTARTER NOW
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <Footer />
+
+    <script>
+      // @ts-nocheck
+      document.addEventListener('DOMContentLoaded', function () {
+        var emailSpan = document.getElementById('vip-email');
+        var nameSpan = document.getElementById('vip-name');
+
+        var params = new URLSearchParams(window.location.search);
+        var emailFromUrl = params.get('email');
+        var nameFromUrl = params.get('name');
+
+        // 优先用 URL 里的 email，其次用 localStorage 里的 manetta_email
+        var finalEmail =
+          (emailFromUrl && emailFromUrl.trim()) ||
+          (localStorage.getItem('manetta_email') || '').trim();
+
+        if (emailSpan) {
+          if (finalEmail) {
+            emailSpan.textContent = finalEmail;
+          } else {
+            emailSpan.textContent = 'your email inbox';
+          }
+        }
+
+        if (nameSpan) {
+          if (nameFromUrl && nameFromUrl.trim()) {
+            nameSpan.textContent = nameFromUrl.trim();
+          } else {
+            nameSpan.textContent = 'VIP supporter';
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  /* 页面基础样式 */
+  .thankyou-page-main {
+    padding: 60px 20px;
+    min-height: 70vh;
+    background-color: #ffffff;
+  }
+
+  .thankyou-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 1.2fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  /* 左侧图片区域（桌面可见） */
+  .thankyou-visual {
+    background-color: #e9e9ea;
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .thankyou-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* 右侧内容区域 */
+  .thankyou-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .thankyou-title {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    color: #111111;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .thankyou-card {
+    width: 100%;
+    border: 1px solid #dedede;
+    border-radius: 4px;
+    padding: 20px 24px;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+  }
+
+  .thankyou-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #111111;
+  }
+
+  .thankyou-card-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    color: #444444;
+  }
+
+  .thankyou-card-line {
+    font-size: 0.95rem;
+    margin: 4px 0;
+    color: #333333;
+  }
+
+  .thankyou-highlight {
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  .thankyou-card-note {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #777777;
+    margin-top: 12px;
+  }
+
+  .thankyou-cta-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    border-radius: 2px;
+    background-color: #9aa2aa; /* 参考你截图里的灰蓝色 */
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .thankyou-cta-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* 响应式：平板 & 手机 */
+  @media (max-width: 1024px) {
+    .thankyou-container {
+      grid-template-columns: 1fr 1.1fr;
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .thankyou-page-main {
+      padding: 40px 16px;
+    }
+
+    .thankyou-container {
+      grid-template-columns: 1fr;
+    }
+
+    /* 手机端隐藏左侧图片 */
+    .thankyou-visual {
+      display: none;
+    }
+
+    .thankyou-title {
+      font-size: 1.6rem;
+      margin-bottom: 18px;
+    }
+  }
+</style>

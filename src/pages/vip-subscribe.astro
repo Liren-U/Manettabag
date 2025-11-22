@@ -270,9 +270,16 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
           // 1）先把邮箱同步到 Klaviyo VIP list（不阻塞太久，简单等一下）
           await subscribeToKlaviyo(emailVal, nameVal);
 
-          // 2）跳转到感谢页
-          window.location.href = 'https://manettabag.com/thankyou';
+          var thankyouUrl = 'https://manettabag.com/thankyou'
+          + '?email=' + encodeURIComponent(emailVal)
+          + (nameVal ? '&name=' + encodeURIComponent(nameVal) : '');
+
+          window.location.href = thankyouUrl;
           return;
+
+          // 2）跳转到感谢页
+          //window.location.href = 'https://manettabag.com/thankyou';
+          //return;
         }
 
         // 理论上正常不会走到这里，但保险起见仍然跳转
@@ -288,7 +295,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
           buttonText.textContent = 'Processing...';
         } else {
           submitButton.disabled = false;
-          buttonText.textContent = 'Pay $5.00 Now';
+          buttonText.textContent = 'Pay Now';
         }
       }
     });
