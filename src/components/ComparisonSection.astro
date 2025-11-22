@@ -1,0 +1,133 @@
+---
+/**
+ * ComparisonSection.astro
+ * 
+ * 用法示例：
+ * <ComparisonSection
+ *   title="Comparison"
+ *   subtitle="MANETTA triples your storage capacity in seconds, with two built–in cube camera bags that can also be used on their own."
+ *   leftImage="/images/comparison/others-22L.png"
+ *   leftAlt="Other camera backpack 22L"
+ *   rightImage="/images/comparison/manetta-22-12-8L.png"
+ *   rightAlt="MANETTA 22L + 12L + 8L"
+ * />
+ */
+const {
+  title = 'Comparison',
+  subtitle = '',
+  leftImage,
+  leftAlt = '',
+  rightImage,
+  rightAlt = '',
+} = Astro.props;
+---
+
+<section class="comparison-section">
+  <div class="comparison-inner">
+    <!-- 顶部标题 + 副标题 -->
+    <header class="comparison-header">
+      <h2 class="comparison-title">{title}</h2>
+      {subtitle && (
+        <p class="comparison-subtitle">
+          {subtitle}
+        </p>
+      )}
+    </header>
+
+    <!-- 下方两列图片容器 -->
+    <div class="comparison-grid">
+      <div class="comparison-card">
+        {leftImage && (
+          <img
+            src={leftImage}
+            alt={leftAlt}
+            loading="lazy"
+            class="comparison-image"
+          />
+        )}
+      </div>
+
+      <div class="comparison-card">
+        {rightImage && (
+          <img
+            src={rightImage}
+            alt={rightAlt}
+            loading="lazy"
+            class="comparison-image"
+          />
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .comparison-section {
+    padding: 60px 16px;
+  }
+
+  .comparison-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .comparison-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .comparison-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .comparison-subtitle {
+    max-width: 760px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-size: 16px;
+    color: #444;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .comparison-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 24px;
+    background-color: #fff;
+    /* 为图片留出一点内边距，整体效果更像你给的截图 */
+  }
+
+  .comparison-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  /* 手机端堆叠显示 */
+  @media (max-width: 768px) {
+    .comparison-section {
+      padding: 40px 16px;
+    }
+
+    .comparison-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .comparison-title {
+      font-size: 22px;
+    }
+
+    .comparison-subtitle {
+      font-size: 14px;
+    }
+  }
+</style>

@@ -11,6 +11,7 @@ import KlaviyoFormModule from '../components/Klaviyo.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 import ImageGridSix1 from '../components/ImageGridSix1.astro';
+import ComparisonSection from '../components/ComparisonSection.astro';
 
 // 确保您的背景图文件存在于 public/images/ 目录下
 // 关键：这些变量必须在 head 中被使用，因此保持定义
@@ -58,6 +59,15 @@ const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
     />
 
     <ImageGridSix1 title="Explore More Possibilities" />
+
+    <ComparisonSection
+        title="Comparison"
+        subtitle="MANETTA triples your storage capacity in seconds, with two built–in cube camera bags that can also be used on their own."
+        leftImage="/images/grid/grid-7.png"
+        leftAlt="Other camera backpack 22L"
+        rightImage="/images/grid/grid-7.png"
+        rightAlt="MANETTA camera bag 22L + 12L + 8L"
+    />
 
     <ImageCarouselSplit
         title="How to organize your clothes, camera gear, and office equipment"
