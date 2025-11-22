@@ -50,7 +50,7 @@ export const POST = async (context) => {
 
   // 公共请求头（新 API 要求）
   const commonHeaders = {
-    Authorization: `KLV ${apiKey}`,
+    Authorization: `Klaviyo-API-Key ${apiKey}`,
     "Content-Type": "application/json",
     revision: "2023-10-15",
   };
