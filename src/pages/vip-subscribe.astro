@@ -71,7 +71,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
     <Footer />
 
-    <script src="https://js.stripe.com/v3/"></script>
+        <script src="https://js.stripe.com/v3/"></script>
     <script>
     // @ts-nocheck  告诉 VSCode/TS 对这个脚本不要做类型检查
 
@@ -89,17 +89,37 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
       var customerName = document.getElementById('customer-name');
 
       /* ----------------------------------------------------
-         从 localStorage 读取订阅邮箱，自动填入并锁定
-         这个值由 Klaviyo 组件写入：localStorage.manetta_email
+         1）优先从 URL 里读 email（以后你如果想用 ?email=xxx 也兼容）
+         2）如果 URL 没有，再从 localStorage 读取订阅邮箱
+         3）如果拿到了，就自动填入并锁定
       ---------------------------------------------------- */
       try {
-        var savedEmail = localStorage.getItem('manetta_email');
-        if (savedEmail && customerEmail) {
-          customerEmail.value = savedEmail;
-          customerEmail.readOnly = true;            // ✅ 只锁定邮箱
+        var finalEmail = '';
+
+        // 1）URL 参数
+        var params = new URLSearchParams(window.location.search);
+        var emailFromUrl = params.get('email');
+        if (emailFromUrl) {
+          finalEmail = emailFromUrl;
+          console.log('[Checkout] email from URL:', finalEmail);
+        }
+
+        // 2）localStorage（Klaviyo 表单 listener 写入的）
+        if (!finalEmail) {
+          var savedEmail = localStorage.getItem('manetta_email');
+          if (savedEmail) {
+            finalEmail = savedEmail;
+            console.log('[Checkout] email from localStorage:', finalEmail);
+          }
+        }
+
+        // 3）写入输入框并锁定
+        if (finalEmail && customerEmail) {
+          customerEmail.value = finalEmail;
+          customerEmail.readOnly = true;
         }
       } catch (err) {
-        console.warn('Cannot read localStorage:', err);
+        console.warn('Cannot get prefilled email:', err);
       }
 
       var backendApiUrl = '/api/create-payment-intent';
@@ -210,6 +230,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
       }
     });
     </script>
+
 
 </body>
 </html>
