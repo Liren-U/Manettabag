@@ -1,4 +1,5 @@
 ---
+// src/pages/reservation.astro
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
@@ -80,6 +81,23 @@ const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
   </main>
 
   <Footer />
+
+  <!-- 这里是关键脚本：从 URL 中读取 email，存到 localStorage -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const url = new URL(window.location.href);
+        const email = url.searchParams.get('email');
+
+        if (email) {
+          console.log('Reservation page: captured email from URL:', email);
+          localStorage.setItem('manetta_email', email);
+        }
+      } catch (err) {
+        console.warn('Failed to read email from URL:', err);
+      }
+    });
+  </script>
 
 </body>
 </html>
