@@ -44,42 +44,46 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
       async
     ></script>
 
-    {/* 监听 Klaviyo 表单提交/成功，保存邮箱/姓名到 localStorage */}
+    {/* 监听 Klaviyo 表单事件，把邮箱写入 localStorage.manetta_email */}
     <script>
       {`
-      window.addEventListener('klaviyoForms', function(e) {
-        try {
-          if (!e || !e.detail) return;
+      (function () {
+        // 防止重复绑定多次（因为页面上你有多个 KlaviyoFormModule）
+        if (window.__manettaKlaviyoBound) return;
+        window.__manettaKlaviyoBound = true;
 
-          var type = e.detail.type;
-          // 只关心 submit / success 两种事件
-          if (type !== 'submit' && type !== 'success') return;
+        window.addEventListener('klaviyoForms', function (e) {
+          try {
+            if (!e || !e.detail) return;
 
-          var meta = e.detail.meta || {};
-          // 尽可能多兼容不同字段名
-          var email =
-            meta.email ||
-            meta.$email ||
-            meta['$email'] ||
-            (meta.fields && (meta.fields.email || meta.fields.$email || meta.fields['$email']));
+            var detail = e.detail;
+            // 只关心 submit / success 事件
+            if (detail.type !== 'submit' && detail.type !== 'success') return;
 
-          var firstName =
-            meta.first_name ||
-            meta.firstName ||
-            meta.$first_name ||
-            (meta.fields && (meta.fields.first_name || meta.fields.$first_name));
+            var meta = detail.meta || {};
 
-          if (email) {
-            localStorage.setItem('manetta_email', email);
-            console.log('[Klaviyo] saved manetta_email:', email);
+            // 尽量多方式兼容地拿 email
+            var email =
+              meta.email ||
+              meta.$email ||
+              meta['$email'] ||
+              (meta.fields &&
+                (meta.fields.email ||
+                 meta.fields.$email ||
+                 meta.fields['$email']));
+
+            if (email) {
+              email = String(email).trim();
+              if (email) {
+                localStorage.setItem('manetta_email', email);
+                console.log('[Klaviyo] saved manetta_email:', email);
+              }
+            }
+          } catch (err) {
+            console.warn('Klaviyo form listener error:', err);
           }
-          if (firstName) {
-            localStorage.setItem('manetta_name', firstName);
-          }
-        } catch (err) {
-          console.warn('Klaviyo form listener error:', err);
-        }
-      });
+        });
+      })();
       `}
     </script>
   </>
