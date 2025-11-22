@@ -46,31 +46,30 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
 
     {/* 2）监听 Klaviyo 表单提交事件，把 email/first_name 写入 localStorage */}
     <script is:inline>
-      // 用一个 IIFE 防止变量污染
       (function () {
-        function pickEmailFrom(obj) {
-          if (!obj) return '';
+        // 在任意对象里递归查找“像邮箱的字符串”
+        function findEmailInObject(obj) {
+          if (!obj || typeof obj !== 'object') return '';
 
-          var candidates = [
-            obj.$email,
-            obj.email,
-            obj.Email,
-            obj['email'],
-            obj['$email'],
-            obj['Email'],
-          ];
+          for (var key in obj) {
+            if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+            var val = obj[key];
 
-          for (var i = 0; i < candidates.length; i++) {
-            var v = candidates[i];
-            if (
-              typeof v === 'string' &&
-              v.indexOf('@') !== -1 &&         // 要有 @
-              v.indexOf('{{') === -1 &&       // 不能包含 {{ 占位符
-              v.indexOf('}}') === -1
-            ) {
-              return v;
+            if (typeof val === 'string') {
+              // 有 @ 且不是 {{email}} 这种占位符
+              if (
+                val.indexOf('@') !== -1 &&
+                val.indexOf('{{') === -1 &&
+                val.indexOf('}}') === -1
+              ) {
+                return val;
+              }
+            } else if (val && typeof val === 'object') {
+              var nested = findEmailInObject(val);
+              if (nested) return nested;
             }
           }
+
           return '';
         }
 
@@ -78,68 +77,41 @@ const { klaviyoApiKey, desktopFormId, mobileFormId } = Astro.props;
           try {
             if (!e || !e.detail) return;
 
-            // 打印整个 detail 看真实结构（方便你在 Console 里检查）
             console.log('[Klaviyo] klaviyoForms event detail:', e.detail);
 
-            // 只处理典型的成功事件类型
+            // 我们主要关心提交成功的事件；你这边有 stepSubmit / submit
             var type = e.detail.type;
-            if (
-              type !== 'submit' &&
-              type !== 'success' &&
-              type !== 'formSubmitted'
-            ) {
+            if (type !== 'submit' && type !== 'stepSubmit') {
               return;
             }
 
-            var meta = e.detail.meta || e.detail.data || {};
-            var fields = meta.fields || meta;
-            var profile = e.detail.profile || meta.profile || {};
+            var email = '';
 
-            // 先从 meta / fields / profile 中“挑”一个真正的邮箱
-            var email =
-              pickEmailFrom(meta) ||
-              pickEmailFrom(fields) ||
-              pickEmailFrom(profile);
+            // 1）优先在 metaData 里找
+            if (e.detail.metaData) {
+              email = findEmailInObject(e.detail.metaData);
+            }
 
-            if (!email && profile && typeof profile.email === 'string') {
-              // 再兜底一次
-              var v = profile.email;
-              if (v.indexOf('@') !== -1 && v.indexOf('{{') === -1) {
-                email = v;
-              }
+            // 2）如果还没找到，再整个 detail 扫一遍兜底
+            if (!email) {
+              email = findEmailInObject(e.detail);
             }
 
             if (email) {
               console.log('[Klaviyo] final captured email:', email);
               localStorage.setItem('manetta_email', email);
             } else {
-              console.warn(
-                '[Klaviyo] no valid email found, meta/fields/profile =',
-                meta,
-                fields,
-                profile
-              );
+              console.warn('[Klaviyo] still no valid email found, detail =', e.detail);
             }
 
-            // 可选：first_name 逻辑，如果你以后要用可以保留
-            var firstName =
-              fields.first_name ||
-              fields.firstName ||
-              fields.$first_name ||
-              profile.first_name ||
-              profile.firstName ||
-              '';
-
-            if (firstName) {
-              console.log('[Klaviyo] captured first name:', firstName);
-              localStorage.setItem('manetta_name', firstName);
-            }
+            // 如果以后想用 first_name，可以类似写一个 findNameInObject 再存
           } catch (err) {
             console.warn('Klaviyo form listener error:', err);
           }
         });
       })();
     </script>
+
   </>
 )}
 
