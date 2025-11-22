@@ -20,27 +20,31 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
     <main class="checkout-page-main">
         <div class="checkout-container">
-            <!-- 外层 H1 已删除 -->
-
             <form id="payment-form" class="unified-checkout-form">
 
                 <div class="price-summary-box">
-                    <!-- H1 移到这里，并作为表单内部主标题 -->
                     <h1 class="checkout-title">VIP Subscription</h1>
                     <p class="price-tag">$ 5.00 USD</p>
-                    <!-- 原来的 Manetta VIP Subscription 已删除 -->
                 </div>
-
-                <!-- 原来的 “1. Your Contact Details” 已删除 -->
 
                 <div class="custom-form-fields">
                     <div class="input-group">
                         <label for="customer-email">Subscribe Email</label>
-                        <input type="email" id="customer-email" required placeholder="Enter your email address">
+                        <input
+                          type="email"
+                          id="customer-email"
+                          required
+                          placeholder="Enter your email address"
+                        >
                     </div>
                     <div class="input-group">
                         <label for="customer-name">Full Name</label>
-                        <input type="text" id="customer-name" required placeholder="Enter your full name">
+                        <input
+                          type="text"
+                          id="customer-name"
+                          required
+                          placeholder="Enter your full name"
+                        >
                     </div>
                 </div>
 
@@ -60,7 +64,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
                     </p>
                 </div>
 
-                <button id="submit-payment-btn">
+                <button id="submit-payment-btn" type="submit">
                     <span id="button-text">Pay Now</span>
                 </button>
 
@@ -71,12 +75,12 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
     <Footer />
 
-        <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
     // @ts-nocheck  告诉 VSCode/TS 对这个脚本不要做类型检查
 
     document.addEventListener('DOMContentLoaded', function () {
-      // 建议开发时先用 pk_test，正式再换回 pk_live
+      // 你的 Stripe 公钥（注意：上线前记得改成 pk_live）
       var stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
 
       var elements;
@@ -88,27 +92,26 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
       var customerEmail = document.getElementById('customer-email');
       var customerName = document.getElementById('customer-name');
 
-      /* ----------------------------------------------------
-         1）优先从 URL 里读 email（以后你如果想用 ?email=xxx 也兼容）
-         2）如果 URL 没有，再从 localStorage 读取订阅邮箱
-         3）如果拿到了，就自动填入并锁定
-      ---------------------------------------------------- */
+      var backendApiUrl = '/api/create-payment-intent';
+      var vipKlaviyoApiUrl = '/api/klaviyo-vip-subscribe';
+
+      // ================ 预填邮箱（URL 参数 / localStorage） =================
       try {
         var finalEmail = '';
 
-        // 1）URL 参数
+        // 1）URL 参数：?email=xxx
         var params = new URLSearchParams(window.location.search);
         var emailFromUrl = params.get('email');
         if (emailFromUrl) {
-          finalEmail = emailFromUrl;
+          finalEmail = emailFromUrl.trim();
           console.log('[Checkout] email from URL:', finalEmail);
         }
 
-        // 2）localStorage（Klaviyo 表单 listener 写入的）
+        // 2）localStorage：Klaviyo 的前端监听写入的 manetta_email
         if (!finalEmail) {
           var savedEmail = localStorage.getItem('manetta_email');
           if (savedEmail) {
-            finalEmail = savedEmail;
+            finalEmail = savedEmail.trim();
             console.log('[Checkout] email from localStorage:', finalEmail);
           }
         }
@@ -122,9 +125,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         console.warn('Cannot get prefilled email:', err);
       }
 
-      var backendApiUrl = '/api/create-payment-intent';
-
-      // 防止 Stripe SDK 没加载成功
+      // ===================== 校验 Stripe SDK =====================
       if (typeof Stripe === 'undefined') {
         if (messageContainer) {
           messageContainer.textContent = 'Error: Stripe SDK failed to load.';
@@ -132,6 +133,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         return;
       }
 
+      // ===================== 初始化 Stripe Elements =====================
       initialize();
 
       async function initialize() {
@@ -159,12 +161,11 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
             return;
           }
 
-          // 初始化 Stripe Elements
           elements = stripe.elements({ clientSecret: clientSecret });
 
           var paymentElement = elements.create('payment', {
             wallets: {
-                link: 'never'   // 禁用 Stripe Link 快速结账
+              link: 'never'   // 禁用 Stripe Link 快速结账
             },
             fields: {
               billingDetails: {
@@ -173,6 +174,7 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
               }
             }
           });
+
           paymentElement.mount(paymentElementContainer);
         } catch (error) {
           console.error('Error fetching client secret:', error);
@@ -182,6 +184,41 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         }
       }
 
+      // ===================== Klaviyo VIP 订阅调用 =====================
+      async function subscribeToKlaviyo(email, name) {
+        try {
+          if (!email) {
+            console.warn('subscribeToKlaviyo: email is empty, skip.');
+            return;
+          }
+
+          var res = await fetch(vipKlaviyoApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              name: name || ''
+            })
+          });
+
+          var data = null;
+          try {
+            data = await res.json();
+          } catch (_) {
+            data = null;
+          }
+
+          if (!res.ok || !data || !data.success) {
+            console.warn('Klaviyo VIP subscribe failed:', data);
+          } else {
+            console.log('Klaviyo VIP subscribe success');
+          }
+        } catch (err) {
+          console.error('subscribeToKlaviyo error:', err);
+        }
+      }
+
+      // ===================== 提交表单，确认支付 =====================
       if (form) {
         form.addEventListener('submit', handleSubmit);
       }
@@ -190,17 +227,30 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
         e.preventDefault();
         setLoading(true);
 
+        // 当前表单里的值（不再依赖 localStorage）
+        var emailVal = customerEmail ? customerEmail.value.trim() : '';
+        var nameVal = customerName ? customerName.value.trim() : '';
+
+        if (!emailVal) {
+          if (messageContainer) {
+            messageContainer.textContent = 'Please enter a valid email.';
+          }
+          setLoading(false);
+          return;
+        }
+
+        // 使用 redirect: 'if_required'，方便我们在前端拿到 paymentIntent 结果
         var result = await stripe.confirmPayment({
           elements: elements,
           confirmParams: {
-            return_url: 'https://manettabag.com/thankyou',
             payment_method_data: {
               billing_details: {
-                name: customerName ? customerName.value : '',
-                email: customerEmail ? customerEmail.value : ''
+                name: nameVal || undefined,
+                email: emailVal
               }
             }
-          }
+          },
+          redirect: 'if_required'
         });
 
         if (result.error) {
@@ -211,9 +261,22 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
               messageContainer.textContent = 'An unknown error occurred. Please try again.';
             }
           }
+          setLoading(false);
+          return;
         }
 
-        setLoading(false);
+        // 没有 error，看看 paymentIntent 状态
+        if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+          // 1）先把邮箱同步到 Klaviyo VIP list（不阻塞太久，简单等一下）
+          await subscribeToKlaviyo(emailVal, nameVal);
+
+          // 2）跳转到感谢页
+          window.location.href = 'https://manettabag.com/thankyou';
+          return;
+        }
+
+        // 理论上正常不会走到这里，但保险起见仍然跳转
+        window.location.href = 'https://manettabag.com/thankyou';
       }
 
       function setLoading(isLoading) {
@@ -238,133 +301,133 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 /* ------------------------------------- */
 /* BASE STYLES */
 /* ------------------------------------- */
-    .checkout-page-main {
-        padding: 40px 20px;
-        min-height: 85vh;
-        background-color: #f0f2f5; /* Light background for contrast */
-    }
+.checkout-page-main {
+    padding: 40px 20px;
+    min-height: 85vh;
+    background-color: #f0f2f5; /* Light background for contrast */
+}
 
-    .checkout-container {
-        max-width: 500px;
-        margin: 0 auto;
-    }
+.checkout-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
 
-    /* 现在页面上只有表单内部这个 H1 */
-    .checkout-title {
-        text-align: center;
-        margin-bottom: 10px;
-        font-size: 1.8em;
-        color: #333;
-    }
+/* 现在页面上只有表单内部这个 H1 */
+.checkout-title {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+    color: #333;
+}
 
-    .unified-checkout-form {
-        padding: 30px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
+.unified-checkout-form {
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
 
 /* ------------------------------------- */
 /* PRICE SUMMARY BOX */
 /* ------------------------------------- */
-    .price-summary-box {
-        text-align: center;
-        padding: 10px 0 20px;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 20px;
-    }
+.price-summary-box {
+    text-align: center;
+    padding: 10px 0 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
 
-    .price-tag {
-        font-size: 2.5em;
-        font-weight: 700;
-        color: #1a73e8; /* Prominent color for the price */
-        margin: 0;
-    }
+.price-tag {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #1a73e8; /* Prominent color for the price */
+    margin: 0;
+}
 
 /* ------------------------------------- */
 /* FORM SECTIONS & INPUTS */
 /* ------------------------------------- */
-    .section-title {
-        font-size: 1.1em;
-        font-weight: 600;
-        color: #333;
-        margin-top: 25px;
-        margin-bottom: 15px;
-        padding-bottom: 5px;
-        border-bottom: 1px solid #f0f0f0;
-    }
+.section-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #333;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #f0f0f0;
+}
 
-    .custom-form-fields .input-group {
-        margin-bottom: 15px;
-    }
+.custom-form-fields .input-group {
+    margin-bottom: 15px;
+}
 
-    .custom-form-fields label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        font-size: 0.9em;
-        color: #555;
-    }
+.custom-form-fields label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #555;
+}
 
-    .custom-form-fields input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        box-sizing: border-box;
-        font-size: 1em;
-    }
+.custom-form-fields input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
 
-    /* 只对 readonly 的输入框做视觉区分（锁定邮箱时） */
-    .custom-form-fields input[readonly] {
-        background-color: #f5f5f5;
-        cursor: not-allowed;
-    }
+/* 只对 readonly 的输入框做视觉区分（锁定邮箱时） */
+.custom-form-fields input[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
 
-    .payment-card-box {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        min-height: 40px; /* Placeholder minimum height for loading */
-    }
+.payment-card-box {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-height: 40px; /* Placeholder minimum height for loading */
+}
 
 /* ------------------------------------- */
 /* BUTTONS & MESSAGES */
 /* ------------------------------------- */
-    .terms-and-conditions {
-        margin: 25px 0 15px;
-        font-size: 0.9em;
-    }
+.terms-and-conditions {
+    margin: 25px 0 15px;
+    font-size: 0.9em;
+}
 
-    #submit-payment-btn {
-        width: 100%;
-        padding: 14px;
-        background-color: #1a73e8; /* Google Blue */
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 1.1em;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        font-weight: 600;
-    }
+#submit-payment-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #1a73e8; /* Google Blue */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 600;
+}
 
-    #submit-payment-btn:disabled {
-        background-color: #99bfea;
-        cursor: not-allowed;
-    }
+#submit-payment-btn:disabled {
+    background-color: #99bfea;
+    cursor: not-allowed;
+}
 
-    #payment-message {
-        color: #d93025; /* Error red */
-        font-weight: bold;
-        margin-top: 15px;
-        text-align: center;
-    }
+#payment-message {
+    color: #d93025; /* Error red */
+    font-weight: bold;
+    margin-top: 15px;
+    text-align: center;
+}
 
-    .security-info {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 0.8em;
-        color: #888;
-    }
+.security-info {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.8em;
+    color: #888;
+}
 </style>
