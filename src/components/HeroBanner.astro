@@ -113,15 +113,15 @@ const {
     z-index: 3;
     width: 100%;
     
-    /* [修改 1] 整体容器加宽，给内容更多呼吸空间 */
-    max-width: 1440px; 
+    /* 容器放宽，给 1400px 的内部元素留出 padding 空间 */
+    max-width: 1600px; 
     
     height: 100%;
     display: flex;
     flex-direction: column;
     padding-top: 60px; 
     padding-bottom: 0; 
-    padding-left: 30px; /* 稍微增加两边内边距 */
+    padding-left: 30px; 
     padding-right: 30px;
     color: #ffffff;
 }
@@ -134,17 +134,17 @@ const {
 }
 
 .hero-header h1 {
-    font-size: clamp(2rem, 3vw, 3.5rem);
+    font-size: clamp(2rem, 3.5vw, 4rem);
     margin-bottom: 10px;
     line-height: 1.1;
     font-weight: bold;
 }
 
 .hero-header p {
-    font-size: clamp(1rem, 1.2vw, 1.4rem);
+    font-size: clamp(1rem, 1.2vw, 1.5rem);
     margin: 0 auto;
     line-height: 1.6;
-    max-width: 800px;
+    max-width: 900px;
 }
 
 .hero-feature-wrapper {
@@ -153,10 +153,10 @@ const {
     flex-direction: column;
     justify-content: flex-end; 
     width: 100%;
-    padding-bottom: 60px; /* 稍微减少底部留白，让图片更贴底 */
+    padding-bottom: 50px; 
 }
 
-/* 电脑端布局 */
+/* 核心布局容器 */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
@@ -164,39 +164,45 @@ const {
     justify-content: space-between;
     width: 100%;
     
-    /* [修改 2] 核心容器加宽！从 1000px 改为 1280px */
-    /* 这会让文字和图片分得更开，显得更大气 */
-    max-width: 1280px; 
+    /* [修改 1] 核心容器宽度设置为 1400px */
+    max-width: 1400px; 
     
     margin: 0 auto;
-    gap: 40px; /* 间距微调 */
+    gap: 50px; /* 增加间距 */
 }
 
 .hero-feature-text {
     flex: 1;
     text-align: left;
-    /* 增加一点最大宽度限制，防止文字行太长难以阅读 */
-    max-width: 600px; 
+    max-width: 650px; 
 }
 
 .feature-desc {
-    /* [修改] 字体稍微加大一点点，因为容器变大了 */
-    font-size: 1.2rem; 
+    /* [修改 2] 响应式字体：最小 1rem，最大 1.5rem，中间随视口宽度变化 */
+    font-size: clamp(1rem, 1.5vw, 1.5rem); 
+    
     line-height: 1.6;
     color: #f0f0f0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     margin-bottom: 25px;
 }
 
-/* Kickstarter 样式 */
+/* --- Kickstarter 样式 --- */
 .ks-row {
     display: flex;
     align-items: center; 
-    gap: 12px; 
+    
+    /* [修改 3] 强制一行显示，不换行 */
+    white-space: nowrap; 
+    
+    gap: 0.8em; /* 间距使用 em，随字体缩放 */
 }
 
 .ks-text {
-    font-size: 1rem; /* 稍微加大一点配合整体 */
+    /* [修改 4] 智能响应式字体，确保手机上一行能放下 */
+    /* 最小 12px，视口宽度的 2.5%，最大 20px */
+    font-size: clamp(0.75rem, 2.5vw, 1.25rem); 
+    
     font-weight: 600; 
     text-transform: uppercase; 
     color: #fff;
@@ -205,7 +211,10 @@ const {
 }
 
 .ks-logo {
-    height: 20px; /* 配合字体微调 */
+    /* [修改 5] 图片高度使用 em 单位 */
+    /* 这样当 ks-text 字体变大变小时，Logo 会自动保持 1.6倍于文字高度的比例 */
+    height: 1.6em; 
+    
     width: auto;
     display: block;
 }
@@ -213,7 +222,7 @@ const {
 .hero-feature-image {
     flex: 1;
     display: flex;
-    justify-content: center; /* 图片在自己格子里居中 */
+    justify-content: center; 
     align-items: center;
 }
 
@@ -221,16 +230,15 @@ const {
     max-width: 100%;
     height: auto;
     
-    /* [修改 3] 图片高度限制大幅放宽 */
-    /* 之前是 380px，现在改为 550px，这会让图片明显变大 */
-    max-height: 550px; 
+    /* [修改 6] 图片放大：高度允许达到 600px */
+    max-height: 600px; 
     
     object-fit: contain;
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.45)); /* 增加投影范围，更有立体感 */
+    filter: drop-shadow(0 25px 50px rgba(0,0,0,0.5)); 
 }
 
 /* --- 移动端适配 --- */
-@media (max-width: 768px) {
+@media (max-width: 900px) { /* 调整断点，适配平板竖屏 */
     .hero-banner__content {
         padding-top: 80px; 
         padding-left: 20px;
@@ -250,7 +258,7 @@ const {
         text-align: center;
     }
 
-    /* 保持 display: contents 用于重新排序 */
+    /* 使用 display: contents 保持 文字->图->Kickstarter 的顺序 */
     .hero-feature-text {
         display: contents;
     }
@@ -258,7 +266,10 @@ const {
     .feature-desc {
         order: 1; 
         text-align: center;
-        font-size: 1.1rem;
+        
+        /* 移动端文字稍大一点以便阅读 */
+        font-size: clamp(1.1rem, 4vw, 1.3rem); 
+        
         margin-bottom: 20px; 
     }
 
@@ -272,12 +283,17 @@ const {
         order: 3;
         justify-content: center;
         width: 100%;
+        /* 移动端间距也随字体缩放 */
+    }
+    
+    /* 移动端单独控制 KS 字体，确保不换行 */
+    .ks-text {
+        font-size: clamp(0.7rem, 3.5vw, 1rem); 
     }
 
     .hero-feature-image img {
-        /* [修改 4] 移动端图片也放大 */
-        /* 之前是 250px，现在是 380px，手机上看会更有冲击力 */
-        max-height: 380px; 
+        /* 移动端图片也放大 */
+        max-height: 400px; 
     }
 }
 </style>
