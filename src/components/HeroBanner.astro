@@ -69,16 +69,8 @@ const {
     display: flex;
     justify-content: center;
     overflow: hidden;
-    
-    /* [修改 1] 背景色改为指定的浅灰色 */
     background-color: #F2F2F2; 
 }
-
-/* 【已删除】以下不再需要的 CSS 类：
- .hero-banner__bg-wrapper
- .hero-banner__background-picture
- .hero-banner__overlay
-*/
 
 .hero-banner__content {
     position: relative;
@@ -92,8 +84,6 @@ const {
     padding-bottom: 0; 
     padding-left: 30px; 
     padding-right: 30px;
-    
-    /* [修改 2] 全局文字颜色从白色改为深灰色，适应浅背景 */
     color: #333333; 
 }
 
@@ -109,7 +99,6 @@ const {
     margin-bottom: 10px;
     line-height: 1.1;
     font-weight: bold;
-    /* 可以选择让标题颜色更深一点 */
     color: #000000; 
 }
 
@@ -118,7 +107,6 @@ const {
     margin: 0 auto;
     line-height: 1.6;
     max-width: 900px;
-    /* 描述文字稍微浅一点 */
     color: #555555;
 }
 
@@ -131,11 +119,15 @@ const {
     padding-bottom: 50px; 
 }
 
-/* 核心布局容器 */
+/* --- 核心布局容器 --- */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
-    align-items: center; 
+    
+    /* [修改 1] 从 center 改为 flex-start */
+    /* 这样左侧文字就会与图片的顶部对齐，而不是与图片的中心对齐 */
+    align-items: flex-start; 
+    
     justify-content: space-between;
     width: 100%;
     max-width: 1400px; 
@@ -147,16 +139,17 @@ const {
     flex: 1;
     text-align: left;
     max-width: 650px; 
+    
+    /* [修改 2] 增加顶部内边距 */
+    /* 因为改成了顶部对齐，文字会贴着最上面。加一点 padding 让它往下一点点，处于“中偏上”的黄金位置 */
+    padding-top: 60px; 
 }
 
 .feature-desc {
     font-size: clamp(1rem, 1.5vw, 1.5rem); 
     line-height: 1.6;
     margin-bottom: 25px;
-
-    /* [修改 3] 特性描述文字颜色变深，移除深色背景下才需要的文字阴影 */
     color: #444444;
-    /* text-shadow: 0 2px 4px rgba(0,0,0,0.5);  已移除 */
 }
 
 /* --- Kickstarter 样式 --- */
@@ -173,8 +166,6 @@ const {
     text-transform: uppercase; 
     letter-spacing: 1px;
     line-height: 1; 
-
-    /* [修改 4] Kickstarter 文字颜色变深 */
     color: #333333;
 }
 
@@ -182,9 +173,6 @@ const {
     height: 1.6em; 
     width: auto;
     display: block;
-    /* [可选] 如果你的 Kickstarter Logo 是纯白色的，在浅背景下可能看不清。
-       如果需要，可以取消下面这行的注释，用滤镜把它变成黑色 */
-    /* filter: brightness(0); */
 }
 
 .hero-feature-image {
@@ -199,7 +187,6 @@ const {
     height: auto;
     max-height: 600px; 
     object-fit: contain;
-    /* [修改 5] 调整投影，让它在浅色背景上更柔和自然 */
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); 
 }
 
@@ -222,10 +209,15 @@ const {
         flex-direction: column;
         gap: 0; 
         text-align: center;
+        
+        /* 移动端恢复默认对齐，防止错位 */
+        align-items: center; 
     }
 
     .hero-feature-text {
         display: contents;
+        /* 移动端去掉 padding-top，因为顺序变了，不需要强制往下挤 */
+        padding-top: 0; 
     }
 
     .feature-desc {
