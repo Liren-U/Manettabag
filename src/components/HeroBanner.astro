@@ -55,7 +55,7 @@ const {
                     <div class="hero-feature-text">
                         <p class="feature-desc">{featureText}</p>
                         
-                        {/* 新增：Kickstarter 行 */}
+                        {/* Kickstarter 行 */}
                         {kickstarterLogo && (
                             <div class="ks-row">
                                 <span class="ks-text">Coming soon on</span>
@@ -122,7 +122,6 @@ const {
     display: flex;
     flex-direction: column;
     
-    /* 标题距离顶部的高度 */
     padding-top: 60px; 
     padding-bottom: 0; 
     padding-left: 20px;
@@ -152,14 +151,14 @@ const {
     max-width: 800px;
 }
 
-/* Feature 容器：沉底 */
+/* Feature 容器 */
 .hero-feature-wrapper {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* 内容沉底 */
+    justify-content: flex-end; 
     width: 100%;
-    padding-bottom: 80px; /* 距离底部的距离 */
+    padding-bottom: 80px; 
 }
 
 .hero-feature-row {
@@ -173,7 +172,6 @@ const {
     margin: 0 auto;
 }
 
-/* 左侧文字块 */
 .hero-feature-text {
     flex: 1;
     text-align: left;
@@ -184,30 +182,32 @@ const {
     line-height: 1.7;
     color: #f0f0f0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    margin-bottom: 20px; /* 文字和 Kickstarter Logo 之间的间距 */
+    margin-bottom: 20px;
 }
 
-/* --- 新增：Kickstarter 样式 --- */
+/* --- 修改：Kickstarter 样式调整 --- */
 .ks-row {
     display: flex;
-    align-items: center; /* 垂直对齐文字和 Logo */
-    gap: 12px; /* 文字和 Logo 的间距 */
+    align-items: center; /* 保持垂直居中 */
+    gap: 10px; /* 间距稍微缩小 */
 }
 
 .ks-text {
-    font-size: 1.2rem;
-    font-weight: 600; /* 加粗 */
-    text-transform: uppercase; /* 大写看起来更像 Banner */
+    /* [修改 1] 字体调小 */
+    font-size: 0.9rem; /* 约 14.4px，看起来更精致 */
+    font-weight: 600; 
+    text-transform: uppercase; 
     color: #fff;
     letter-spacing: 1px;
+    /* [修改 2] 设置行高为 1，确保没有多余的上下空白，便于与图片对齐 */
+    line-height: 1; 
 }
 
 .ks-logo {
-    height: 30px; /* 控制 Kickstarter Logo 的高度，按需调整 */
+    /* [修改 3] 图片高度调小，匹配文字 */
+    height: 18px; /* 18px 的图片高度通常能很好地平衡 0.9rem 的文字 */
     width: auto;
     display: block;
-    /* 如果你的 Logo 是黑色的，可以用滤镜把它变白，或者直接上传白色 PNG */
-    /* filter: brightness(0) invert(1); */ 
 }
 
 /* 右侧图片 */
@@ -250,10 +250,9 @@ const {
         order: 1;
         display: flex;
         flex-direction: column;
-        align-items: center; /* 移动端让文字和 KS Logo 居中 */
+        align-items: center; 
     }
     
-    /* 移动端 KS 行也要居中 */
     .ks-row {
         justify-content: center;
     }
