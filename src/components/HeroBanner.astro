@@ -4,7 +4,7 @@
 interface Props {
   title: string;
   description: string;
-  // 保留这些 Props 定义以兼容 index.astro 的调用，但实际上不再用于背景显示
+  // 保留参数定义以兼容调用，但实际上不再用于背景显示
   desktopImage: string;
   mobileImage: string;
   featureText?: string;
@@ -15,8 +15,8 @@ interface Props {
 const { 
   title, 
   description, 
-  // desktopImage, // 背景图不再使用
-  // mobileImage,  // 背景图不再使用
+  // desktopImage, 
+  // mobileImage, 
   featureText,
   featureImage,
   kickstarterLogo
@@ -67,7 +67,7 @@ const {
     display: flex;
     justify-content: center;
     overflow: hidden;
-    /* 背景色改为浅灰色 */
+    /* 背景色：浅灰色 */
     background-color: #F2F2F2; 
 }
 
@@ -75,7 +75,7 @@ const {
     position: relative;
     z-index: 3;
     width: 100%;
-    /* 外部大容器最大宽度 1600px */
+    /* 外部大容器最大宽度 */
     max-width: 1600px; 
     height: 100%;
     display: flex;
@@ -84,7 +84,7 @@ const {
     padding-bottom: 0; 
     padding-left: 30px; 
     padding-right: 30px;
-    /* 字体颜色改为深色 */
+    /* 字体颜色：深色 */
     color: #333333; 
 }
 
@@ -125,12 +125,11 @@ const {
     display: flex;
     flex-direction: row;
     
-    /* 顶部对齐，配合 padding-top 实现自定义位置 */
+    /* 顶部对齐：这是实现自定义 padding-top 的基础 */
     align-items: flex-start; 
     
     justify-content: space-between;
     width: 100%;
-    /* 内部内容区域最大宽度 1400px */
     max-width: 1400px; 
     margin: 0 auto;
     gap: 50px; 
@@ -142,10 +141,10 @@ const {
     text-align: left;
     max-width: 650px; 
     
-    /* [关键] 自适应顶部间距 */
-    /* clamp(最小值, 视口高度百分比, 最大值) */
-    /* 这会让文字既不贴顶，也不居中，而是处于大约前 1/3 的舒适位置 */
-    padding-top: clamp(100px, 18vh, 240px);
+    /* [修改核心] 纯动态间距 */
+    /* 15vh = 屏幕高度的 15%。
+       完全随屏幕高度变化，没有 px 的硬性限制。 */
+    padding-top: 15vh;
 }
 
 .feature-desc {
@@ -191,7 +190,6 @@ const {
     height: auto;
     max-height: 600px; 
     object-fit: contain;
-    /* 适应浅色背景的柔和投影 */
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); 
 }
 
@@ -221,7 +219,8 @@ const {
     .hero-feature-text {
         /* 使用 contents 消除父容器影响，以便重新排序 */
         display: contents;
-        /* 移动端不需要顶部 padding */
+        
+        /* [关键] 移动端必须去掉这个动态间距，否则文字上面会空出一大块 */
         padding-top: 0; 
     }
 
