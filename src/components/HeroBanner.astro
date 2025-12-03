@@ -6,7 +6,7 @@ interface Props {
   description: string;
   desktopImage: string;
   mobileImage: string;
-  // 新增 Props：用于下方的特性介绍和产品图
+  // 新增参数：用于显示下方的特性文字和图片
   featureText?: string;
   featureImage?: string;
 }
@@ -22,6 +22,7 @@ const {
 ---
 
 <section class="hero-banner">
+    {/* 1. 背景层：绝对定位铺满 */}
     <div class="hero-banner__bg-wrapper">
         <picture>
             {/* 移动端背景图 */}
@@ -36,27 +37,32 @@ const {
                 fetchpriority="high"
             />
         </picture>
+        {/* 半透明遮罩 */}
         <div class="hero-banner__overlay"></div>
     </div>
 
+    {/* 2. 内容层：Flex Column 布局 */}
     <div class="hero-banner__content">
+        
+        {/* 上部：标题和描述 (固定在较上方) */}
         <div class="hero-header">
             <h1>{title}</h1>
             <p>{description}</p>
         </div>
 
-        {/* 只有当传入了 featureImage 时才渲染下方的新区域 */}
+        {/* 下部：特性区域 (自动占据剩余空间并居中) */}
         {featureImage && (
-            <div class="hero-feature-row">
-                {/* 左侧文字区域 */}
-                <div class="hero-feature-text">
-                    {/* 如果传入了 featureText，显示它，否则显示默认占位或留空 */}
-                    <p>{featureText}</p>
-                </div>
-                
-                {/* 右侧图片区域 */}
-                <div class="hero-feature-image">
-                    <img src={featureImage} alt="Product Feature" />
+            <div class="hero-feature-wrapper">
+                <div class="hero-feature-row">
+                    {/* 左侧文字 */}
+                    <div class="hero-feature-text">
+                        <p>{featureText}</p>
+                    </div>
+                    
+                    {/* 右侧图片 */}
+                    <div class="hero-feature-image">
+                        <img src={featureImage} alt="Product Feature" />
+                    </div>
                 </div>
             </div>
         )}
@@ -65,25 +71,27 @@ const {
 
 <style>
 /*
+ * =======================================================
  * src/styles/hero-banner.css
- * 策略: 
- * 1. 容器 min-height: 90vh 保证有足够的高度。
- * 2. 使用 Flexbox 的 column 布局。
- * 3. Title 也就是 .hero-header 位于顶部。
- * 4. Feature Row 使用 margin-top: auto 和 margin-bottom: auto，这样它会自动占据剩余空间的中心位置。
+ * 布局逻辑：
+ * 1. Banner 高度至少 90vh。
+ * 2. Content 采用 Flex Column。
+ * 3. Header 通过 padding-top 固定在顶部。
+ * 4. Wrapper 通过 flex-grow: 1 占据剩余高度，并 justify-content: center 实现垂直居中。
+ * =======================================================
  */
 
 .hero-banner {
     position: relative;
     width: 100%;
-    min-height: 90vh; /* 增加高度，给“中间”留出空间 */
+    min-height: 90vh; /* 保证高度足够，才有“中间”的概念 */
     display: flex;
     justify-content: center;
     overflow: hidden;
     background-color: #333;
 }
 
-/* 背景图容器 */
+/* --- 背景控制 --- */
 .hero-banner__bg-wrapper {
     position: absolute;
     top: 0;
@@ -96,7 +104,7 @@ const {
 .hero-banner__background-picture {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* 保持比例填充 */
     display: block;
 }
 
@@ -106,37 +114,36 @@ const {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.45); /* 遮罩深度 */
     z-index: 2;
 }
 
-/* 内容区域 - 关键布局修改 */
+/* --- 内容布局核心 --- */
 .hero-banner__content {
     position: relative;
     z-index: 3;
     width: 100%;
     max-width: 1200px;
-    height: 100%; /* 继承父元素高度 */
+    height: 100%; /* 继承 Banner 高度 */
     
-    /* 设置为 Flex 列布局 */
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* 垂直排列 */
     
-    /* 顶部内边距：控制 Title 距离顶部的绝对位置 */
-    padding-top: 130px; 
-    padding-bottom: 60px;
+    /* [控制 Title 位置的关键]：90px 距离顶部 */
+    padding-top: 90px; 
+    
+    padding-bottom: 40px; /* 底部留白 */
     padding-left: 20px;
     padding-right: 20px;
     
     color: #ffffff;
 }
 
-/* 1. 上部的 Title 区域 */
+/* 1. 顶部 Header */
 .hero-header {
     text-align: center;
     width: 100%;
-    /* 不需要 margin-bottom，因为下方的元素会自动居中 */
-    flex-shrink: 0; /* 防止空间不足时被压缩 */
+    flex-shrink: 0; /* 防止被挤压 */
 }
 
 .hero-header h1 {
@@ -153,23 +160,32 @@ const {
     max-width: 800px;
 }
 
-/* 2. 中部的产品/文字区域 */
+/* 2. 中部 Wrapper (弹性容器) */
+.hero-feature-wrapper {
+    /* 核心代码：吃掉 Header 下方所有剩余空间 */
+    flex-grow: 1; 
+    
+    /* 核心代码：让内部元素（Row）在这个大空间里垂直居中 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    
+    width: 100%;
+}
+
+/* 3. 特性行 (左右布局) */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    
+    /* 核心代码：确保文字和图片互相垂直对齐 */
+    align-items: center; 
+    
     justify-content: space-between;
     width: 100%;
     gap: 60px;
     max-width: 1000px;
-    
-    /* 自身居中 */
-    align-self: center; 
-    
-    /* 关键技巧：上下 Auto Margin */
-    /* 这会让这个区块自动浮动在 Title 和 底部 之间的正中间 */
-    margin-top: auto;
-    margin-bottom: auto;
+    margin: 0 auto; /* 水平居中 */
 }
 
 /* 左侧文字 */
@@ -181,7 +197,8 @@ const {
 .hero-feature-text p {
     font-size: 1.1rem;
     line-height: 1.7;
-    color: #eee;
+    color: #f0f0f0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 增加一点阴影提高可读性 */
 }
 
 /* 右侧图片 */
@@ -189,48 +206,52 @@ const {
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .hero-feature-image img {
     max-width: 100%;
     height: auto;
-    max-height: 380px; /* 控制中间图片大小 */
+    max-height: 380px; /* 限制图片最大高度 */
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4)); /* 图片投影，增加立体感 */
 }
 
-/* --- 移动端适配 --- */
+/* --- 移动端适配 (<= 768px) --- */
 @media (max-width: 768px) {
     .hero-banner {
-        min-height: auto; /* 移动端不要强制撑满屏幕，允许自然滚动 */
+        /* 移动端通常不需要 min-height: 90vh，自然高度体验更好 */
+        /* 如果您希望移动端也是全屏，可以保留，但可能会导致小屏手机内容显示不全 */
+        min-height: auto; 
     }
 
     .hero-banner__content {
-        padding-top: 100px;
+        padding-top: 100px; /* 移动端顶部留白 */
         padding-bottom: 60px;
     }
 
+    .hero-feature-wrapper {
+        flex-grow: 0; /* 移动端取消强力撑开 */
+        margin-top: 40px; /* 改为固定间距 */
+    }
+
     .hero-feature-row {
-        flex-direction: column; /* 上下排列 */
+        flex-direction: column; /* 上下堆叠 */
         gap: 30px;
         text-align: center;
-        
-        /* 移动端取消自动居中，改为固定间距，防止内容太长重叠 */
-        margin-top: 40px; 
-        margin-bottom: 0;
     }
 
     .hero-feature-text {
         text-align: center;
-        order: 1;
+        order: 1; /* 文字在上 */
     }
 
     .hero-feature-image {
-        order: 2;
+        order: 2; /* 图片在下 */
     }
 
     .hero-feature-image img {
-        max-height: 250px;
+        max-height: 250px; /* 移动端图片缩小 */
     }
 }
 </style>
