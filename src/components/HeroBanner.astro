@@ -1,65 +1,101 @@
 ---
 // src/components/HeroBanner.astro
-//import '../styles/hero-banner.css';
 
 interface Props {
   title: string;
   description: string;
   desktopImage: string;
   mobileImage: string;
+  // 新增：下方特性区域的文字和图片
+  featureText?: string;
+  featureImage?: string;
 }
 
-const { title, description, desktopImage, mobileImage } = Astro.props;
+const { 
+  title, 
+  description, 
+  desktopImage, 
+  mobileImage,
+  featureText,
+  featureImage
+} = Astro.props;
 ---
 
 <section class="hero-banner">
-    <picture>
-        {/* 移动端图片优先加载 (小于等于 768px) */}
-        <source srcset={mobileImage} media="(max-width: 768px)">
-
-        {/* 默认加载桌面端图片 */}
-        <img
-            src={desktopImage}
-            alt={title}
-            class="hero-banner__background-picture"
-            loading="eager"
-            decoding="async"
-            fetchpriority="high"
-        />
-    </picture>
-
-    <div class="hero-banner__overlay"></div> {/* 半透明蒙版 */}
+    <div class="hero-banner__bg-wrapper">
+        <picture>
+            {/* 移动端背景图 */}
+            <source srcset={mobileImage} media="(max-width: 768px)">
+            {/* 桌面端背景图 */}
+            <img
+                src={desktopImage}
+                alt=""
+                class="hero-banner__background-picture"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+            />
+        </picture>
+        <div class="hero-banner__overlay"></div>
+    </div>
 
     <div class="hero-banner__content">
-        <h1>{title}</h1>
-        <p>{description}</p>
+        {/* 原有的标题区域 */}
+        <div class="hero-header">
+            <h1>{title}</h1>
+            <p>{description}</p>
+        </div>
+
+        {/* 新增：左文右图区域 (仅当有图片传入时显示) */}
+        {featureImage && (
+            <div class="hero-feature-split">
+                <div class="hero-feature-left">
+                    <p>{featureText}</p>
+                </div>
+                <div class="hero-feature-right">
+                    <img src={featureImage} alt="Feature highlight" />
+                </div>
+            </div>
+        )}
     </div>
 </section>
 
 <style>
-    /*
+/*
  * =======================================================
- * src/styles/hero-banner.css - 最终版 (全宽内容 + 响应式字体)
- * 策略: 内容全宽 (100% 视口宽度)，仅通过 padding 控制左右边距
+ * src/styles/hero-banner.css
+ * 策略变更：由内容撑开高度 (Content-driven height)
  * =======================================================
  */
 
 .hero-banner {
     position: relative;
     width: 100%;
-    background-color: #333333;
+    /* 设置最小高度，防止内容太少时 Banner 太窄 */
+    min-height: 85vh; 
+    display: flex;
+    justify-content: center;
     overflow: hidden;
+    background-color: #333;
 }
 
-/* 1. 背景图片样式 */
-.hero-banner__background-picture {
+/* 1. 背景层：改为绝对定位，铺满整个区域 */
+.hero-banner__bg-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
     z-index: 1;
 }
 
-/* 2. 背景蒙版 */
+.hero-banner__background-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 关键：保持比例覆盖，不拉伸 */
+    display: block;
+}
+
 .hero-banner__overlay {
     position: absolute;
     top: 0;
@@ -70,61 +106,107 @@ const { title, description, desktopImage, mobileImage } = Astro.props;
     z-index: 2;
 }
 
-/* 3. 内容区域样式 (全宽容器) */
+/* 2. 内容区域：改为 Relative，由它来决定 Banner 的实际高度 */
 .hero-banner__content {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-
-    padding-top: 80px;
+    position: relative;
     z-index: 3;
-
-    /* 关键修正 A: 移除 max-width，使其宽度继承父元素（全宽） */
-    max-width: 100%; /* 确保它至少是全宽的 */
-    width: 100%;     /* 确保它撑开 */
-
-    /* 关键修正 B: 统一设置左右内边距，作为所有设备上的最小安全边距 */
+    width: 100%;
+    max-width: 1200px; /* 限制最大宽度，保持排版整洁 */
+    
+    /* 保持原来的排版位置：通过 padding-top 控制标题距离顶部的距离 */
+    padding-top: 80px; 
+    padding-bottom: 60px;
     padding-left: 20px;
     padding-right: 20px;
 
-    text-align: center;
     color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* 4. H1 标题 - 流体排版 */
-.hero-banner__content h1 {
-    /* 字体范围: 24px 到 40px，保持不变 */
-    font-size: clamp(1.7rem, 2.2vw, 2.5rem);
-    /* H1 现在会占满 100% 的 content 区域（即全宽减去 20px 边距） */
+/* 3. 标题区域样式 (保持原有风格) */
+.hero-header {
+    text-align: center;
     width: 100%;
+    margin-bottom: 60px; /* 与下方新区域拉开距离 */
+}
+
+.hero-header h1 {
+    font-size: clamp(1.7rem, 2.2vw, 2.5rem);
     margin-bottom: 15px;
     line-height: 1.1;
     font-weight: bold;
 }
 
-/* P 字段 - 流体排版 */
-.hero-banner__content p {
-    /* 字体范围: 14.4px 到 22.4px，保持不变 */
+.hero-header p {
     font-size: clamp(0.9rem, 1.2vw, 1.4rem);
-
-    /* 关键修正 C: 移除 max-width，使其也占满全宽（但不会比 H1 窄） */
-    max-width: 100%; /* 移除 700px/900px 的硬限制 */
-
-    margin-left: auto; /* 保持居中规则，但现在 P 字段是全宽的 */
-    margin-right: auto;
+    margin: 0 auto;
     line-height: 1.6;
+    max-width: 800px; /* 描述文字限制宽度，便于阅读 */
 }
 
-/* 5. 移动端调整 */
+/* 4. 新增：左文右图布局 */
+.hero-feature-split {
+    display: flex;
+    flex-direction: row; /* 左右排列 */
+    align-items: center; /* 垂直居中 */
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1000px; /* 限制这块内容的宽度，防止太散 */
+    gap: 50px; /* 左右间距 */
+}
+
+/* 左侧文字容器 */
+.hero-feature-left {
+    flex: 1;
+    text-align: left; /* 文字左对齐 */
+}
+
+.hero-feature-left p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #f0f0f0;
+}
+
+/* 右侧图片容器 */
+.hero-feature-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-feature-right img {
+    max-width: 100%;
+    height: auto;
+    max-height: 350px; /* 限制图片最大高度 */
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); /* 加一点阴影更有质感 */
+}
+
+/* 5. 移动端适配 */
 @media (max-width: 768px) {
     .hero-banner__content {
         padding-top: 60px;
-        /* 关键修正 D: 移动端使用更小的内边距，让内容更贴边 */
-        padding-left: 15px;
-        padding-right: 15px;
     }
 
-    /* H1 和 P 字体大小由 clamp() 统一处理 */
+    .hero-feature-split {
+        flex-direction: column; /* 移动端改为上下堆叠 */
+        gap: 30px;
+        text-align: center;
+    }
+
+    .hero-feature-left {
+        text-align: center; /* 移动端文字居中 */
+        order: 1; /* 文字在上 */
+    }
+
+    .hero-feature-right {
+        order: 2; /* 图片在下 */
+    }
+    
+    .hero-feature-right img {
+        max-height: 250px; /* 移动端图片稍微小一点 */
+    }
 }
 </style>
