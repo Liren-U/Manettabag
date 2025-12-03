@@ -4,7 +4,6 @@
 interface Props {
   title: string;
   description: string;
-  // 保留参数定义以兼容调用，但实际上不再用于背景显示
   desktopImage: string;
   mobileImage: string;
   featureText?: string;
@@ -15,8 +14,6 @@ interface Props {
 const { 
   title, 
   description, 
-  // desktopImage, 
-  // mobileImage, 
   featureText,
   featureImage,
   kickstarterLogo
@@ -24,8 +21,6 @@ const {
 ---
 
 <section class="hero-banner">
-    {/* 背景图片结构已移除，直接使用 CSS 背景色 */}
-
     <div class="hero-banner__content">
         <div class="hero-header">
             <h1>{title}</h1>
@@ -35,7 +30,7 @@ const {
         {featureImage && (
             <div class="hero-feature-wrapper">
                 <div class="hero-feature-row">
-                    {/* 左侧容器：包含文字和KS Logo */}
+                    {/* 左侧容器 */}
                     <div class="hero-feature-text">
                         <p class="feature-desc">{featureText}</p>
                         
@@ -47,7 +42,7 @@ const {
                         )}
                     </div>
                     
-                    {/* 右侧容器：产品图 */}
+                    {/* 右侧容器 */}
                     <div class="hero-feature-image">
                         <img src={featureImage} alt="Product Feature" />
                     </div>
@@ -63,28 +58,34 @@ const {
 .hero-banner {
     position: relative;
     width: 100%;
-    min-height: 90vh; 
+    
+    /* [修改 1] 高度改为自适应 (auto)，不再强制 90vh */
+    min-height: auto; 
+    
     display: flex;
     justify-content: center;
     overflow: hidden;
-    /* 背景色：浅灰色 */
     background-color: #F2F2F2; 
+    
+    /* [修改 2] 增加底部内边距，确保内容下方有呼吸空间，但不会过大 */
+    padding-bottom: 100px;
 }
 
 .hero-banner__content {
     position: relative;
     z-index: 3;
     width: 100%;
-    /* 外部大容器最大宽度 */
     max-width: 1600px; 
-    height: 100%;
+    
+    /* [修改 3] 移除 height: 100%，让高度随内容自然流动 */
+    height: auto; 
+    
     display: flex;
     flex-direction: column;
     padding-top: 60px; 
-    padding-bottom: 0; 
+    /* 左右内边距 */
     padding-left: 30px; 
     padding-right: 30px;
-    /* 字体颜色：深色 */
     color: #333333; 
 }
 
@@ -112,22 +113,24 @@ const {
 }
 
 .hero-feature-wrapper {
-    flex-grow: 1;
+    /* [修改 4] 移除 flex-grow，不需要撑开空间了，紧随 Title 之后即可 */
+    flex-grow: 0;
+    
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; 
+    /* 移除之前的沉底对齐，现在自然排列 */
+    justify-content: flex-start; 
+    
     width: 100%;
-    padding-bottom: 50px; 
+    /* 移除 wrapper 的 padding，统一由 banner 控制底部 */
+    padding-bottom: 0; 
 }
 
 /* --- 核心布局容器 --- */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
-    
-    /* 顶部对齐：这是实现自定义 padding-top 的基础 */
     align-items: flex-start; 
-    
     justify-content: space-between;
     width: 100%;
     max-width: 1400px; 
@@ -141,9 +144,7 @@ const {
     text-align: left;
     max-width: 650px; 
     
-    /* [修改核心] 纯动态间距 */
-    /* 15vh = 屏幕高度的 15%。
-       完全随屏幕高度变化，没有 px 的硬性限制。 */
+    /* 保持动态的顶部间距 */
     padding-top: 15vh;
 }
 
@@ -158,7 +159,7 @@ const {
 .ks-row {
     display: flex;
     align-items: center; 
-    white-space: nowrap; /* 强制不换行 */
+    white-space: nowrap; 
     gap: 0.8em; 
 }
 
@@ -172,7 +173,7 @@ const {
 }
 
 .ks-logo {
-    height: 1.6em; /* 随字体大小自动变化 */
+    height: 1.6em; 
     width: auto;
     display: block;
 }
@@ -193,8 +194,13 @@ const {
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); 
 }
 
-/* --- 移动端适配 (平板竖屏及手机) --- */
+/* --- 移动端适配 --- */
 @media (max-width: 900px) { 
+    .hero-banner {
+        /* 移动端底部稍微紧凑一点 */
+        padding-bottom: 60px;
+    }
+
     .hero-banner__content {
         padding-top: 80px; 
         padding-left: 20px;
@@ -202,25 +208,18 @@ const {
     }
 
     .hero-feature-wrapper {
-        flex-grow: 0;
-        justify-content: flex-start;
         margin-top: 30px; 
-        padding-bottom: 50px;
     }
 
     .hero-feature-row {
         flex-direction: column;
         gap: 0; 
         text-align: center;
-        /* 移动端恢复居中对齐 */
         align-items: center; 
     }
 
     .hero-feature-text {
-        /* 使用 contents 消除父容器影响，以便重新排序 */
         display: contents;
-        
-        /* [关键] 移动端必须去掉这个动态间距，否则文字上面会空出一大块 */
         padding-top: 0; 
     }
 
