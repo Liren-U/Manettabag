@@ -112,14 +112,17 @@ const {
     position: relative;
     z-index: 3;
     width: 100%;
-    max-width: 1200px;
+    
+    /* [修改 1] 整体容器加宽，给内容更多呼吸空间 */
+    max-width: 1440px; 
+    
     height: 100%;
     display: flex;
     flex-direction: column;
     padding-top: 60px; 
     padding-bottom: 0; 
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 30px; /* 稍微增加两边内边距 */
+    padding-right: 30px;
     color: #ffffff;
 }
 
@@ -150,7 +153,7 @@ const {
     flex-direction: column;
     justify-content: flex-end; 
     width: 100%;
-    padding-bottom: 80px; 
+    padding-bottom: 60px; /* 稍微减少底部留白，让图片更贴底 */
 }
 
 /* 电脑端布局 */
@@ -160,33 +163,40 @@ const {
     align-items: center; 
     justify-content: space-between;
     width: 100%;
-    gap: 60px;
-    max-width: 1000px;
+    
+    /* [修改 2] 核心容器加宽！从 1000px 改为 1280px */
+    /* 这会让文字和图片分得更开，显得更大气 */
+    max-width: 1280px; 
+    
     margin: 0 auto;
+    gap: 40px; /* 间距微调 */
 }
 
 .hero-feature-text {
     flex: 1;
     text-align: left;
+    /* 增加一点最大宽度限制，防止文字行太长难以阅读 */
+    max-width: 600px; 
 }
 
 .feature-desc {
-    font-size: 1.1rem;
-    line-height: 1.7;
+    /* [修改] 字体稍微加大一点点，因为容器变大了 */
+    font-size: 1.2rem; 
+    line-height: 1.6;
     color: #f0f0f0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 /* Kickstarter 样式 */
 .ks-row {
     display: flex;
     align-items: center; 
-    gap: 10px; 
+    gap: 12px; 
 }
 
 .ks-text {
-    font-size: 0.9rem; 
+    font-size: 1rem; /* 稍微加大一点配合整体 */
     font-weight: 600; 
     text-transform: uppercase; 
     color: #fff;
@@ -195,7 +205,7 @@ const {
 }
 
 .ks-logo {
-    height: 18px; 
+    height: 20px; /* 配合字体微调 */
     width: auto;
     display: block;
 }
@@ -203,63 +213,61 @@ const {
 .hero-feature-image {
     flex: 1;
     display: flex;
-    justify-content: center;
+    justify-content: center; /* 图片在自己格子里居中 */
     align-items: center;
 }
 
 .hero-feature-image img {
     max-width: 100%;
     height: auto;
-    max-height: 380px;
+    
+    /* [修改 3] 图片高度限制大幅放宽 */
+    /* 之前是 380px，现在改为 550px，这会让图片明显变大 */
+    max-height: 550px; 
+    
     object-fit: contain;
-    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4));
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.45)); /* 增加投影范围，更有立体感 */
 }
 
-/* --- 移动端适配 (核心修改) --- */
+/* --- 移动端适配 --- */
 @media (max-width: 768px) {
     .hero-banner__content {
         padding-top: 80px; 
+        padding-left: 20px;
+        padding-right: 20px;
     }
 
     .hero-feature-wrapper {
         flex-grow: 0;
         justify-content: flex-start;
-        margin-top: 40px; 
-        padding-bottom: 60px;
+        margin-top: 30px; 
+        padding-bottom: 50px;
     }
 
-    /* 移动端主容器设为列布局 */
     .hero-feature-row {
         flex-direction: column;
-        gap: 0; /* 间距由子元素 margin 控制 */
+        gap: 0; 
         text-align: center;
     }
 
-    /* * [关键修改技巧] 
-     * 使用 display: contents;
-     * 作用：在移动端，"消除" .hero-feature-text 这个父级 div 的布局影响。
-     * 结果：它的子元素 (p.feature-desc 和 div.ks-row) 会“升级”变成 .hero-feature-row 的直接子元素。
-     * 这样我们就可以把它们和 图片容器 (.hero-feature-image) 混合在一起排序了。
-     */
+    /* 保持 display: contents 用于重新排序 */
     .hero-feature-text {
         display: contents;
     }
 
-    /* 排序 1: 文字 */
     .feature-desc {
         order: 1; 
         text-align: center;
-        margin-bottom: 30px; /* 文字和图片的距离 */
+        font-size: 1.1rem;
+        margin-bottom: 20px; 
     }
 
-    /* 排序 2: 图片 (插入到文字和Logo中间) */
     .hero-feature-image {
         order: 2;
-        width: 100%; /* 确保图片占满宽 */
-        margin-bottom: 30px; /* 图片和底部 Logo 的距离 */
+        width: 100%; 
+        margin-bottom: 30px; 
     }
 
-    /* 排序 3: Kickstarter Logo */
     .ks-row {
         order: 3;
         justify-content: center;
@@ -267,7 +275,9 @@ const {
     }
 
     .hero-feature-image img {
-        max-height: 250px;
+        /* [修改 4] 移动端图片也放大 */
+        /* 之前是 250px，现在是 380px，手机上看会更有冲击力 */
+        max-height: 380px; 
     }
 }
 </style>
