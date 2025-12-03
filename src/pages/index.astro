@@ -15,9 +15,8 @@ import ComparisonSection from '../components/ComparisonSection.astro';
 
 const DESKTOP_HERO_IMAGE = "/images/Manetta-hero-banner-bg-desktop.jpg";
 const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
-
-// 这里设置你要在 Banner 下方显示的图片路径
 const HERO_FEATURE_IMAGE = "/images/Manetta-hero-banner-product.png";
+const KICKSTARTER_LOGO = "/images/kickstarter-logo-white.png";
 ---
 <!DOCTYPE html>
 <html lang="zh">
@@ -42,6 +41,7 @@ const HERO_FEATURE_IMAGE = "/images/Manetta-hero-banner-product.png";
         mobileImage={MOBILE_HERO_IMAGE}
         featureText="Join now and receive your exclusive up to 30% Super early bird discount! Limited spots available."
         featureImage={HERO_FEATURE_IMAGE}
+        kickstarterLogo={KICKSTARTER_LOGO}
     />
 
     <KlaviyoFormModule

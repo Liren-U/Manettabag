@@ -6,27 +6,28 @@ interface Props {
   description: string;
   desktopImage: string;
   mobileImage: string;
-  // 新增：下方特性区域的文字和图片
+  // 特性区域参数
   featureText?: string;
   featureImage?: string;
+  // 新增：Kickstarter Logo 图片路径
+  kickstarterLogo?: string;
 }
 
-const {
-  title,
-  description,
-  desktopImage,
+const { 
+  title, 
+  description, 
+  desktopImage, 
   mobileImage,
   featureText,
-  featureImage
+  featureImage,
+  kickstarterLogo
 } = Astro.props;
 ---
 
 <section class="hero-banner">
     <div class="hero-banner__bg-wrapper">
         <picture>
-            {/* 移动端背景图 */}
             <source srcset={mobileImage} media="(max-width: 768px)">
-            {/* 桌面端背景图 */}
             <img
                 src={desktopImage}
                 alt=""
@@ -40,20 +41,33 @@ const {
     </div>
 
     <div class="hero-banner__content">
-        {/* 原有的标题区域 */}
+        {/* Title 区域 */}
         <div class="hero-header">
             <h1>{title}</h1>
             <p>{description}</p>
         </div>
 
-        {/* 新增：左文右图区域 (仅当有图片传入时显示) */}
+        {/* Feature 区域 */}
         {featureImage && (
-            <div class="hero-feature-split">
-                <div class="hero-feature-left">
-                    <p>{featureText}</p>
-                </div>
-                <div class="hero-feature-right">
-                    <img src={featureImage} alt="Feature highlight" />
+            <div class="hero-feature-wrapper">
+                <div class="hero-feature-row">
+                    {/* 左侧：文字 + Kickstarter 预告 */}
+                    <div class="hero-feature-text">
+                        <p class="feature-desc">{featureText}</p>
+                        
+                        {/* 新增：Kickstarter 行 */}
+                        {kickstarterLogo && (
+                            <div class="ks-row">
+                                <span class="ks-text">Coming soon on</span>
+                                <img src={kickstarterLogo} alt="Kickstarter" class="ks-logo" />
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* 右侧：产品图 */}
+                    <div class="hero-feature-image">
+                        <img src={featureImage} alt="Product Feature" />
+                    </div>
                 </div>
             </div>
         )}
@@ -61,25 +75,18 @@ const {
 </section>
 
 <style>
-/*
- * =======================================================
- * src/styles/hero-banner.css
- * 策略变更：由内容撑开高度 (Content-driven height)
- * =======================================================
- */
+/* src/styles/hero-banner.css */
 
 .hero-banner {
     position: relative;
     width: 100%;
-    /* 设置最小高度，防止内容太少时 Banner 太窄 */
-    min-height: 85vh; 
+    min-height: 90vh; 
     display: flex;
     justify-content: center;
     overflow: hidden;
     background-color: #333;
 }
 
-/* 1. 背景层：改为绝对定位，铺满整个区域 */
 .hero-banner__bg-wrapper {
     position: absolute;
     top: 0;
@@ -92,7 +99,7 @@ const {
 .hero-banner__background-picture {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 关键：保持比例覆盖，不拉伸 */
+    object-fit: cover;
     display: block;
 }
 
@@ -102,111 +109,161 @@ const {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.45);
     z-index: 2;
 }
 
-/* 2. 内容区域：改为 Relative，由它来决定 Banner 的实际高度 */
 .hero-banner__content {
     position: relative;
     z-index: 3;
     width: 100%;
-    max-width: 1200px; /* 限制最大宽度，保持排版整洁 */
-
-    /* 保持原来的排版位置：通过 padding-top 控制标题距离顶部的距离 */
-    padding-top: 80px;
-    padding-bottom: 60px;
-    padding-left: 20px;
-    padding-right: 20px;
-
-    color: #ffffff;
+    max-width: 1200px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    
+    /* 标题距离顶部的高度 */
+    padding-top: 60px; 
+    padding-bottom: 0; 
+    padding-left: 20px;
+    padding-right: 20px;
+    
+    color: #ffffff;
 }
 
-/* 3. 标题区域样式 (保持原有风格) */
 .hero-header {
     text-align: center;
     width: 100%;
-    margin-bottom: 60px; /* 与下方新区域拉开距离 */
+    flex-shrink: 0;
+    margin-bottom: 20px; 
 }
 
 .hero-header h1 {
-    font-size: clamp(1.7rem, 2.2vw, 2.5rem);
-    margin-bottom: 15px;
+    font-size: clamp(2rem, 3vw, 3.5rem);
+    margin-bottom: 10px;
     line-height: 1.1;
     font-weight: bold;
 }
 
 .hero-header p {
-    font-size: clamp(0.9rem, 1.2vw, 1.4rem);
+    font-size: clamp(1rem, 1.2vw, 1.4rem);
     margin: 0 auto;
     line-height: 1.6;
-    max-width: 800px; /* 描述文字限制宽度，便于阅读 */
+    max-width: 800px;
 }
 
-/* 4. 新增：左文右图布局 */
-.hero-feature-split {
+/* Feature 容器：沉底 */
+.hero-feature-wrapper {
+    flex-grow: 1;
     display: flex;
-    flex-direction: row; /* 左右排列 */
-    align-items: center; /* 垂直居中 */
+    flex-direction: column;
+    justify-content: flex-end; /* 内容沉底 */
+    width: 100%;
+    padding-bottom: 80px; /* 距离底部的距离 */
+}
+
+.hero-feature-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center; 
     justify-content: space-between;
     width: 100%;
-    max-width: 1000px; /* 限制这块内容的宽度，防止太散 */
-    gap: 50px; /* 左右间距 */
+    gap: 60px;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-/* 左侧文字容器 */
-.hero-feature-left {
+/* 左侧文字块 */
+.hero-feature-text {
     flex: 1;
-    text-align: left; /* 文字左对齐 */
+    text-align: left;
 }
 
-.hero-feature-left p {
+.feature-desc {
     font-size: 1.1rem;
     line-height: 1.7;
     color: #f0f0f0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 20px; /* 文字和 Kickstarter Logo 之间的间距 */
 }
 
-/* 右侧图片容器 */
-.hero-feature-right {
+/* --- 新增：Kickstarter 样式 --- */
+.ks-row {
+    display: flex;
+    align-items: center; /* 垂直对齐文字和 Logo */
+    gap: 12px; /* 文字和 Logo 的间距 */
+}
+
+.ks-text {
+    font-size: 1.2rem;
+    font-weight: 600; /* 加粗 */
+    text-transform: uppercase; /* 大写看起来更像 Banner */
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.ks-logo {
+    height: 30px; /* 控制 Kickstarter Logo 的高度，按需调整 */
+    width: auto;
+    display: block;
+    /* 如果你的 Logo 是黑色的，可以用滤镜把它变白，或者直接上传白色 PNG */
+    /* filter: brightness(0) invert(1); */ 
+}
+
+/* 右侧图片 */
+.hero-feature-image {
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
-.hero-feature-right img {
+.hero-feature-image img {
     max-width: 100%;
     height: auto;
-    max-height: 350px; /* 限制图片最大高度 */
+    max-height: 380px;
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); /* 加一点阴影更有质感 */
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4));
 }
 
-/* 5. 移动端适配 */
+/* --- 移动端适配 --- */
 @media (max-width: 768px) {
     .hero-banner__content {
-        padding-top: 60px;
+        padding-top: 80px; 
     }
 
-    .hero-feature-split {
-        flex-direction: column; /* 移动端改为上下堆叠 */
+    .hero-feature-wrapper {
+        flex-grow: 0;
+        justify-content: flex-start;
+        margin-top: 40px; 
+        padding-bottom: 60px;
+    }
+
+    .hero-feature-row {
+        flex-direction: column;
         gap: 30px;
         text-align: center;
     }
 
-    .hero-feature-left {
-        text-align: center; /* 移动端文字居中 */
-        order: 1; /* 文字在上 */
-    }
-
-    .hero-feature-right {
-        order: 2; /* 图片在下 */
+    .hero-feature-text {
+        text-align: center;
+        order: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* 移动端让文字和 KS Logo 居中 */
     }
     
-    .hero-feature-right img {
-        max-height: 250px; /* 移动端图片稍微小一点 */
+    /* 移动端 KS 行也要居中 */
+    .ks-row {
+        justify-content: center;
+    }
+
+    .hero-feature-image {
+        order: 2;
+    }
+
+    .hero-feature-image img {
+        max-height: 250px;
     }
 }
 </style>
