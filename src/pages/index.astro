@@ -17,6 +17,8 @@ import ComparisonSection from '../components/ComparisonSection.astro';
 // 关键：这些变量必须在 head 中被使用，因此保持定义
 const DESKTOP_HERO_IMAGE = "/images/Manetta-hero-banner-bg-desktop.jpg";
 const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
+// hero banner product image
+const HERO_PRODUCT_IMAGE = "/images/Manetta-hero-product.png";
 ---
 <!DOCTYPE html>
 <html lang="zh">
@@ -50,6 +52,7 @@ const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
         description="Modular Design | 3X Expandable Space | Waterproff Protection | Ergonormic Carrying System"
         desktopImage={DESKTOP_HERO_IMAGE}
         mobileImage={MOBILE_HERO_IMAGE}
+        productImage={HERO_PRODUCT_IMAGE}
     />
 
     <KlaviyoFormModule

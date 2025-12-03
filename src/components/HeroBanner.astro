@@ -1,130 +1,188 @@
 ---
 // src/components/HeroBanner.astro
-//import '../styles/hero-banner.css';
 
 interface Props {
   title: string;
   description: string;
-  desktopImage: string;
-  mobileImage: string;
+  desktopImage: string; // 背景图 (桌面)
+  mobileImage: string;  // 背景图 (移动)
+  productImage: string; // 新增：右侧产品图
+  productAlt?: string;  // 新增：产品图描述
 }
 
-const { title, description, desktopImage, mobileImage } = Astro.props;
+const { 
+  title, 
+  description, 
+  desktopImage, 
+  mobileImage, 
+  productImage,
+  productAlt = "Manetta Camera Bag"
+} = Astro.props;
 ---
 
 <section class="hero-banner">
-    <picture>
-        {/* 移动端图片优先加载 (小于等于 768px) */}
-        <source srcset={mobileImage} media="(max-width: 768px)">
+    {/* 1. 背景层：绝对定位，铺满底层 */}
+    <div class="hero-banner__bg">
+        <picture>
+            <source srcset={mobileImage} media="(max-width: 768px)">
+            <img 
+                src={desktopImage} 
+                alt="" 
+                class="hero-banner__bg-img"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+            />
+        </picture>
+        <div class="hero-banner__overlay"></div>
+    </div>
 
-        {/* 默认加载桌面端图片 */}
-        <img
-            src={desktopImage}
-            alt={title}
-            class="hero-banner__background-picture"
-            loading="eager"
-            decoding="async"
-            fetchpriority="high"
-        />
-    </picture>
+    {/* 2. 内容层：相对定位，分为左右两栏 */}
+    <div class="hero-banner__container">
+        <div class="hero-banner__content-wrapper">
+            
+            {/* 左侧：文字内容 */}
+            <div class="hero-content__left">
+                <h1>{title}</h1>
+                <p>{description}</p>
+                {/* 如果需要按钮，可以在这里添加 */}
+                {/* <a href="#shop" class="hero-btn">Shop Now</a> */}
+            </div>
 
-    <div class="hero-banner__overlay"></div> {/* 半透明蒙版 */}
+            {/* 右侧：产品图片 */}
+            <div class="hero-content__right">
+                <img 
+                    src={productImage} 
+                    alt={productAlt} 
+                    class="hero-product-img"
+                    loading="eager"
+                />
+            </div>
 
-    <div class="hero-banner__content">
-        <h1>{title}</h1>
-        <p>{description}</p>
+        </div>
     </div>
 </section>
 
 <style>
-    /*
- * =======================================================
- * src/styles/hero-banner.css - 最终版 (全宽内容 + 响应式字体)
- * 策略: 内容全宽 (100% 视口宽度)，仅通过 padding 控制左右边距
- * =======================================================
+/* * 布局策略：
+ * 1. 外部容器 (.hero-banner) 相对定位。
+ * 2. 背景层 (.hero-banner__bg) 绝对定位铺满，z-index 低。
+ * 3. 内容层 (.hero-banner__container) 相对定位，z-index 高，使用 Flexbox 布局。
  */
 
 .hero-banner {
     position: relative;
     width: 100%;
-    background-color: #333333;
     overflow: hidden;
+    background-color: #333; /* 图片加载前的背景色 */
 }
 
-/* 1. 背景图片样式 */
-.hero-banner__background-picture {
+/* --- 背景层样式 --- */
+.hero-banner__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
     z-index: 1;
 }
 
-/* 2. 背景蒙版 */
+.hero-banner__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 关键：确保背景图覆盖整个区域且不变形 */
+    display: block;
+}
+
 .hero-banner__overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.4); /* 半透明遮罩 */
     z-index: 2;
 }
 
-/* 3. 内容区域样式 (全宽容器) */
-.hero-banner__content {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-
-    padding-top: 80px;
+/* --- 内容层样式 --- */
+.hero-banner__container {
+    position: relative;
     z-index: 3;
+    width: 100%;
+    /* 限制最大宽度，防止在大屏上太散 */
+    max-width: 1400px; 
+    margin: 0 auto;
+    padding: 80px 40px; /* 上下左右内边距 */
+}
 
-    /* 关键修正 A: 移除 max-width，使其宽度继承父元素（全宽） */
-    max-width: 100%; /* 确保它至少是全宽的 */
-    width: 100%;     /* 确保它撑开 */
+.hero-banner__content-wrapper {
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: space-between; /* 左右分布 */
+    gap: 40px; /* 左右栏之间的间距 */
+}
 
-    /* 关键修正 B: 统一设置左右内边距，作为所有设备上的最小安全边距 */
-    padding-left: 20px;
-    padding-right: 20px;
-
-    text-align: center;
+/* --- 左侧文字 --- */
+.hero-content__left {
+    flex: 1; /* 占据剩余空间 */
+    max-width: 600px; /* 限制文字最大宽度，增加可读性 */
+    text-align: left; /* 文字左对齐 */
     color: #ffffff;
 }
 
-/* 4. H1 标题 - 流体排版 */
-.hero-banner__content h1 {
-    /* 字体范围: 24px 到 40px，保持不变 */
-    font-size: clamp(1.7rem, 2.2vw, 2.5rem);
-    /* H1 现在会占满 100% 的 content 区域（即全宽减去 20px 边距） */
-    width: 100%;
-    margin-bottom: 15px;
+.hero-content__left h1 {
+    font-size: clamp(2rem, 3.5vw, 3.5rem); /* 流体字体 */
     line-height: 1.1;
     font-weight: bold;
+    margin-bottom: 20px;
 }
 
-/* P 字段 - 流体排版 */
-.hero-banner__content p {
-    /* 字体范围: 14.4px 到 22.4px，保持不变 */
-    font-size: clamp(0.9rem, 1.2vw, 1.4rem);
-
-    /* 关键修正 C: 移除 max-width，使其也占满全宽（但不会比 H1 窄） */
-    max-width: 100%; /* 移除 700px/900px 的硬限制 */
-
-    margin-left: auto; /* 保持居中规则，但现在 P 字段是全宽的 */
-    margin-right: auto;
+.hero-content__left p {
+    font-size: clamp(1rem, 1.2vw, 1.25rem);
     line-height: 1.6;
+    opacity: 0.9;
 }
 
-/* 5. 移动端调整 */
-@media (max-width: 768px) {
-    .hero-banner__content {
-        padding-top: 60px;
-        /* 关键修正 D: 移动端使用更小的内边距，让内容更贴边 */
-        padding-left: 15px;
-        padding-right: 15px;
+/* --- 右侧产品图 --- */
+.hero-content__right {
+    flex: 1; /* 占据剩余空间 */
+    display: flex;
+    justify-content: center; /* 图片在右侧区域内居中 */
+    align-items: center;
+}
+
+.hero-product-img {
+    width: 100%;
+    max-width: 500px; /* 限制产品图最大宽度 */
+    height: auto;
+    /* 可选：给产品图加一点投影，增加立体感 */
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); 
+}
+
+/* --- 响应式设计 (平板和手机) --- */
+@media (max-width: 900px) {
+    .hero-banner__container {
+        padding: 60px 20px;
     }
 
-    /* H1 和 P 字体大小由 clamp() 统一处理 */
+    .hero-banner__content-wrapper {
+        flex-direction: column-reverse; /* 手机端：图片在上，文字在下 (或者用 column) */
+        /* 如果希望文字在上，图片在下，请改为 flex-direction: column; */
+        text-align: center;
+    }
+
+    .hero-content__left {
+        text-align: center; /* 手机端文字居中 */
+        margin-top: 30px;
+        max-width: 100%;
+    }
+
+    .hero-content__right {
+        width: 100%;
+    }
+
+    .hero-product-img {
+        max-width: 80%; /* 手机端图片稍微缩小一点 */
+    }
 }
 </style>
