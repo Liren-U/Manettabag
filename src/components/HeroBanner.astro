@@ -58,16 +58,11 @@ const {
 .hero-banner {
     position: relative;
     width: 100%;
-    
-    /* [修改 1] 高度改为自适应 (auto)，不再强制 90vh */
-    min-height: auto; 
-    
+    min-height: auto; /* 高度自适应 */
     display: flex;
     justify-content: center;
     overflow: hidden;
     background-color: #F2F2F2; 
-    
-    /* [修改 2] 增加底部内边距，确保内容下方有呼吸空间，但不会过大 */
     padding-bottom: 100px;
 }
 
@@ -76,14 +71,10 @@ const {
     z-index: 3;
     width: 100%;
     max-width: 1600px; 
-    
-    /* [修改 3] 移除 height: 100%，让高度随内容自然流动 */
     height: auto; 
-    
     display: flex;
     flex-direction: column;
     padding-top: 60px; 
-    /* 左右内边距 */
     padding-left: 30px; 
     padding-right: 30px;
     color: #333333; 
@@ -113,16 +104,11 @@ const {
 }
 
 .hero-feature-wrapper {
-    /* [修改 4] 移除 flex-grow，不需要撑开空间了，紧随 Title 之后即可 */
     flex-grow: 0;
-    
     display: flex;
     flex-direction: column;
-    /* 移除之前的沉底对齐，现在自然排列 */
     justify-content: flex-start; 
-    
     width: 100%;
-    /* 移除 wrapper 的 padding，统一由 banner 控制底部 */
     padding-bottom: 0; 
 }
 
@@ -144,7 +130,7 @@ const {
     text-align: left;
     max-width: 650px; 
     
-    /* 保持动态的顶部间距 */
+    /* 动态间距：视口高度的 15% */
     padding-top: 15vh;
 }
 
@@ -155,24 +141,38 @@ const {
     color: #444444;
 }
 
-/* --- Kickstarter 样式 --- */
+/* --- Kickstarter 样式 (核心修改部分) --- */
 .ks-row {
     display: flex;
     align-items: center; 
-    white-space: nowrap; 
+    
+    /* [修改 1] 允许换行！
+       当空间不足时（比如手机竖屏），Logo 会自动掉到下一行 
+       而不是强行挤在一起 */
+    flex-wrap: wrap;
+    
+    /* 设置行列间距，换行后 Logo 和文字之间也会有间距 */
     gap: 0.8em; 
 }
 
 .ks-text {
-    font-size: clamp(0.75rem, 2.5vw, 1.25rem); 
+    /* [修改 2] 字体大小响应式 
+       因为允许换行，最小字体可以稍微设大一点点 (0.9rem)，保证清晰度 */
+    font-size: clamp(0.9rem, 2.5vw, 1.3rem); 
+    
     font-weight: 600; 
     text-transform: uppercase; 
     letter-spacing: 1px;
-    line-height: 1; 
+    line-height: 1.2; 
     color: #333333;
+
+    /* [修改 3] 关键：文字本身不换行
+       "Coming soon on" 永远是一个整体 */
+    white-space: nowrap; 
 }
 
 .ks-logo {
+    /* Logo 高度随字体大小成比例 */
     height: 1.6em; 
     width: auto;
     display: block;
@@ -197,7 +197,6 @@ const {
 /* --- 移动端适配 --- */
 @media (max-width: 900px) { 
     .hero-banner {
-        /* 移动端底部稍微紧凑一点 */
         padding-bottom: 60px;
     }
 
@@ -241,12 +240,14 @@ const {
     /* 排序 3: Kickstarter Logo */
     .ks-row {
         order: 3;
+        /* 在移动端居中显示 */
         justify-content: center;
         width: 100%;
     }
     
+    /* 移动端字体大小 */
     .ks-text {
-        font-size: clamp(0.7rem, 3.5vw, 1rem); 
+        font-size: clamp(0.8rem, 3.5vw, 1.1rem); 
     }
 
     .hero-feature-image img {
