@@ -6,10 +6,8 @@ interface Props {
   description: string;
   desktopImage: string;
   mobileImage: string;
-  // 特性区域参数
   featureText?: string;
   featureImage?: string;
-  // 新增：Kickstarter Logo 图片路径
   kickstarterLogo?: string;
 }
 
@@ -41,21 +39,18 @@ const {
     </div>
 
     <div class="hero-banner__content">
-        {/* Title 区域 */}
         <div class="hero-header">
             <h1>{title}</h1>
             <p>{description}</p>
         </div>
 
-        {/* Feature 区域 */}
         {featureImage && (
             <div class="hero-feature-wrapper">
                 <div class="hero-feature-row">
-                    {/* 左侧：文字 + Kickstarter 预告 */}
+                    {/* 左侧容器：包含文字和KS Logo */}
                     <div class="hero-feature-text">
                         <p class="feature-desc">{featureText}</p>
                         
-                        {/* Kickstarter 行 */}
                         {kickstarterLogo && (
                             <div class="ks-row">
                                 <span class="ks-text">Coming soon on</span>
@@ -64,7 +59,7 @@ const {
                         )}
                     </div>
                     
-                    {/* 右侧：产品图 */}
+                    {/* 右侧容器：产品图 */}
                     <div class="hero-feature-image">
                         <img src={featureImage} alt="Product Feature" />
                     </div>
@@ -121,12 +116,10 @@ const {
     height: 100%;
     display: flex;
     flex-direction: column;
-    
     padding-top: 60px; 
     padding-bottom: 0; 
     padding-left: 20px;
     padding-right: 20px;
-    
     color: #ffffff;
 }
 
@@ -151,7 +144,6 @@ const {
     max-width: 800px;
 }
 
-/* Feature 容器 */
 .hero-feature-wrapper {
     flex-grow: 1;
     display: flex;
@@ -161,6 +153,7 @@ const {
     padding-bottom: 80px; 
 }
 
+/* 电脑端布局 */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
@@ -185,32 +178,28 @@ const {
     margin-bottom: 20px;
 }
 
-/* --- 修改：Kickstarter 样式调整 --- */
+/* Kickstarter 样式 */
 .ks-row {
     display: flex;
-    align-items: center; /* 保持垂直居中 */
-    gap: 10px; /* 间距稍微缩小 */
+    align-items: center; 
+    gap: 10px; 
 }
 
 .ks-text {
-    /* [修改 1] 字体调小 */
-    font-size: 0.9rem; /* 约 14.4px，看起来更精致 */
+    font-size: 0.9rem; 
     font-weight: 600; 
     text-transform: uppercase; 
     color: #fff;
     letter-spacing: 1px;
-    /* [修改 2] 设置行高为 1，确保没有多余的上下空白，便于与图片对齐 */
     line-height: 1; 
 }
 
 .ks-logo {
-    /* [修改 3] 图片高度调小，匹配文字 */
-    height: 18px; /* 18px 的图片高度通常能很好地平衡 0.9rem 的文字 */
+    height: 18px; 
     width: auto;
     display: block;
 }
 
-/* 右侧图片 */
 .hero-feature-image {
     flex: 1;
     display: flex;
@@ -226,7 +215,7 @@ const {
     filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4));
 }
 
-/* --- 移动端适配 --- */
+/* --- 移动端适配 (核心修改) --- */
 @media (max-width: 768px) {
     .hero-banner__content {
         padding-top: 80px; 
@@ -239,26 +228,42 @@ const {
         padding-bottom: 60px;
     }
 
+    /* 移动端主容器设为列布局 */
     .hero-feature-row {
         flex-direction: column;
-        gap: 30px;
+        gap: 0; /* 间距由子元素 margin 控制 */
         text-align: center;
     }
 
+    /* * [关键修改技巧] 
+     * 使用 display: contents;
+     * 作用：在移动端，"消除" .hero-feature-text 这个父级 div 的布局影响。
+     * 结果：它的子元素 (p.feature-desc 和 div.ks-row) 会“升级”变成 .hero-feature-row 的直接子元素。
+     * 这样我们就可以把它们和 图片容器 (.hero-feature-image) 混合在一起排序了。
+     */
     .hero-feature-text {
-        text-align: center;
-        order: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center; 
-    }
-    
-    .ks-row {
-        justify-content: center;
+        display: contents;
     }
 
+    /* 排序 1: 文字 */
+    .feature-desc {
+        order: 1; 
+        text-align: center;
+        margin-bottom: 30px; /* 文字和图片的距离 */
+    }
+
+    /* 排序 2: 图片 (插入到文字和Logo中间) */
     .hero-feature-image {
         order: 2;
+        width: 100%; /* 确保图片占满宽 */
+        margin-bottom: 30px; /* 图片和底部 Logo 的距离 */
+    }
+
+    /* 排序 3: Kickstarter Logo */
+    .ks-row {
+        order: 3;
+        justify-content: center;
+        width: 100%;
     }
 
     .hero-feature-image img {
