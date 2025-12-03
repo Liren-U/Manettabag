@@ -67,21 +67,17 @@ const {
 /*
  * src/styles/hero-banner.css
  * 策略: 
- * 1. 内容撑开高度
- * 2. 电脑端改为“顶部对齐”，通过 padding-top 控制标题高度
+ * 1. 容器 min-height: 90vh 保证有足够的高度。
+ * 2. 使用 Flexbox 的 column 布局。
+ * 3. Title 也就是 .hero-header 位于顶部。
+ * 4. Feature Row 使用 margin-top: auto 和 margin-bottom: auto，这样它会自动占据剩余空间的中心位置。
  */
 
 .hero-banner {
     position: relative;
     width: 100%;
-    /* 保证最小高度 */
-    min-height: 85vh; 
+    min-height: 90vh; /* 增加高度，给“中间”留出空间 */
     display: flex;
-    
-    /* [修改点 1] 电脑端改为顶部对齐 (flex-start)，而不是居中 (center) */
-    /* 这样标题的位置就由 padding-top 决定，而不会被下方的图片高度影响 */
-    align-items: flex-start; 
-    
     justify-content: center;
     overflow: hidden;
     background-color: #333;
@@ -114,37 +110,37 @@ const {
     z-index: 2;
 }
 
-/* 内容区域 */
+/* 内容区域 - 关键布局修改 */
 .hero-banner__content {
     position: relative;
     z-index: 3;
     width: 100%;
     max-width: 1200px;
+    height: 100%; /* 继承父元素高度 */
     
-    /* [修改点 2] 这里控制标题距离顶部的具体位置 */
-    /* 140px 大约是 Header 高度 + 想要的间距，你可以把这个数字改小（如 120px）让标题更靠上 */
-    padding-top: 140px; 
+    /* 设置为 Flex 列布局 */
+    display: flex;
+    flex-direction: column;
     
+    /* 顶部内边距：控制 Title 距离顶部的绝对位置 */
+    padding-top: 130px; 
     padding-bottom: 60px;
     padding-left: 20px;
     padding-right: 20px;
     
     color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-/* 头部标题区域 */
+/* 1. 上部的 Title 区域 */
 .hero-header {
     text-align: center;
-    /* [修改点 3] 增加标题和下方内容的间距，让布局更舒展 */
-    margin-bottom: 60px; 
     width: 100%;
+    /* 不需要 margin-bottom，因为下方的元素会自动居中 */
+    flex-shrink: 0; /* 防止空间不足时被压缩 */
 }
 
 .hero-header h1 {
-    font-size: clamp(2rem, 3vw, 3.5rem); /* 稍微调大了点字体，更有气势 */
+    font-size: clamp(2rem, 3vw, 3.5rem);
     margin-bottom: 15px;
     line-height: 1.1;
     font-weight: bold;
@@ -157,17 +153,23 @@ const {
     max-width: 800px;
 }
 
-/* --- 下方左右分栏区域 --- */
+/* 2. 中部的产品/文字区域 */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
-    align-items: center; /* 垂直方向居中对齐 */
+    align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 60px; /* 增加左右间距 */
+    gap: 60px;
+    max-width: 1000px;
     
-    /* 限制内容区的最大宽度，让文字和图片不要太靠边 */
-    max-width: 1000px; 
+    /* 自身居中 */
+    align-self: center; 
+    
+    /* 关键技巧：上下 Auto Margin */
+    /* 这会让这个区块自动浮动在 Title 和 底部 之间的正中间 */
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 /* 左侧文字 */
@@ -192,8 +194,7 @@ const {
 .hero-feature-image img {
     max-width: 100%;
     height: auto;
-    /* 稍微限制图片高度，防止把页面撑太长 */
-    max-height: 350px; 
+    max-height: 380px; /* 控制中间图片大小 */
     object-fit: contain;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
 }
@@ -201,25 +202,22 @@ const {
 /* --- 移动端适配 --- */
 @media (max-width: 768px) {
     .hero-banner {
-        /* 移动端依然保持垂直居中可能更好看，或者你也想靠上就保持 flex-start */
-        align-items: center; 
-        min-height: auto;
+        min-height: auto; /* 移动端不要强制撑满屏幕，允许自然滚动 */
     }
 
     .hero-banner__content {
-        /* 移动端不需要那么大的 padding-top */
-        padding-top: 100px; 
-        padding-bottom: 40px;
-    }
-
-    .hero-header {
-        margin-bottom: 30px;
+        padding-top: 100px;
+        padding-bottom: 60px;
     }
 
     .hero-feature-row {
-        flex-direction: column;
+        flex-direction: column; /* 上下排列 */
         gap: 30px;
         text-align: center;
+        
+        /* 移动端取消自动居中，改为固定间距，防止内容太长重叠 */
+        margin-top: 40px; 
+        margin-bottom: 0;
     }
 
     .hero-feature-text {
@@ -230,9 +228,9 @@ const {
     .hero-feature-image {
         order: 2;
     }
-    
+
     .hero-feature-image img {
-        max-height: 250px; /* 移动端图片稍微小一点 */
+        max-height: 250px;
     }
 }
 </style>
