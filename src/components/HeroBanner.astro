@@ -71,27 +71,24 @@ const {
 
 <style>
 /*
- * =======================================================
  * src/styles/hero-banner.css
- * 布局逻辑：
- * 1. Banner 高度至少 90vh。
- * 2. Content 采用 Flex Column。
- * 3. Header 通过 padding-top 固定在顶部。
- * 4. Wrapper 通过 flex-grow: 1 占据剩余高度，并 justify-content: center 实现垂直居中。
- * =======================================================
+ * 布局策略调整：
+ * 1. Title: 通过极小的 padding-top 顶到最上方。
+ * 2. Feature区域: 通过 justify-content: flex-end 沉到底部，再用 padding-bottom 抬高一点。
  */
 
 .hero-banner {
     position: relative;
     width: 100%;
-    min-height: 90vh; /* 保证高度足够，才有“中间”的概念 */
+    /* 保持高度，确保有足够空间拉开距离 */
+    min-height: 90vh; 
     display: flex;
     justify-content: center;
     overflow: hidden;
     background-color: #333;
 }
 
-/* --- 背景控制 --- */
+/* 背景图容器 */
 .hero-banner__bg-wrapper {
     position: absolute;
     top: 0;
@@ -104,7 +101,7 @@ const {
 .hero-banner__background-picture {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 保持比例填充 */
+    object-fit: cover;
     display: block;
 }
 
@@ -114,41 +111,45 @@ const {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.45); /* 遮罩深度 */
+    background-color: rgba(0, 0, 0, 0.45);
     z-index: 2;
 }
 
-/* --- 内容布局核心 --- */
+/* 内容区域 */
 .hero-banner__content {
     position: relative;
     z-index: 3;
     width: 100%;
     max-width: 1200px;
-    height: 100%; /* 继承 Banner 高度 */
+    height: 100%;
     
     display: flex;
-    flex-direction: column; /* 垂直排列 */
+    flex-direction: column;
     
-    /* [控制 Title 位置的关键]：90px 距离顶部 */
-    padding-top: 90px; 
+    /* [修改点 1: Title 再往上] */
+    /* 之前是 90px，现在改为 60px (甚至可以更小，取决于你的 Header 是否遮挡) */
+    padding-top: 60px; 
     
-    padding-bottom: 40px; /* 底部留白 */
+    /* 底部 padding 交给 wrapper 控制，这里设为 0 */
+    padding-bottom: 0; 
     padding-left: 20px;
     padding-right: 20px;
     
     color: #ffffff;
 }
 
-/* 1. 顶部 Header */
+/* 顶部 Header */
 .hero-header {
     text-align: center;
     width: 100%;
-    flex-shrink: 0; /* 防止被挤压 */
+    flex-shrink: 0;
+    /* 稍微增加一点下边距，防止在手机端重叠 */
+    margin-bottom: 20px; 
 }
 
 .hero-header h1 {
     font-size: clamp(2rem, 3vw, 3.5rem);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     line-height: 1.1;
     font-weight: bold;
 }
@@ -160,32 +161,33 @@ const {
     max-width: 800px;
 }
 
-/* 2. 中部 Wrapper (弹性容器) */
+/* [修改点 2: Feature 往下沉] */
 .hero-feature-wrapper {
-    /* 核心代码：吃掉 Header 下方所有剩余空间 */
-    flex-grow: 1; 
-    
-    /* 核心代码：让内部元素（Row）在这个大空间里垂直居中 */
+    flex-grow: 1; /* 占据剩余所有空间 */
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    
+    /* 关键修改：改为 flex-end (底部对齐) */
+    /* 这样内容就会沉在下面，而不是悬在中间 */
+    justify-content: flex-end; 
     
     width: 100%;
+    
+    /* [修改点 3: 控制 Feature 距离底部的距离] */
+    /* 这里的 80px 决定了文字和图片距离底边的距离。觉得太低就加大，觉得太高就减小 */
+    padding-bottom: 80px; 
 }
 
-/* 3. 特性行 (左右布局) */
+/* Feature 行 (左右布局) */
 .hero-feature-row {
     display: flex;
     flex-direction: row;
-    
-    /* 核心代码：确保文字和图片互相垂直对齐 */
-    align-items: center; 
-    
+    align-items: center; /* 确保文字和图片垂直居中对齐 */
     justify-content: space-between;
     width: 100%;
     gap: 60px;
     max-width: 1000px;
-    margin: 0 auto; /* 水平居中 */
+    margin: 0 auto;
 }
 
 /* 左侧文字 */
@@ -198,7 +200,7 @@ const {
     font-size: 1.1rem;
     line-height: 1.7;
     color: #f0f0f0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 增加一点阴影提高可读性 */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 /* 右侧图片 */
@@ -212,46 +214,43 @@ const {
 .hero-feature-image img {
     max-width: 100%;
     height: auto;
-    max-height: 380px; /* 限制图片最大高度 */
+    max-height: 380px;
     object-fit: contain;
-    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4)); /* 图片投影，增加立体感 */
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.4));
 }
 
-/* --- 移动端适配 (<= 768px) --- */
+/* --- 移动端适配 --- */
 @media (max-width: 768px) {
-    .hero-banner {
-        /* 移动端通常不需要 min-height: 90vh，自然高度体验更好 */
-        /* 如果您希望移动端也是全屏，可以保留，但可能会导致小屏手机内容显示不全 */
-        min-height: auto; 
-    }
-
     .hero-banner__content {
-        padding-top: 100px; /* 移动端顶部留白 */
-        padding-bottom: 60px;
+        /* 移动端 Title 保持适当距离，避免太贴顶 */
+        padding-top: 80px; 
     }
 
     .hero-feature-wrapper {
-        flex-grow: 0; /* 移动端取消强力撑开 */
-        margin-top: 40px; /* 改为固定间距 */
+        flex-grow: 0;
+        justify-content: flex-start;
+        /* 移动端不需要强制沉底，自然排列即可，改为 margin-top 隔开 */
+        margin-top: 40px; 
+        padding-bottom: 60px;
     }
 
     .hero-feature-row {
-        flex-direction: column; /* 上下堆叠 */
+        flex-direction: column;
         gap: 30px;
         text-align: center;
     }
 
     .hero-feature-text {
         text-align: center;
-        order: 1; /* 文字在上 */
+        order: 1;
     }
 
     .hero-feature-image {
-        order: 2; /* 图片在下 */
+        order: 2;
     }
 
     .hero-feature-image img {
-        max-height: 250px; /* 移动端图片缩小 */
+        max-height: 250px;
     }
 }
 </style>
