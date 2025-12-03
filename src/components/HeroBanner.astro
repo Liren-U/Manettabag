@@ -4,7 +4,7 @@
 interface Props {
   title: string;
   description: string;
-  // 虽然现在不显示图片了，但为了不报错，暂时保留这些 Props 定义
+  // 保留这些 Props 定义以兼容 index.astro 的调用，但实际上不再用于背景显示
   desktopImage: string;
   mobileImage: string;
   featureText?: string;
@@ -15,8 +15,8 @@ interface Props {
 const { 
   title, 
   description, 
-  // desktopImage, // 不再使用
-  // mobileImage,  // 不再使用
+  // desktopImage, // 背景图不再使用
+  // mobileImage,  // 背景图不再使用
   featureText,
   featureImage,
   kickstarterLogo
@@ -24,9 +24,7 @@ const {
 ---
 
 <section class="hero-banner">
-    {/* 【已删除】背景图片包装器 (.hero-banner__bg-wrapper) 及其内部的 picture 和 overlay 
-      现在直接显示纯色背景
-    */}
+    {/* 背景图片结构已移除，直接使用 CSS 背景色 */}
 
     <div class="hero-banner__content">
         <div class="hero-header">
@@ -69,6 +67,7 @@ const {
     display: flex;
     justify-content: center;
     overflow: hidden;
+    /* 背景色改为浅灰色 */
     background-color: #F2F2F2; 
 }
 
@@ -76,6 +75,7 @@ const {
     position: relative;
     z-index: 3;
     width: 100%;
+    /* 外部大容器最大宽度 1600px */
     max-width: 1600px; 
     height: 100%;
     display: flex;
@@ -84,6 +84,7 @@ const {
     padding-bottom: 0; 
     padding-left: 30px; 
     padding-right: 30px;
+    /* 字体颜色改为深色 */
     color: #333333; 
 }
 
@@ -124,25 +125,27 @@ const {
     display: flex;
     flex-direction: row;
     
-    /* [修改 1] 从 center 改为 flex-start */
-    /* 这样左侧文字就会与图片的顶部对齐，而不是与图片的中心对齐 */
+    /* 顶部对齐，配合 padding-top 实现自定义位置 */
     align-items: flex-start; 
     
     justify-content: space-between;
     width: 100%;
+    /* 内部内容区域最大宽度 1400px */
     max-width: 1400px; 
     margin: 0 auto;
     gap: 50px; 
 }
 
+/* 左侧文字区块 */
 .hero-feature-text {
     flex: 1;
     text-align: left;
     max-width: 650px; 
     
-    /* [修改 2] 增加顶部内边距 */
-    /* 因为改成了顶部对齐，文字会贴着最上面。加一点 padding 让它往下一点点，处于“中偏上”的黄金位置 */
-    padding-top: 60px; 
+    /* [关键] 自适应顶部间距 */
+    /* clamp(最小值, 视口高度百分比, 最大值) */
+    /* 这会让文字既不贴顶，也不居中，而是处于大约前 1/3 的舒适位置 */
+    padding-top: clamp(100px, 18vh, 240px);
 }
 
 .feature-desc {
@@ -156,7 +159,7 @@ const {
 .ks-row {
     display: flex;
     align-items: center; 
-    white-space: nowrap; 
+    white-space: nowrap; /* 强制不换行 */
     gap: 0.8em; 
 }
 
@@ -170,11 +173,12 @@ const {
 }
 
 .ks-logo {
-    height: 1.6em; 
+    height: 1.6em; /* 随字体大小自动变化 */
     width: auto;
     display: block;
 }
 
+/* 右侧产品图区块 */
 .hero-feature-image {
     flex: 1;
     display: flex;
@@ -187,10 +191,11 @@ const {
     height: auto;
     max-height: 600px; 
     object-fit: contain;
+    /* 适应浅色背景的柔和投影 */
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); 
 }
 
-/* --- 移动端适配 --- */
+/* --- 移动端适配 (平板竖屏及手机) --- */
 @media (max-width: 900px) { 
     .hero-banner__content {
         padding-top: 80px; 
@@ -209,17 +214,18 @@ const {
         flex-direction: column;
         gap: 0; 
         text-align: center;
-        
-        /* 移动端恢复默认对齐，防止错位 */
+        /* 移动端恢复居中对齐 */
         align-items: center; 
     }
 
     .hero-feature-text {
+        /* 使用 contents 消除父容器影响，以便重新排序 */
         display: contents;
-        /* 移动端去掉 padding-top，因为顺序变了，不需要强制往下挤 */
+        /* 移动端不需要顶部 padding */
         padding-top: 0; 
     }
 
+    /* 排序 1: 文字 */
     .feature-desc {
         order: 1; 
         text-align: center;
@@ -227,12 +233,14 @@ const {
         margin-bottom: 20px; 
     }
 
+    /* 排序 2: 图片 */
     .hero-feature-image {
         order: 2;
         width: 100%; 
         margin-bottom: 30px; 
     }
 
+    /* 排序 3: Kickstarter Logo */
     .ks-row {
         order: 3;
         justify-content: center;
