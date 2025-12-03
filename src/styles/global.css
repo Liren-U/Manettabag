@@ -5,23 +5,18 @@
  * =======================================================
  */
 
-/* 🚀 修改点 1 & 2: 定义 ElmsSans-Light 字体 */
+/* 🚀 1. 定义 ElmsSans-Light 字体 */
 @font-face {
-    /* 更改为新的字体族名称 */
     font-family: 'Manetta-ElmsSans';
-
-    /* 更改为新的字体文件名 ElmsSans-Light.ttf */
+    /* 确保该路径下文件存在 */
     src: url('/fonts/ElmsSans-Light.ttf') format('truetype'); 
-
-    /* Light 字体通常设置为 300 */
+    /* 定义该字体的字重为 300 (Light) */
     font-weight: 300; 
     font-style: normal;
-
-    /* 优化字体加载 */
     font-display: swap;
 }
 
-/* 1. CSS Reset (解决全页面白边和不一致性问题) */
+/* 2. CSS Reset (解决全页面白边和不一致性问题) */
 * {
     /* 统一使用盒模型 */
     box-sizing: border-box;
@@ -30,25 +25,34 @@
     padding: 0;
 }
 
-/* 2. 核心 HTML/BODY 设置 (确保全宽和防止溢出) */
+/* 3. 核心 HTML/BODY 设置 */
 html, body {
     /* 确保页面宽度完全占满视口 */
     width: 100%;
-    /* 关键：防止任何元素意外超出视口宽度，避免出现水平滚动条和白边 */
+    /* 防止水平滚动条 */
     overflow-x: hidden;
+    
     /* 基础排版设置 */
     font-size: 16px;
     line-height: 1.5;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+    /* [关键修改 A] 将您的自定义字体放在首位 */
+    font-family: 'Manetta-ElmsSans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    
+    /* [关键修改 B] 设置全局默认字重为 300 */
+    /* 因为您的字体文件是 Light 版本，必须设置 300 才能正确匹配并显示该字体 */
+    font-weight: 300;
+
     background-color: #ffffff;
 }
 
-/* 3. 基础元素美化 */
+/* 4. 基础元素美化 */
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: 0.5em;
     line-height: 1.1;
-    font-weight: bold;
+    /* 标题保持加粗 (浏览器会自动对 Light 字体进行加粗模拟) */
+    font-weight: bold; 
 }
 
 p {
