@@ -4,6 +4,7 @@
 interface Props {
   title: string;
   description: string;
+  // 虽然现在不显示图片了，但为了不报错，暂时保留这些 Props 定义
   desktopImage: string;
   mobileImage: string;
   featureText?: string;
@@ -14,8 +15,8 @@ interface Props {
 const { 
   title, 
   description, 
-  desktopImage, 
-  mobileImage,
+  // desktopImage, // 不再使用
+  // mobileImage,  // 不再使用
   featureText,
   featureImage,
   kickstarterLogo
@@ -23,20 +24,9 @@ const {
 ---
 
 <section class="hero-banner">
-    <div class="hero-banner__bg-wrapper">
-        <picture>
-            <source srcset={mobileImage} media="(max-width: 768px)">
-            <img
-                src={desktopImage}
-                alt=""
-                class="hero-banner__background-picture"
-                loading="eager"
-                decoding="async"
-                fetchpriority="high"
-            />
-        </picture>
-        <div class="hero-banner__overlay"></div>
-    </div>
+    {/* 【已删除】背景图片包装器 (.hero-banner__bg-wrapper) 及其内部的 picture 和 overlay 
+      现在直接显示纯色背景
+    */}
 
     <div class="hero-banner__content">
         <div class="hero-header">
@@ -79,43 +69,22 @@ const {
     display: flex;
     justify-content: center;
     overflow: hidden;
-    background-color: #333;
+    
+    /* [修改 1] 背景色改为指定的浅灰色 */
+    background-color: #F2F2F2; 
 }
 
-.hero-banner__bg-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.hero-banner__background-picture {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.hero-banner__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.45);
-    z-index: 2;
-}
+/* 【已删除】以下不再需要的 CSS 类：
+ .hero-banner__bg-wrapper
+ .hero-banner__background-picture
+ .hero-banner__overlay
+*/
 
 .hero-banner__content {
     position: relative;
     z-index: 3;
     width: 100%;
-    
-    /* 容器放宽，给 1400px 的内部元素留出 padding 空间 */
     max-width: 1600px; 
-    
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -123,7 +92,9 @@ const {
     padding-bottom: 0; 
     padding-left: 30px; 
     padding-right: 30px;
-    color: #ffffff;
+    
+    /* [修改 2] 全局文字颜色从白色改为深灰色，适应浅背景 */
+    color: #333333; 
 }
 
 .hero-header {
@@ -138,6 +109,8 @@ const {
     margin-bottom: 10px;
     line-height: 1.1;
     font-weight: bold;
+    /* 可以选择让标题颜色更深一点 */
+    color: #000000; 
 }
 
 .hero-header p {
@@ -145,6 +118,8 @@ const {
     margin: 0 auto;
     line-height: 1.6;
     max-width: 900px;
+    /* 描述文字稍微浅一点 */
+    color: #555555;
 }
 
 .hero-feature-wrapper {
@@ -163,12 +138,9 @@ const {
     align-items: center; 
     justify-content: space-between;
     width: 100%;
-    
-    /* [修改 1] 核心容器宽度设置为 1400px */
     max-width: 1400px; 
-    
     margin: 0 auto;
-    gap: 50px; /* 增加间距 */
+    gap: 50px; 
 }
 
 .hero-feature-text {
@@ -178,45 +150,41 @@ const {
 }
 
 .feature-desc {
-    /* [修改 2] 响应式字体：最小 1rem，最大 1.5rem，中间随视口宽度变化 */
     font-size: clamp(1rem, 1.5vw, 1.5rem); 
-    
     line-height: 1.6;
-    color: #f0f0f0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     margin-bottom: 25px;
+
+    /* [修改 3] 特性描述文字颜色变深，移除深色背景下才需要的文字阴影 */
+    color: #444444;
+    /* text-shadow: 0 2px 4px rgba(0,0,0,0.5);  已移除 */
 }
 
 /* --- Kickstarter 样式 --- */
 .ks-row {
     display: flex;
     align-items: center; 
-    
-    /* [修改 3] 强制一行显示，不换行 */
     white-space: nowrap; 
-    
-    gap: 0.8em; /* 间距使用 em，随字体缩放 */
+    gap: 0.8em; 
 }
 
 .ks-text {
-    /* [修改 4] 智能响应式字体，确保手机上一行能放下 */
-    /* 最小 12px，视口宽度的 2.5%，最大 20px */
     font-size: clamp(0.75rem, 2.5vw, 1.25rem); 
-    
     font-weight: 600; 
     text-transform: uppercase; 
-    color: #fff;
     letter-spacing: 1px;
     line-height: 1; 
+
+    /* [修改 4] Kickstarter 文字颜色变深 */
+    color: #333333;
 }
 
 .ks-logo {
-    /* [修改 5] 图片高度使用 em 单位 */
-    /* 这样当 ks-text 字体变大变小时，Logo 会自动保持 1.6倍于文字高度的比例 */
     height: 1.6em; 
-    
     width: auto;
     display: block;
+    /* [可选] 如果你的 Kickstarter Logo 是纯白色的，在浅背景下可能看不清。
+       如果需要，可以取消下面这行的注释，用滤镜把它变成黑色 */
+    /* filter: brightness(0); */
 }
 
 .hero-feature-image {
@@ -229,16 +197,14 @@ const {
 .hero-feature-image img {
     max-width: 100%;
     height: auto;
-    
-    /* [修改 6] 图片放大：高度允许达到 600px */
     max-height: 600px; 
-    
     object-fit: contain;
-    filter: drop-shadow(0 25px 50px rgba(0,0,0,0.5)); 
+    /* [修改 5] 调整投影，让它在浅色背景上更柔和自然 */
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); 
 }
 
 /* --- 移动端适配 --- */
-@media (max-width: 900px) { /* 调整断点，适配平板竖屏 */
+@media (max-width: 900px) { 
     .hero-banner__content {
         padding-top: 80px; 
         padding-left: 20px;
@@ -258,7 +224,6 @@ const {
         text-align: center;
     }
 
-    /* 使用 display: contents 保持 文字->图->Kickstarter 的顺序 */
     .hero-feature-text {
         display: contents;
     }
@@ -266,10 +231,7 @@ const {
     .feature-desc {
         order: 1; 
         text-align: center;
-        
-        /* 移动端文字稍大一点以便阅读 */
         font-size: clamp(1.1rem, 4vw, 1.3rem); 
-        
         margin-bottom: 20px; 
     }
 
@@ -283,16 +245,13 @@ const {
         order: 3;
         justify-content: center;
         width: 100%;
-        /* 移动端间距也随字体缩放 */
     }
     
-    /* 移动端单独控制 KS 字体，确保不换行 */
     .ks-text {
         font-size: clamp(0.7rem, 3.5vw, 1rem); 
     }
 
     .hero-feature-image img {
-        /* 移动端图片也放大 */
         max-height: 400px; 
     }
 }
