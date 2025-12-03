@@ -4,6 +4,7 @@
 interface Props {
   title: string;
   description: string;
+  // 保留参数定义以兼容调用
   desktopImage: string;
   mobileImage: string;
   featureText?: string;
@@ -58,7 +59,7 @@ const {
 .hero-banner {
     position: relative;
     width: 100%;
-    min-height: auto; /* 高度自适应 */
+    min-height: auto; 
     display: flex;
     justify-content: center;
     overflow: hidden;
@@ -89,7 +90,10 @@ const {
 
 .hero-header h1 {
     font-size: clamp(2rem, 3.5vw, 4rem);
-    margin-bottom: 10px;
+    
+    /* [修改] 增加标题和下方描述的间距 */
+    margin-bottom: 30px; 
+    
     line-height: 1.1;
     font-weight: bold;
     color: #000000; 
@@ -99,7 +103,7 @@ const {
     font-size: clamp(1rem, 1.2vw, 1.5rem);
     margin: 0 auto;
     line-height: 1.6;
-    max-width: 900px;
+    max-width: 1200px;
     color: #555555;
 }
 
@@ -130,7 +134,7 @@ const {
     text-align: left;
     max-width: 650px; 
     
-    /* 动态间距：视口高度的 15% */
+    /* [修改] 纯动态顶部间距 (视口高度的 15%) */
     padding-top: 15vh;
 }
 
@@ -139,40 +143,35 @@ const {
     line-height: 1.6;
     margin-bottom: 25px;
     color: #444444;
+    
+    /* [关键修复] 允许识别 \n 换行符 */
+    white-space: pre-line;
 }
 
-/* --- Kickstarter 样式 (核心修改部分) --- */
+/* --- Kickstarter 样式 --- */
 .ks-row {
     display: flex;
     align-items: center; 
     
-    /* [修改 1] 允许换行！
-       当空间不足时（比如手机竖屏），Logo 会自动掉到下一行 
-       而不是强行挤在一起 */
+    /* 允许换行 */
     flex-wrap: wrap;
     
-    /* 设置行列间距，换行后 Logo 和文字之间也会有间距 */
     gap: 0.8em; 
 }
 
 .ks-text {
-    /* [修改 2] 字体大小响应式 
-       因为允许换行，最小字体可以稍微设大一点点 (0.9rem)，保证清晰度 */
     font-size: clamp(0.9rem, 2.5vw, 1.3rem); 
-    
     font-weight: 600; 
     text-transform: uppercase; 
     letter-spacing: 1px;
     line-height: 1.2; 
     color: #333333;
-
-    /* [修改 3] 关键：文字本身不换行
-       "Coming soon on" 永远是一个整体 */
+    
+    /* 文字本身不打断 */
     white-space: nowrap; 
 }
 
 .ks-logo {
-    /* Logo 高度随字体大小成比例 */
     height: 1.6em; 
     width: auto;
     display: block;
@@ -219,33 +218,32 @@ const {
 
     .hero-feature-text {
         display: contents;
+        /* 移动端重置 padding */
         padding-top: 0; 
     }
 
-    /* 排序 1: 文字 */
+    /* 排序 1: 图片 */
+    .hero-feature-image {
+        order: 1;
+        width: 100%; 
+        margin-bottom: 30px; 
+    }
+
+    /* 排序 2: 文字 */
     .feature-desc {
-        order: 1; 
+        order: 2; 
         text-align: center;
         font-size: clamp(1.1rem, 4vw, 1.3rem); 
         margin-bottom: 20px; 
     }
 
-    /* 排序 2: 图片 */
-    .hero-feature-image {
-        order: 2;
-        width: 100%; 
-        margin-bottom: 30px; 
-    }
-
     /* 排序 3: Kickstarter Logo */
     .ks-row {
         order: 3;
-        /* 在移动端居中显示 */
         justify-content: center;
         width: 100%;
     }
     
-    /* 移动端字体大小 */
     .ks-text {
         font-size: clamp(0.8rem, 3.5vw, 1.1rem); 
     }

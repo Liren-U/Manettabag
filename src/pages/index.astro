@@ -25,8 +25,6 @@ const KICKSTARTER_LOGO = "/images/kickstarter.png";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manetta Modular Bag</title>
 
-    <link rel="preload" href={DESKTOP_HERO_IMAGE} as="image" media="(min-width: 769px)" />
-    <link rel="preload" href={MOBILE_HERO_IMAGE} as="image" media="(max-width: 768px)" />
     <link rel="canonical" href="https://manettabag.com/" />
 </head>
 <body>
@@ -36,10 +34,10 @@ const KICKSTARTER_LOGO = "/images/kickstarter.png";
     {/* 修改 HeroBanner 调用，添加 featureText 和 featureImage */}
     <HeroBanner
         title="Modular Camera Bag - 1 Bag, 3X the Space"
-        description="Modular Design | 3X Expandable Space | Waterproff Protection | Ergonormic Carrying System"
+        description="Modular Design | 3X Expandable Space | Waterproof Protection | Ergonormic Carrying System"
         desktopImage={DESKTOP_HERO_IMAGE}
         mobileImage={MOBILE_HERO_IMAGE}
-        featureText="Join now and receive your exclusive up to 30% Super early bird discount! Limited spots available."
+        featureText={'Join now and receive your exclusive up to \n30% Super early bird discount! Limited spots available.'}
         featureImage={HERO_FEATURE_IMAGE}
         kickstarterLogo={KICKSTARTER_LOGO}
     />
