@@ -13,8 +13,10 @@ import '../styles/global.css';
 import ImageGridSix1 from '../components/ImageGridSix1.astro';
 import ComparisonSection from '../components/ComparisonSection.astro';
 
+
 import ManettaBagHeader from "../components/ManettaBag-Header.astro";
 import ManettaBagHeroBanner from "../components/ManettaBag-Hero-Banner.astro";
+import ManettaBagMarqueeBanner from "../components/ManettaBag-MarqueeBanner.astro";
 
 const DESKTOP_HERO_IMAGE = "/images/Manetta-hero-banner-bg-desktop.jpg";
 const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
@@ -41,6 +43,8 @@ const KICKSTARTER_LOGO = "/images/kickstarter.png";
     <ManettaBagHeader />
 
     <ManettaBagHeroBanner />
+
+    <ManettaBagMarqueeBanner />
 
 
     {/* 修改 HeroBanner 调用，添加 featureText 和 featureImage */}

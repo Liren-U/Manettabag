@@ -1,0 +1,38 @@
+---
+// src/components/ManettaBag-MarqueeBanner.astro
+// MANETTA 跑马灯组件（走马灯）
+
+interface Props {
+  messages?: string[];
+}
+
+const { messages = [
+  "⚡️ LAUNCHING SOON ON KICKSTARTER",
+  "GET 30% OFF SUPER EARLY BIRD",
+  "THE ULTIMATE 3-IN-1 MODULAR SYSTEM",
+  "⚡️ LAUNCHING SOON ON KICKSTARTER",
+  "GET 30% OFF SUPER EARLY BIRD",
+] } = Astro.props;
+---
+
+<div class="marquee-container py-5 overflow-hidden select-none relative z-20">
+  <div class="animate-scroll whitespace-nowrap">
+    {messages.map((msg, index) => (
+      <>
+        <span
+          class="text-white font-display font-black italic text-3xl mx-10 tracking-tighter"
+        >
+          {msg}
+        </span>
+
+        {index !== messages.length - 1 && (
+          <span
+            class="text-dark-main font-display font-black text-3xl mx-10"
+          >
+            ///
+          </span>
+        )}
+      </>
+    ))}
+  </div>
+</div>
