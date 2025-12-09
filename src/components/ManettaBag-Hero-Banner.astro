@@ -140,13 +140,13 @@
   </div>
 </section>
 
-<!-- 表单邮箱校验脚本（只允许合法 Email + 提交到 Klaviyo） -->
+<!-- 表单邮箱校验脚本（成功时直接跳转 reservation 并带上 email） -->
 <script is:inline>
   async function validateHeroEmail(form) {
     const input = form.querySelector("#hero-email");
     const email = input.value.trim();
 
-    // 基础邮箱格式校验
+    // 1）基础邮箱格式校验
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(email)) {
@@ -155,14 +155,14 @@
       return false;
     }
 
-    // 可选：把邮箱存到 localStorage，后面 VIP 结账可以预填
+    // 2）可选：把邮箱存到 localStorage，后面 VIP 结账可以预填
     try {
       localStorage.setItem("manetta_email", email);
     } catch (e) {
       console.warn("Cannot access localStorage:", e);
     }
 
-    // 调用你自己的后端 API -> Klaviyo main list
+    // 3）调用你自己的后端 API -> Klaviyo main list
     try {
       const res = await fetch("/api/klaviyo-subscribe", {
         method: "POST",
@@ -174,6 +174,7 @@
 
       if (!res.ok || !data.success) {
         console.warn("[Hero subscribe] failed:", data);
+        // ❌ 出错时才提示，不再有成功提示
         alert(
           data.error ||
             "Subscription failed, please try again in a moment."
@@ -181,9 +182,10 @@
         return false;
       }
 
-      // 成功提示（你也可以改成跳转到 reservation 页面等）
-      alert("Thanks! You're on the list now.");
-      input.value = "";
+      // 4）✅ 成功：直接跳转到 reservation 页面，并把 email 带过去
+      window.location.href =
+        "/reservation?email=" + encodeURIComponent(email);
+
       return true;
     } catch (err) {
       console.error("[Hero subscribe] error:", err);
@@ -192,4 +194,3 @@
     }
   }
 </script>
-
