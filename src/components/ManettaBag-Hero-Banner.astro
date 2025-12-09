@@ -85,36 +85,44 @@
 
           <!-- 只能填写邮箱的表单 -->
           <form
-            class="flex gap-3 relative"
+            class="flex flex-col gap-3 relative"
             onsubmit="event.preventDefault(); validateHeroEmail(this);"
           >
-            <input
-              id="hero-email"
-              type="email"
-              inputmode="email"
-              autocomplete="email"
-              placeholder="Your email address"
-              class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-light-muted/50 focus:outline-none focus:border-brand/50 focus:bg-white/10 transition-all"
-              required
-            />
-            <button
-              type="submit"
-              class="bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            <div class="flex gap-3">
+              <input
+                id="hero-email"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="Your email address"
+                class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-light-muted/50 focus:outline-none focus:border-brand/50 focus:bg-white/10 transition-all"
+                required
+              />
+              <button
+                type="submit"
+                class="bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </button>
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- ✅ 表单内提示信息（默认占位高度，避免跳动） -->
+            <p
+              id="hero-message"
+              class="min-h-[1.25rem] text-sm text-red-400"
+            ></p>
           </form>
         </div>
       </div>
@@ -140,17 +148,40 @@
   </div>
 </section>
 
-<!-- 表单邮箱校验脚本（成功时直接跳转 reservation 并带上 email） -->
+<!-- 表单邮箱校验脚本（错误提示在表单内部显示） -->
 <script is:inline>
+  function setHeroMessage(messageEl, text, type) {
+    if (!messageEl) return;
+
+    messageEl.textContent = text || "";
+
+    // 重置颜色类
+    messageEl.classList.remove("text-red-400", "text-amber-300");
+
+    if (!text) return;
+
+    if (type === "error") {
+      messageEl.classList.add("text-red-400");
+    } else if (type === "info") {
+      messageEl.classList.add("text-amber-300");
+    }
+  }
+
   async function validateHeroEmail(form) {
     const input = form.querySelector("#hero-email");
-    const email = input.value.trim();
+    const messageEl = form.querySelector("#hero-message");
+    const email = (input?.value || "").trim();
+
+    if (!input) return false;
+
+    // 清空上一条消息
+    setHeroMessage(messageEl, "", "");
 
     // 1）基础邮箱格式校验
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
 
     if (!emailPattern.test(email)) {
-      alert("Please enter a valid email address.");
+      setHeroMessage(messageEl, "Please enter a valid email address.", "error");
       input.focus();
       return false;
     }
@@ -160,10 +191,14 @@
       localStorage.setItem("manetta_email", email);
     } catch (e) {
       console.warn("Cannot access localStorage:", e);
+      // 这里不提示用户，静默失败即可
     }
 
     // 3）调用你自己的后端 API -> Klaviyo main list
     try {
+      // 提交中提示（可选）
+      setHeroMessage(messageEl, "Subscribing...", "info");
+
       const res = await fetch("/api/klaviyo-subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -174,22 +209,27 @@
 
       if (!res.ok || !data.success) {
         console.warn("[Hero subscribe] failed:", data);
-        // ❌ 出错时才提示，不再有成功提示
-        alert(
-          data.error ||
-            "Subscription failed, please try again in a moment."
+        setHeroMessage(
+          messageEl,
+          data.error || "Subscription failed, please try again in a moment.",
+          "error"
         );
         return false;
       }
 
-      // 4）✅ 成功：直接跳转到 reservation 页面，并把 email 带过去
+      // 4）✅ 成功：清空错误文字，直接跳转 reservation 页面，并把 email 带过去
+      setHeroMessage(messageEl, "", "");
       window.location.href =
         "/reservation?email=" + encodeURIComponent(email);
 
       return true;
     } catch (err) {
       console.error("[Hero subscribe] error:", err);
-      alert("Network error, please try again.");
+      setHeroMessage(
+        messageEl,
+        "Network error, please check your connection and try again.",
+        "error"
+      );
       return false;
     }
   }
