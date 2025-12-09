@@ -1,65 +1,121 @@
-/*
- * =======================================================
- * GLOBAL STYLESHEET (全局样式)
- * 目的: CSS Reset (清除白边)、基础排版设置
- * =======================================================
- */
+/* ① Tailwind 指令（保留） */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* 🚀 1. 定义 ElmsSans-Light 字体 */
-@font-face {
-    font-family: 'Manetta-ElmsSans';
-    /* 确保该路径下文件存在 */
-    src: url('/fonts/ElmsSans-Light.ttf') format('truetype'); 
-    /* 定义该字体的字重为 300 (Light) */
-    font-weight: 300; 
-    font-style: normal;
-    font-display: swap;
-}
-
-/* 2. CSS Reset (解决全页面白边和不一致性问题) */
+/* ② 全局 Reset & 排版 */
 * {
-    /* 统一使用盒模型 */
-    box-sizing: border-box;
-    /* 统一清除所有元素的默认外边距和内边距 */
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* 3. 核心 HTML/BODY 设置 */
-html, body {
-    /* 确保页面宽度完全占满视口 */
-    width: 100%;
-    /* 防止水平滚动条 */
-    overflow-x: hidden;
-    
-    /* 基础排版设置 */
-    font-size: 16px;
-    line-height: 1.5;
-
-    /* [关键修改 A] 将您的自定义字体放在首位 */
-    font-family: 'Manetta-ElmsSans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    
-    /* [关键修改 B] 设置全局默认字重为 300 */
-    /* 因为您的字体文件是 Light 版本，必须设置 300 才能正确匹配并显示该字体 */
-    font-weight: 300;
-
-    background-color: #ffffff;
+html {
+  width: 100%;
+  scroll-behavior: smooth;
 }
 
-/* 4. 基础元素美化 */
-h1, h2, h3, h4, h5, h6 {
-    margin-top: 0;
-    margin-bottom: 0.5em;
-    line-height: 1.1;
-    /* 标题保持加粗 (浏览器会自动对 Light 字体进行加粗模拟) */
-    font-weight: bold; 
+body {
+  width: 100%;
+  overflow-x: hidden;
+  font-size: 16px;
+  line-height: 1.5;
+  /* 不再使用自定义字体，改为系统 / 默认无衬线 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-weight: 300;
+  background-color: #0a0a0a; /* 深色背景，与设计稿一致 */
+  color: #ffffff;
+}
+
+/* 标题基础样式 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  line-height: 1.1;
+  font-weight: bold;
 }
 
 p {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 a {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 自定义滚动条 (深色模式) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d46a22;
+}
+
+/* 跑马灯动画 */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.animate-scroll {
+  display: flex;
+  width: max-content;
+  animation: scroll 25s linear infinite;
+}
+
+/* 跑马灯容器风格 */
+.marquee-container {
+  transform: rotate(-3deg) skewX(-5deg) scale(1.05);
+  background: linear-gradient(90deg, #d46a22, #a04c12, #d46a22);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 元素入场动画 */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.98);
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 导航栏磨砂过渡 (深色) */
+.nav-scrolled {
+  background-color: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* 灵动岛交互 */
+.island-item {
+  flex: 1;
+  transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.island-container:hover .island-item:hover {
+  flex: 1.5;
+}
+.island-container:hover .island-item:not(:hover) img {
+  filter: grayscale(0.5) brightness(0.7);
 }

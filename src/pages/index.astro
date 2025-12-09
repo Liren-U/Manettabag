@@ -13,6 +13,9 @@ import '../styles/global.css';
 import ImageGridSix1 from '../components/ImageGridSix1.astro';
 import ComparisonSection from '../components/ComparisonSection.astro';
 
+import ManettaBagHeader from "../components/ManettaBag-Header.astro";
+import ManettaBagHeroBanner from "../components/ManettaBag-Hero-Banner.astro";
+
 const DESKTOP_HERO_IMAGE = "/images/Manetta-hero-banner-bg-desktop.jpg";
 const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
 const HERO_FEATURE_IMAGE = "/images/Manetta-herobanner-product.png";
@@ -26,10 +29,19 @@ const KICKSTARTER_LOGO = "/images/kickstarter.png";
     <title>Manetta Modular Bag</title>
 
     <link rel="canonical" href="https://manettabag.com/" />
+
+    <!-- 引用编译好的 Tailwind + 全局样式 -->
+    <link rel="stylesheet" href="/tailwind.css" />
 </head>
 <body>
 
-    <Header />
+    {/*<Header />*/}
+
+    <div id="top"></div>
+    <ManettaBagHeader />
+
+    <ManettaBagHeroBanner />
+
 
     {/* 修改 HeroBanner 调用，添加 featureText 和 featureImage */}
     <HeroBanner

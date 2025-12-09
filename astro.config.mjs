@@ -11,4 +11,5 @@ export default defineConfig({
 
   // 🚀 关键：应用 Cloudflare 适配器，不添加任何额外的配置对象
   adapter: cloudflare(),
+
 });

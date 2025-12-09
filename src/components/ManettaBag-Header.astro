@@ -1,0 +1,70 @@
+---
+/*
+  ManettaBag-Header.astro
+  黑色磨砂导航栏版本（去掉 Features / Capacity / Specs）
+*/
+---
+
+<header
+  id="navbar"
+  class="fixed top-0 left-0 w-full z-50 transition-all duration-500 border-b border-white/5"
+>
+  <div class="max-w-limit mx-auto px-6 lg:px-gutter h-[88px] flex justify-between items-center">
+
+    <!-- Logo -->
+    <a href="#" class="group">
+      <div
+        id="nav-logo"
+        class="text-2xl font-display font-bold tracking-tighter text-white transition-colors duration-300 group-hover:text-brand"
+      >
+        MANETTA<span class="text-brand">.</span>
+      </div>
+    </a>
+
+    <!-- 右侧：只保留 CTA 按钮 -->
+    <div class="flex items-center gap-6">
+      <a
+        href="#reserve"
+        class="relative overflow-hidden bg-brand text-white px-8 py-3 rounded-full text-sm font-bold shadow-glow hover:shadow-brand/60 transition-all duration-300 hover:-translate-y-0.5 group"
+      >
+        <span class="relative z-10 flex items-center gap-2">
+          Reserve Now
+          <svg
+            class="w-4 h-4 transition-transform group-hover:translate-x-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            />
+          </svg>
+        </span>
+
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
+        ></div>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Header 滚动变磨砂效果 -->
+<script is:inline>
+  const navbar = document.getElementById("navbar");
+
+  if (navbar) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add("nav-scrolled");
+        navbar.classList.remove("border-white/5");
+      } else {
+        navbar.classList.remove("nav-scrolled");
+        navbar.classList.add("border-white/5");
+      }
+    });
+  }
+</script>
