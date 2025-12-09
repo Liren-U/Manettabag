@@ -1,27 +1,15 @@
 ---
 // src/pages/index.astro
-import Header from '../components/Header.astro';
-import HeroBanner from '../components/HeroBanner.astro';
-import ImageGrid from '../components/ImageGrid.astro';
-import ImageCarouselSplit from '../components/ImageCarouselSplit.astro';
-import ImageGridSix from '../components/ImageGridSix.astro';
-import SimpleTitleModule from '../components/SimpleTitleModule.astro';
-import FullWidthBanner from '../components/FullWidthBanner.astro';
-import KlaviyoFormModule from '../components/Klaviyo.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
-import ImageGridSix1 from '../components/ImageGridSix1.astro';
-import ComparisonSection from '../components/ComparisonSection.astro';
 
 
 import ManettaBagHeader from "../components/ManettaBag-Header.astro";
 import ManettaBagHeroBanner from "../components/ManettaBag-Hero-Banner.astro";
 import ManettaBagMarqueeBanner from "../components/ManettaBag-MarqueeBanner.astro";
+import ManettaBagFeaturePackLikePro from "../components/ManettaBag-Feature-PackLikePro.astro";
 
-const DESKTOP_HERO_IMAGE = "/images/Manetta-hero-banner-bg-desktop.jpg";
-const MOBILE_HERO_IMAGE = "/images/Manetta-hero-banner-bg-mobile.png";
-const HERO_FEATURE_IMAGE = "/images/Manetta-herobanner-product.png";
-const KICKSTARTER_LOGO = "/images/kickstarter.png";
+
 ---
 <!DOCTYPE html>
 <html lang="zh">
@@ -46,66 +34,10 @@ const KICKSTARTER_LOGO = "/images/kickstarter.png";
 
     <ManettaBagMarqueeBanner />
 
-
-    {/* 修改 HeroBanner 调用，添加 featureText 和 featureImage */}
-    <HeroBanner
-        title="Modular Camera Bag - 1 Bag, 3X the Space"
-        description="Modular Design | 3X Expandable Space | Waterproof Protection | Ergonormic Carrying System"
-        desktopImage={DESKTOP_HERO_IMAGE}
-        mobileImage={MOBILE_HERO_IMAGE}
-        featureText={'Join now and receive your exclusive up to \n30% Super early bird discount! Limited spots available.'}
-        featureImage={HERO_FEATURE_IMAGE}
-        kickstarterLogo={KICKSTARTER_LOGO}
-    />
-
-    <KlaviyoFormModule
-        klaviyoApiKey="X86W3s"
-        desktopFormId="XTtKZk"
-        mobileFormId="XTtKZk"
-    />
-
-    <ImageGridSix1 title="Explore More Possibilities" />
-
-    <ComparisonSection
-        title="Comparison"
-        subtitle="MANETTA triples your storage capacity in seconds, with two built–in cube camera bags that can also be used on their own."
-        leftImage="/images/grid/grid-7.png"
-        leftAlt="Other camera backpack 22L"
-        rightImage="/images/grid/grid-7.png"
-        rightAlt="MANETTA camera bag 22L + 12L + 8L"
-    />
-
-    <ImageCarouselSplit
-        title="How to organize your clothes, camera gear, and office equipment"
-        featureImage="/images/grid/grid-7.png"
-        featureAlt="Manetta"
-    />
-
-    <ImageGridSix title="Learn More" />
-
-    <KlaviyoFormModule
-        klaviyoApiKey="X86W3s"
-        desktopFormId="XTtKZk"
-        mobileFormId="XTtKZk"
-    />
-
-    <SimpleTitleModule title="MANETTA exists to bring joy through creation and to unlock new possibilities for those who love photography" />
-
-    <FullWidthBanner
-        desktopImage="/images/full-w.png"
-        mobileImage="/images/full-w-mobile.jpg"
-        alt="这是一个响应式全宽横幅"
-        height=""
-    />
-
-    <KlaviyoFormModule
-        klaviyoApiKey="X86W3s"
-        desktopFormId="XTtKZk"
-        mobileFormId="XTtKZk"
-    />
-
-    <main>
+    <main id="features" class="relative z-10 bg-dark-main pt-20">
+        <ManettaBagFeaturePackLikePro />
         {/* 其他众筹模块将在这里添加，这些模块可能需要宽度限制 */}
+
     </main>
 
     <Footer />
