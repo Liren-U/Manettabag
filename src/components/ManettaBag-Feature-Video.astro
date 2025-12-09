@@ -1,0 +1,119 @@
+---
+/**
+ * ManettaBag-Feature-Video.astro
+ * 容量测试视频区块：What Fits Inside?
+ */
+---
+
+<section
+  id="video"
+  class="py-40 bg-dark-main relative overflow-hidden"
+>
+  <!-- 背景橙色虚光 -->
+  <div
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[50%] bg-brand/20 blur-[200px] rounded-full pointer-events-none opacity-40"
+  ></div>
+
+  <div
+    class="max-w-limit mx-auto px-6 lg:px-gutter text-center relative z-10"
+  >
+    <span
+      class="text-brand font-bold tracking-[0.3em] uppercase text-sm mb-8 block animate-pulse"
+    >
+      Capacity Test
+    </span>
+
+    <h2
+      class="font-display font-bold text-5xl lg:text-6xl mb-20"
+    >
+      What Fits Inside?
+    </h2>
+
+    <!-- 视频容器 -->
+    <div
+      class="reveal active relative w-full aspect-video rounded-[2.5rem] overflow-hidden border-2 border-brand/30 bg-dark-card shadow-glow"
+    >
+      <video
+        id="manetta-video"
+        class="w-full h-full object-cover"
+        controls
+        poster="/videos/ManettaBag-video.jpg"
+      >
+        <source src="/videos/ManettaBag-video.mp4" type="video/mp4" />
+        Your browser does not support HTML5 video.
+      </video>
+
+      <!-- 中间的圆形播放按钮（暂停/初始/播放结束时显示） -->
+      <div
+        id="video-overlay"
+        class="absolute inset-0 flex items-center justify-center bg-transparent transition-opacity duration-300"
+      >
+        <div
+          class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40"
+        >
+          <svg
+            class="w-10 h-10 text-white ml-2"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 交互逻辑 -->
+<script is:inline>
+  const video = document.getElementById("manetta-video");
+  const overlay = document.getElementById("video-overlay");
+
+  if (video && overlay) {
+    // 显示按钮
+    const showOverlay = () => {
+      overlay.style.display = "flex";
+      requestAnimationFrame(() => {
+        overlay.style.opacity = "1";
+      });
+    };
+
+    // 隐藏按钮
+    const hideOverlay = () => {
+      overlay.style.opacity = "0";
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 300);
+    };
+
+    // 初始：显示按钮
+    showOverlay();
+
+    // 点击按钮：开始播放 & 隐藏按钮
+    overlay.addEventListener("click", () => {
+      hideOverlay();
+      video.play();
+    });
+
+    // 视频开始播放：隐藏按钮（防止用控制条点播放时按钮还在）
+    video.addEventListener("play", () => {
+      hideOverlay();
+    });
+
+    // 视频暂停：显示按钮（但不重置进度）
+    video.addEventListener("pause", () => {
+      // 播放结束时也会触发 pause，这里让 ended 事件单独处理
+      if (!video.ended) {
+        showOverlay();
+      }
+    });
+
+    // 视频播放结束：回到封面，并显示按钮
+    video.addEventListener("ended", () => {
+      // 回到封面：重置时间并重新加载，让 poster 显示
+      video.currentTime = 0;
+      video.load(); // 重新加载后，会显示 poster
+      showOverlay();
+    });
+  }
+</script>
