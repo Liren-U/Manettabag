@@ -1,7 +1,6 @@
 ---
 // src/components/Footer.astro
 
-// 获取当前年份，用于版权信息
 const currentYear = new Date().getFullYear();
 const siteName = "Manetta Bag";
 const siteDomain = "manettabag.com";
@@ -26,12 +25,15 @@ const siteDomain = "manettabag.com";
 .main-footer {
     width: 100%;
     padding: 30px 20px;
-    background-color: #333; /* 深色背景，与主体内容区分 */
-    color: #fff; /* 白色文字 */
+    background-color: #333;
+    color: #fff;
     text-align: center;
     font-size: 0.9rem;
     line-height: 1.4;
     box-sizing: border-box;
+
+    /* --- 核心修改 --- */
+    margin-top: auto; /* 在 Flex 容器中，这会将 Footer 自动推到最底部 */
 }
 
 .footer-container {
@@ -40,18 +42,19 @@ const siteDomain = "manettabag.com";
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px; /* 元素间距 */
+    gap: 10px;
 }
 
 .copyright-text a,
 .footer-links a {
-    color: #ccc; /* 浅灰色链接 */
+    color: #ccc;
     transition: color 0.3s ease;
 }
 
 .copyright-text a:hover,
 .footer-links a:hover {
-    color: #fff; /* 悬停时变亮 */
+    color: #fff;
+    text-decoration: underline; /* 增加一点交互反馈 */
 }
 
 .footer-links {
@@ -60,7 +63,7 @@ const siteDomain = "manettabag.com";
 }
 
 .footer-links span {
-    color: #666; /* 分隔符颜色 */
+    color: #666;
 }
 
 /* 移动端优化 */
@@ -71,6 +74,10 @@ const siteDomain = "manettabag.com";
     .footer-links {
         flex-direction: column;
         gap: 5px;
+    }
+    /* 在移动端也可以隐藏原本的分隔符，如果换行了的话 */
+    .footer-links span {
+        display: none;
     }
 }
 </style>

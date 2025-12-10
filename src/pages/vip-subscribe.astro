@@ -1,10 +1,11 @@
 ---
 // src/pages/vip-subscribe.astro
-import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import ManettaBagHeaderOther from '../components/ManettaBag-Header-other.astro';
 
-const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
+const PAGE_TITLE = "Secure Checkout - Manetta Bag";
+const BRAND_HEX = "#D46A22";
 ---
 
 <!DOCTYPE html>
@@ -13,62 +14,116 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{PAGE_TITLE}</title>
+    <link rel="stylesheet" href="/tailwind.css" />
+    <style define:vars={{ brandColor: BRAND_HEX }}>
+      ::selection {
+        background-color: var(--brandColor);
+        color: white;
+      }
+      /* 按钮流光动画 */
+      @keyframes shine-sweep {
+        0% { transform: translateX(-100%) skewX(-15deg); }
+        100% { transform: translateX(200%) skewX(-15deg); }
+      }
+      .group:hover .animate-shine {
+        animation: shine-sweep 1s ease-in-out forwards;
+      }
+    </style>
 </head>
-<body>
 
-    <Header />
+<body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased">
 
-    <main class="checkout-page-main">
-        <div class="checkout-container">
-            <form id="payment-form" class="unified-checkout-form">
+    <ManettaBagHeaderOther />
 
-                <div class="price-summary-box">
-                    <h1 class="checkout-title">VIP Subscription</h1>
-                    <p class="price-tag">$ 5.00 USD</p>
+    <main class="flex-1 w-full px-4 pt-32 pb-20 relative flex items-center justify-center overflow-hidden">
+        
+        <div class="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-white opacity-[0.03] blur-[150px] pointer-events-none"></div>
+
+        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-[var(--brandColor)] opacity-[0.1] blur-[180px] rounded-full pointer-events-none"></div>
+
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+
+        <div class="w-full max-w-[480px] mx-auto relative z-10">
+            
+            <form id="payment-form" class="bg-[#141414] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden ring-1 ring-white/5">
+
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--brandColor)] to-[#141414]"></div>
+
+                <div class="flex justify-between items-end border-b border-white/10 pb-6 mb-8">
+                    <div>
+                        <h1 class="font-display font-bold text-2xl text-white tracking-tight">VIP Access</h1>
+                        <p class="text-sm text-gray-400 mt-1 font-light">Secure your early bird discount</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-3xl font-bold text-[var(--brandColor)] leading-none tracking-tight">$5.00</span>
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">USD Total</span>
+                    </div>
                 </div>
 
-                <div class="custom-form-fields">
-                    <div class="input-group">
-                        <label for="customer-email">Subscribe Email</label>
+                <div class="space-y-6 mb-8">
+                    <div class="flex flex-col gap-2 group">
+                        <label for="customer-email" class="text-xs font-bold text-gray-400 uppercase tracking-widest group-focus-within:text-[var(--brandColor)] transition-colors">Subscribe Email</label>
                         <input
                           type="email"
                           id="customer-email"
                           required
-                          placeholder="Enter your email address"
+                          placeholder="name@example.com"
+                          class="w-full h-[50px] bg-[#0A0A0A] border border-[#333] rounded-lg px-4 text-white placeholder-gray-600 focus:outline-none focus:border-[var(--brandColor)] focus:ring-1 focus:ring-[var(--brandColor)] transition-all text-base"
                         >
                     </div>
-                    <div class="input-group">
-                        <label for="customer-name">Full Name</label>
+                    <div class="flex flex-col gap-2 group">
+                        <label for="customer-name" class="text-xs font-bold text-gray-400 uppercase tracking-widest group-focus-within:text-[var(--brandColor)] transition-colors">Full Name</label>
                         <input
                           type="text"
                           id="customer-name"
                           required
-                          placeholder="Enter your full name"
+                          placeholder="Name on card"
+                          class="w-full h-[50px] bg-[#0A0A0A] border border-[#333] rounded-lg px-4 text-white placeholder-gray-600 focus:outline-none focus:border-[var(--brandColor)] focus:ring-1 focus:ring-[var(--brandColor)] transition-all text-base"
                         >
                     </div>
                 </div>
 
-                <h3 class="section-title">Payment Information</h3>
-                <div id="payment-element-container" class="payment-card-box">
-                    <p>Loading card details...</p>
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Card Details</h3>
+                        <div class="flex gap-2 opacity-30 grayscale">
+                             <img src="https://cdn.branding.stripe.com/v3/assets/images/logos/visa.svg" class="h-3" alt="Visa">
+                             <img src="https://cdn.branding.stripe.com/v3/assets/images/logos/mastercard.svg" class="h-3" alt="Mastercard">
+                        </div>
+                    </div>
+                    
+                    <div id="payment-element-container" class="min-h-[50px]">
+                        <div class="animate-pulse h-[50px] bg-[#0A0A0A] border border-[#333] rounded-lg w-full"></div>
+                    </div>
+                    
+                    <div id="payment-message" role="alert" class="hidden text-[var(--brandColor)] text-sm mt-3 text-center font-bold bg-[var(--brandColor)]/10 py-2 rounded border border-[var(--brandColor)]/20"></div>
                 </div>
 
-                <div id="payment-message" role="alert"></div>
+                <div class="text-xs text-gray-500 text-center mb-6 leading-relaxed px-2">
+                    By paying, you agree to the <a href="/terms" class="text-gray-300 hover:text-white underline transition-colors">Terms</a> and <a href="/privacy" class="text-gray-300 hover:text-white underline transition-colors">Privacy Policy</a>.
+                </div>
 
-                <div class="terms-and-conditions">
-                    <p>
-                        By paying, you agree to the
-                        <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-                        and
-                        <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+                <button id="submit-payment-btn" type="submit" class="group relative w-full h-14 bg-[#D46A22] hover:bg-[#b5581b] text-white font-bold rounded-xl shadow-[0_5px_20px_-5px_rgba(212,106,34,0.4)] hover:shadow-[0_10px_30px_-5px_rgba(212,106,34,0.6)] transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 overflow-hidden">
+                    
+                    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shine pointer-events-none"></div>
+
+                    <span id="button-text" class="text-lg tracking-widest font-display uppercase relative z-10 text-shadow-sm">Pay Securely</span>
+                    
+                    <svg class="w-5 h-5 text-white/90 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    
+                    <span id="spinner" class="hidden relative z-10">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </span>
+                </button>
+                
+                <div class="text-center mt-6 flex flex-col items-center gap-2 opacity-40 hover:opacity-70 transition-opacity">
+                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                    <p class="text-[10px] text-white tracking-widest uppercase leading-tight font-medium">
+                        Securely processed by Stripe. SSL encryption.
                     </p>
                 </div>
 
-                <button id="submit-payment-btn" type="submit">
-                    <span id="button-text">Pay Now</span>
-                </button>
-
-                <p class="security-info">Securely processed by Stripe. SSL encryption.</p>
             </form>
         </div>
     </main>
@@ -76,64 +131,43 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
     <Footer />
 
     <script src="https://js.stripe.com/v3/"></script>
-    <script>
-    // @ts-nocheck  告诉 VSCode/TS 对这个脚本不要做类型检查
-
+    <script define:vars={{ brandColor: BRAND_HEX }}>
+    // @ts-nocheck
     document.addEventListener('DOMContentLoaded', function () {
-      // 你的 Stripe 公钥（注意：上线前记得改成 pk_live）
+      // ⚠️ 记得换 Live Key
       var stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
 
       var elements;
       var form = document.getElementById('payment-form');
-      var paymentElementContainer = document.getElementById('payment-element-container');
-      var submitButton = document.getElementById('submit-payment-btn');
       var messageContainer = document.getElementById('payment-message');
-
+      var submitButton = document.getElementById('submit-payment-btn');
+      var buttonText = document.getElementById('button-text');
+      var spinner = document.getElementById('spinner');
       var customerEmail = document.getElementById('customer-email');
       var customerName = document.getElementById('customer-name');
-
+      
       var backendApiUrl = '/api/create-payment-intent';
       var vipKlaviyoApiUrl = '/api/klaviyo-vip-subscribe';
 
-      // ================ 预填邮箱（URL 参数 / localStorage） =================
+      // 1. Prefill
       try {
         var finalEmail = '';
-
-        // 1）URL 参数：?email=xxx
         var params = new URLSearchParams(window.location.search);
-        var emailFromUrl = params.get('email');
-        if (emailFromUrl) {
-          finalEmail = emailFromUrl.trim();
-          console.log('[Checkout] email from URL:', finalEmail);
+        if (params.get('email')) {
+            finalEmail = params.get('email').trim();
+        } else if (localStorage.getItem('manetta_email')) {
+            finalEmail = localStorage.getItem('manetta_email').trim();
         }
 
-        // 2）localStorage：Klaviyo 的前端监听写入的 manetta_email
-        if (!finalEmail) {
-          var savedEmail = localStorage.getItem('manetta_email');
-          if (savedEmail) {
-            finalEmail = savedEmail.trim();
-            console.log('[Checkout] email from localStorage:', finalEmail);
-          }
-        }
-
-        // 3）写入输入框并锁定
         if (finalEmail && customerEmail) {
           customerEmail.value = finalEmail;
           customerEmail.readOnly = true;
+          // 锁定样式：稍微变暗
+          customerEmail.classList.add('opacity-60', 'cursor-not-allowed');
         }
-      } catch (err) {
-        console.warn('Cannot get prefilled email:', err);
-      }
+      } catch (err) { console.warn('Email prefill error', err); }
 
-      // ===================== 校验 Stripe SDK =====================
-      if (typeof Stripe === 'undefined') {
-        if (messageContainer) {
-          messageContainer.textContent = 'Error: Stripe SDK failed to load.';
-        }
-        return;
-      }
-
-      // ===================== 初始化 Stripe Elements =====================
+      // 2. Initialize
       initialize();
 
       async function initialize() {
@@ -142,160 +176,138 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
           });
-
-          if (!response.ok) {
-            if (messageContainer) {
-              messageContainer.textContent = 'Server error fetching client secret: Status ' + response.status;
-            }
-            return;
-          }
-
           var json = await response.json();
-          var clientSecret = json.clientSecret;
-          var apiError = json.error;
 
-          if (apiError || !clientSecret) {
-            if (messageContainer) {
-              messageContainer.textContent = apiError || 'Could not start payment process. Check backend config or logs.';
-            }
-            return;
+          if (!json.clientSecret) {
+             showMessage('System Error: Could not initiate payment.');
+             return;
           }
 
-          elements = stripe.elements({ clientSecret: clientSecret });
+          // ⭐⭐ Stripe 配置：完美同步 HTML 输入框样式 ⭐⭐
+          // Background: #0A0A0A | Border: #333333
+          const appearance = {
+            theme: 'night', 
+            variables: {
+              colorPrimary: brandColor,
+              colorBackground: '#0A0A0A', // 必须与 input bg-[#0A0A0A] 一致
+              colorText: '#ffffff',
+              colorDanger: brandColor,
+              fontFamily: 'Inter, system-ui, sans-serif',
+              borderRadius: '8px', 
+              spacingUnit: '4px',
+              placeholderColor: '#525252' // gray-600
+            },
+            rules: {
+                '.Input': {
+                    border: '1px solid #333333', // 必须与 input border-[#333] 一致
+                    backgroundColor: '#0A0A0A',
+                    color: '#ffffff',
+                    paddingTop: '12px',  // 对应 h-[50px]
+                    paddingBottom: '12px',
+                    fontSize: '16px',
+                },
+                '.Input:focus': {
+                    border: `1px solid ${brandColor}`,
+                    boxShadow: 'none'
+                },
+                '.Label': {
+                    color: '#9ca3af', // text-gray-400
+                    fontSize: '12px', // text-xs
+                    fontWeight: '700', // font-bold
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em', // tracking-widest
+                    marginBottom: '8px'
+                }
+            }
+          };
+
+          elements = stripe.elements({ 
+              clientSecret: json.clientSecret, 
+              appearance: appearance 
+          });
 
           var paymentElement = elements.create('payment', {
-            wallets: {
-              link: 'never'   // 禁用 Stripe Link 快速结账
-            },
-            fields: {
-              billingDetails: {
-                name: 'never',
-                email: 'never'
-              }
-            }
+            wallets: { link: 'never' },
+            fields: { billingDetails: { name: 'never', email: 'never' } }
           });
 
-          paymentElement.mount(paymentElementContainer);
+          paymentElement.mount('#payment-element-container');
+
         } catch (error) {
-          console.error('Error fetching client secret:', error);
-          if (messageContainer) {
-            messageContainer.textContent = 'Payment initialization failed. Check network or configuration.';
-          }
+          console.error(error);
+          showMessage('Failed to load payment system.');
         }
       }
 
-      // ===================== Klaviyo VIP 订阅调用 =====================
+      // 3. Submit
+      if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            setLoading(true);
+
+            var emailVal = customerEmail.value.trim();
+            var nameVal = customerName.value.trim();
+
+            if (!emailVal) {
+                showMessage('Please enter your email.');
+                setLoading(false);
+                return;
+            }
+
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements: elements,
+                confirmParams: {
+                    payment_method_data: {
+                        billing_details: { name: nameVal, email: emailVal }
+                    }
+                },
+                redirect: 'if_required'
+            });
+
+            if (error) {
+                showMessage(error.message);
+                setLoading(false);
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                await subscribeToKlaviyo(emailVal, nameVal);
+                
+                var thankyouUrl = 'https://manettabag.com/thankyou' 
+                    + '?email=' + encodeURIComponent(emailVal)
+                    + '&name=' + encodeURIComponent(nameVal);
+                
+                window.location.href = thankyouUrl;
+            } else {
+                showMessage('Payment failed. Please try again.');
+                setLoading(false);
+            }
+        });
+      }
+
       async function subscribeToKlaviyo(email, name) {
         try {
-          if (!email) {
-            console.warn('subscribeToKlaviyo: email is empty, skip.');
-            return;
-          }
-
-          var res = await fetch(vipKlaviyoApiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: email,
-              name: name || ''
-            })
-          });
-
-          var data = null;
-          try {
-            data = await res.json();
-          } catch (_) {
-            data = null;
-          }
-
-          if (!res.ok || !data || !data.success) {
-            console.warn('Klaviyo VIP subscribe failed:', data);
-          } else {
-            console.log('Klaviyo VIP subscribe success');
-          }
-        } catch (err) {
-          console.error('subscribeToKlaviyo error:', err);
-        }
+            await fetch(vipKlaviyoApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, name })
+            });
+        } catch (e) { console.warn('Klaviyo error', e); }
       }
 
-      // ===================== 提交表单，确认支付 =====================
-      if (form) {
-        form.addEventListener('submit', handleSubmit);
-      }
-
-      async function handleSubmit(e) {
-        e.preventDefault();
-        setLoading(true);
-
-        // 当前表单里的值（不再依赖 localStorage）
-        var emailVal = customerEmail ? customerEmail.value.trim() : '';
-        var nameVal = customerName ? customerName.value.trim() : '';
-
-        if (!emailVal) {
-          if (messageContainer) {
-            messageContainer.textContent = 'Please enter a valid email.';
-          }
-          setLoading(false);
-          return;
+      function showMessage(messageText) {
+        if (messageContainer) {
+            messageContainer.textContent = messageText;
+            messageContainer.classList.remove('hidden');
         }
-
-        // 使用 redirect: 'if_required'，方便我们在前端拿到 paymentIntent 结果
-        var result = await stripe.confirmPayment({
-          elements: elements,
-          confirmParams: {
-            payment_method_data: {
-              billing_details: {
-                name: nameVal || undefined,
-                email: emailVal
-              }
-            }
-          },
-          redirect: 'if_required'
-        });
-
-        if (result.error) {
-          if (messageContainer) {
-            if (result.error.type === 'card_error' || result.error.type === 'validation_error') {
-              messageContainer.textContent = result.error.message;
-            } else {
-              messageContainer.textContent = 'An unknown error occurred. Please try again.';
-            }
-          }
-          setLoading(false);
-          return;
-        }
-
-        // 没有 error，看看 paymentIntent 状态
-        if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-          // 1）先把邮箱同步到 Klaviyo VIP list（不阻塞太久，简单等一下）
-          await subscribeToKlaviyo(emailVal, nameVal);
-
-          var thankyouUrl = 'https://manettabag.com/thankyou'
-          + '?email=' + encodeURIComponent(emailVal)
-          + (nameVal ? '&name=' + encodeURIComponent(nameVal) : '');
-
-          window.location.href = thankyouUrl;
-          return;
-
-          // 2）跳转到感谢页
-          //window.location.href = 'https://manettabag.com/thankyou';
-          //return;
-        }
-
-        // 理论上正常不会走到这里，但保险起见仍然跳转
-        window.location.href = 'https://manettabag.com/thankyou';
       }
 
       function setLoading(isLoading) {
-        var buttonText = document.getElementById('button-text');
-        if (!submitButton || !buttonText) return;
-
         if (isLoading) {
-          submitButton.disabled = true;
-          buttonText.textContent = 'Processing...';
+            submitButton.disabled = true;
+            buttonText.classList.add('hidden');
+            spinner.classList.remove('hidden');
         } else {
-          submitButton.disabled = false;
-          buttonText.textContent = 'Pay Now';
+            submitButton.disabled = false;
+            buttonText.classList.remove('hidden');
+            spinner.classList.add('hidden');
         }
       }
     });
@@ -303,138 +315,3 @@ const PAGE_TITLE = "Single-Page Checkout - Manetta Bag";
 
 </body>
 </html>
-
-<style>
-/* ------------------------------------- */
-/* BASE STYLES */
-/* ------------------------------------- */
-.checkout-page-main {
-    padding: 40px 20px;
-    min-height: 85vh;
-    background-color: #f0f2f5; /* Light background for contrast */
-}
-
-.checkout-container {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-/* 现在页面上只有表单内部这个 H1 */
-.checkout-title {
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 1.8em;
-    color: #333;
-}
-
-.unified-checkout-form {
-    padding: 30px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* ------------------------------------- */
-/* PRICE SUMMARY BOX */
-/* ------------------------------------- */
-.price-summary-box {
-    text-align: center;
-    padding: 10px 0 20px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 20px;
-}
-
-.price-tag {
-    font-size: 2.5em;
-    font-weight: 700;
-    color: #1a73e8; /* Prominent color for the price */
-    margin: 0;
-}
-
-/* ------------------------------------- */
-/* FORM SECTIONS & INPUTS */
-/* ------------------------------------- */
-.section-title {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #333;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.custom-form-fields .input-group {
-    margin-bottom: 15px;
-}
-
-.custom-form-fields label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    font-size: 0.9em;
-    color: #555;
-}
-
-.custom-form-fields input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-size: 1em;
-}
-
-/* 只对 readonly 的输入框做视觉区分（锁定邮箱时） */
-.custom-form-fields input[readonly] {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-}
-
-.payment-card-box {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    min-height: 40px; /* Placeholder minimum height for loading */
-}
-
-/* ------------------------------------- */
-/* BUTTONS & MESSAGES */
-/* ------------------------------------- */
-.terms-and-conditions {
-    margin: 25px 0 15px;
-    font-size: 0.9em;
-}
-
-#submit-payment-btn {
-    width: 100%;
-    padding: 14px;
-    background-color: #1a73e8; /* Google Blue */
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-weight: 600;
-}
-
-#submit-payment-btn:disabled {
-    background-color: #99bfea;
-    cursor: not-allowed;
-}
-
-#payment-message {
-    color: #d93025; /* Error red */
-    font-weight: bold;
-    margin-top: 15px;
-    text-align: center;
-}
-
-.security-info {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 0.8em;
-    color: #888;
-}
-</style>

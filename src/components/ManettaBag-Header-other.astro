@@ -1,0 +1,40 @@
+---
+/*
+  ManettaBag-Header-other.astro
+  黑色磨砂导航栏版本（适用于非首页，内容不重叠）
+*/
+---
+
+<header
+  id="navbar"
+  class="fixed top-0 left-0 w-full z-50 transition-all duration-500 border-b border-white/5 bg-dark-main/80 backdrop-blur-md"
+>
+  <div class="max-w-limit mx-auto px-6 lg:px-gutter h-[88px] flex justify-between items-center">
+    <a href="#" class="group">
+      <div
+        id="nav-logo"
+        class="text-2xl font-display font-bold tracking-tighter text-white transition-colors duration-300 group-hover:text-brand"
+      >
+        MANETTA<span class="text-brand">.</span>
+      </div>
+    </a>
+  </div>
+</header>
+
+<div class="w-full h-[88px]" aria-hidden="true"></div>
+
+<script is:inline>
+  const navbar = document.getElementById("navbar");
+
+  if (navbar) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add("nav-scrolled");
+        navbar.classList.remove("border-white/5");
+      } else {
+        navbar.classList.remove("nav-scrolled");
+        navbar.classList.add("border-white/5");
+      }
+    });
+  }
+</script>

@@ -23,17 +23,20 @@ body {
   overflow-x: hidden;
   font-size: 16px;
   line-height: 1.5;
-  /* --- 修改开始 --- */
-  /* 将原本的一长串系统字体改为 Inter */
   font-family: 'Inter', sans-serif;
-  /* --- 修改结束 --- */
   font-weight: 300;
   background-color: #0a0a0a; /* 深色背景，与设计稿一致 */
   color: #ffffff;
+
+  /* --- ⭐ 修改开始：Sticky Footer 核心代码 --- */
+  min-height: 100vh;      /* 1. 强制 body 最小高度为屏幕视口高度 */
+  display: flex;          /* 2. 启用 Flexbox 布局 */
+  flex-direction: column; /* 3. 让子元素（Header, Main, Footer）垂直排列 */
+  /* --- 修改结束 --- */
 }
 
 /* 标题基础样式 */
-h1,h2,h3,h4,h5,h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: 'Space Grotesk', sans-serif;
   margin-top: 0;
   margin-bottom: 0.5em;

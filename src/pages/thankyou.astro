@@ -1,80 +1,113 @@
 ---
-import Header from '../components/Header.astro';
+// src/pages/thankyou.astro
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import ManettaBagHeaderOther from '../components/ManettaBag-Header-other.astro';
 
-const PAGE_TITLE = "Thank you - You're a VIP | Manetta Bag";
+const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{PAGE_TITLE}</title>
+    <link rel="stylesheet" href="/tailwind.css" />
   </head>
-  <body>
-    <Header />
+  
+  <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased selection:bg-[#D46A22] selection:text-white">
+    
+    <ManettaBagHeaderOther />
 
-    <main class="thankyou-page-main">
-      <div class="thankyou-container">
-        <!-- 左侧图片：桌面/平板可见，手机隐藏 -->
-        <div class="thankyou-visual">
-          <img
-            src="/images/thankyou-vip-placeholder.png"
-            alt="Manetta VIP illustration"
-            class="thankyou-image"
-            loading="lazy"
-          />
-        </div>
+    <main class="flex-1 w-full pt-32 pb-20 relative overflow-hidden flex items-center justify-center">
 
-        <!-- 右侧内容 -->
-        <div class="thankyou-content">
-          <h1 class="thankyou-title">Congrats! You&apos;re a VIP</h1>
+      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D46A22]/10 blur-[120px] rounded-full pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none"></div>
 
-          <!-- 结账订阅信息卡片 -->
-          <section class="thankyou-card">
-            <h2 class="thankyou-card-title">VIP Reservation Details</h2>
-            <p class="thankyou-card-text">
-              We&apos;ve received your VIP deposit and saved your spot for
-              the MANETTA modular camera bag launch.
-            </p>
+      <div class="w-full max-w-[1200px] mx-auto px-6 lg:px-12 relative z-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          
+          <div class="hidden lg:block relative group animate-float-slow">
+             <div class="absolute inset-0 bg-[#D46A22]/20 blur-[60px] rounded-full opacity-60"></div>
+             
+             <div class="relative rounded-3xl overflow-hidden border border-white/20 shadow-2xl bg-[#141414]">
+                <img
+                  src="/images/grid/grid-4.jpg" 
+                  alt="Manetta VIP"
+                  class="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700 hover:scale-105"
+                  loading="lazy"
+                />
+             </div>
+          </div>
 
-            <p class="thankyou-card-line">
-              Email:
-              <span id="vip-email" class="thankyou-highlight">
-                (checking…)
-              </span>
-            </p>
-            <p class="thankyou-card-line">
-              Name:
-              <span id="vip-name" class="thankyou-highlight">
-                (optional)
-              </span>
-            </p>
-            <p class="thankyou-card-line">
-              Deposit:
-              <span class="thankyou-highlight">$5.00 USD</span>
-            </p>
+          <div class="flex flex-col w-full">
+            
+            <div class="mb-8 text-center lg:text-left">
+                <span class="text-[#D46A22] font-bold tracking-[0.2em] uppercase text-xs mb-3 block animate-pulse">
+                    Reservation Confirmed
+                </span>
+                <h1 class="font-display font-bold text-4xl lg:text-5xl text-white leading-tight">
+                  Congrats! <br />
+                  <span class="text-gray-400">You're a VIP.</span>
+                </h1>
+            </div>
 
-            <p class="thankyou-card-note">
-              You&apos;ll receive VIP updates and an exclusive early-bird
-              discount link in your inbox before we go live on Kickstarter.
-            </p>
-          </section>
+            <section class="bg-[#171717] border border-white/10 rounded-2xl p-8 mb-8 shadow-2xl relative w-full overflow-hidden">
+              
+              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D46A22] to-[#171717]"></div>
 
-          <!-- 跳转按钮 -->
-          <a
-            href="https://www.kickstarter.com" 
-            class="thankyou-cta-btn"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            FOLLOW US ON KICKSTARTER NOW
-          </a>
+              <h2 class="font-display font-bold text-xl text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-[#D46A22]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Reservation Details
+              </h2>
+              
+              <p class="text-gray-300 text-sm mb-6 leading-relaxed">
+                We've received your VIP deposit and saved your spot for the MANETTA modular camera bag launch.
+              </p>
+
+              <div class="space-y-4 border-t border-white/10 pt-6">
+                
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <span class="text-gray-500 font-medium text-sm">Email:</span>
+                  <span id="vip-email" class="text-white font-bold text-lg break-all sm:text-right">(checking...)</span>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <span class="text-gray-500 font-medium text-sm">Name:</span>
+                  <span id="vip-name" class="text-white font-bold text-lg sm:text-right">(optional)</span>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <span class="text-gray-500 font-medium text-sm">Deposit:</span>
+                  <span class="text-[#D46A22] font-bold text-lg sm:text-right">$5.00 USD</span>
+                </div>
+
+                <div class="pt-2">
+                   <span class="inline-flex items-center bg-[#D46A22]/10 border border-[#D46A22]/30 text-[#D46A22] text-xs px-3 py-1 rounded font-bold uppercase tracking-wider">
+                     VIP Status Active
+                   </span>
+                </div>
+              </div>
+
+              <p class="text-xs text-gray-500 mt-6 italic">
+                * You'll receive VIP updates and an exclusive early-bird discount link in your inbox.
+              </p>
+            </section>
+
+            <a
+              href="https://www.kickstarter.com" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group relative w-full bg-[#D46A22] hover:bg-[#b5581b] text-white font-bold py-4 lg:py-5 rounded-xl text-center transition-all duration-300 shadow-[0_0_30px_-10px_rgba(212,106,34,0.5)] hover:shadow-[0_0_40px_-5px_rgba(212,106,34,0.7)] hover:-translate-y-1 flex items-center justify-center gap-2 text-sm lg:text-base tracking-wide"
+            >
+              <span>FOLLOW US ON KICKSTARTER NOW</span>
+              <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+
+          </div>
         </div>
       </div>
     </main>
@@ -91,7 +124,6 @@ const PAGE_TITLE = "Thank you - You're a VIP | Manetta Bag";
         var emailFromUrl = params.get('email');
         var nameFromUrl = params.get('name');
 
-        // 优先用 URL 里的 email，其次用 localStorage 里的 manetta_email
         var finalEmail =
           (emailFromUrl && emailFromUrl.trim()) ||
           (localStorage.getItem('manetta_email') || '').trim();
@@ -99,6 +131,7 @@ const PAGE_TITLE = "Thank you - You're a VIP | Manetta Bag";
         if (emailSpan) {
           if (finalEmail) {
             emailSpan.textContent = finalEmail;
+            emailSpan.classList.add('text-white'); // 确认后显示高亮白
           } else {
             emailSpan.textContent = 'your email inbox';
           }
@@ -108,150 +141,10 @@ const PAGE_TITLE = "Thank you - You're a VIP | Manetta Bag";
           if (nameFromUrl && nameFromUrl.trim()) {
             nameSpan.textContent = nameFromUrl.trim();
           } else {
-            nameSpan.textContent = 'VIP supporter';
+            nameSpan.textContent = '-';
           }
         }
       });
     </script>
   </body>
 </html>
-
-<style>
-  /* 页面基础样式 */
-  .thankyou-page-main {
-    padding: 60px 20px;
-    min-height: 70vh;
-    background-color: #ffffff;
-  }
-
-  .thankyou-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1.1fr 1.2fr;
-    gap: 40px;
-    align-items: center;
-  }
-
-  /* 左侧图片区域（桌面可见） */
-  .thankyou-visual {
-    background-color: #e9e9ea;
-    border-radius: 4px;
-    overflow: hidden;
-    min-height: 260px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .thankyou-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  /* 右侧内容区域 */
-  .thankyou-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .thankyou-title {
-    font-size: 2rem;
-    margin-bottom: 24px;
-    color: #111111;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-  }
-
-  .thankyou-card {
-    width: 100%;
-    border: 1px solid #dedede;
-    border-radius: 4px;
-    padding: 20px 24px;
-    background-color: #ffffff;
-    margin-bottom: 20px;
-  }
-
-  .thankyou-card-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #111111;
-  }
-
-  .thankyou-card-text {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 14px;
-    color: #444444;
-  }
-
-  .thankyou-card-line {
-    font-size: 0.95rem;
-    margin: 4px 0;
-    color: #333333;
-  }
-
-  .thankyou-highlight {
-    font-weight: 600;
-    margin-left: 4px;
-  }
-
-  .thankyou-card-note {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    color: #777777;
-    margin-top: 12px;
-  }
-
-  .thankyou-cta-btn {
-    display: inline-block;
-    padding: 10px 24px;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    border-radius: 2px;
-    background-color: #9aa2aa; /* 参考你截图里的灰蓝色 */
-    color: #ffffff;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-  }
-
-  .thankyou-cta-btn:hover {
-    opacity: 0.9;
-  }
-
-  /* 响应式：平板 & 手机 */
-  @media (max-width: 1024px) {
-    .thankyou-container {
-      grid-template-columns: 1fr 1.1fr;
-      gap: 24px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .thankyou-page-main {
-      padding: 40px 16px;
-    }
-
-    .thankyou-container {
-      grid-template-columns: 1fr;
-    }
-
-    /* 手机端隐藏左侧图片 */
-    .thankyou-visual {
-      display: none;
-    }
-
-    .thankyou-title {
-      font-size: 1.6rem;
-      margin-bottom: 18px;
-    }
-  }
-</style>
