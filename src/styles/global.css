@@ -1,3 +1,6 @@
+/* 1. 在最顶部引入 Google Fonts (必须在 @tailwind 指令之前) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap');
+
 /* ① Tailwind 指令（保留） */
 @tailwind base;
 @tailwind components;
@@ -20,21 +23,18 @@ body {
   overflow-x: hidden;
   font-size: 16px;
   line-height: 1.5;
-  /* 不再使用自定义字体，改为系统 / 默认无衬线 */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  /* --- 修改开始 --- */
+  /* 将原本的一长串系统字体改为 Inter */
+  font-family: 'Inter', sans-serif;
+  /* --- 修改结束 --- */
   font-weight: 300;
   background-color: #0a0a0a; /* 深色背景，与设计稿一致 */
   color: #ffffff;
 }
 
 /* 标题基础样式 */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1,h2,h3,h4,h5,h6 {
+  font-family: 'Space Grotesk', sans-serif;
   margin-top: 0;
   margin-bottom: 0.5em;
   line-height: 1.1;
