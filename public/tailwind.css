@@ -1415,6 +1415,10 @@ video {
   opacity: 1;
 }
 
+.opacity-0 {
+  opacity: 0;
+}
+
 .mix-blend-overlay {
   mix-blend-mode: overlay;
 }

@@ -37,15 +37,19 @@
         id="manetta-video"
         class="w-full h-full object-cover"
         controls
+        poster=""
       >
-        <source src="https://cdn.shopify.com/videos/c/o/v/f586f1d516e14c6c843580287f165454.mp4" type="video/mp4" />
+        <source
+          src="https://cdn.shopify.com/videos/c/o/v/f586f1d516e14c6c843580287f165454.mp4"
+          type="video/mp4"
+        />
         Your browser does not support HTML5 video.
       </video>
 
       <!-- 中间的圆形播放按钮（暂停/初始/播放结束时显示） -->
       <div
         id="video-overlay"
-        class="absolute inset-0 flex items-center justify-center bg-transparent transition-opacity duration-300"
+        class="absolute inset-0 flex items-center justify-center bg-transparent transition-opacity duration-300 opacity-100"
       >
         <div
           class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40"
@@ -63,56 +67,45 @@
   </div>
 </section>
 
-<!-- 交互逻辑 -->
+<!-- 交互逻辑：只改透明度 & pointer-events，不动 display，也不再用 video.load() -->
 <script is:inline>
   const video = document.getElementById("manetta-video");
   const overlay = document.getElementById("video-overlay");
 
   if (video && overlay) {
-    // 显示按钮
-    const showOverlay = () => {
-      overlay.style.display = "flex";
-      requestAnimationFrame(() => {
-        overlay.style.opacity = "1";
-      });
-    };
-
-    // 隐藏按钮
-    const hideOverlay = () => {
-      overlay.style.opacity = "0";
-      setTimeout(() => {
-        overlay.style.display = "none";
-      }, 300);
+    const setOverlayVisible = (visible) => {
+      if (visible) {
+        overlay.classList.remove("opacity-0", "pointer-events-none");
+      } else {
+        overlay.classList.add("opacity-0", "pointer-events-none");
+      }
     };
 
     // 初始：显示按钮
-    showOverlay();
+    setOverlayVisible(true);
 
-    // 点击按钮：开始播放 & 隐藏按钮
+    // 点击按钮：开始播放（按钮本身不需要再主动 hide，play 事件会处理）
     overlay.addEventListener("click", () => {
-      hideOverlay();
       video.play();
     });
 
-    // 视频开始播放：隐藏按钮（防止用控制条点播放时按钮还在）
+    // 视频开始播放：隐藏按钮
     video.addEventListener("play", () => {
-      hideOverlay();
+      setOverlayVisible(false);
     });
 
     // 视频暂停：显示按钮（但不重置进度）
     video.addEventListener("pause", () => {
-      // 播放结束时也会触发 pause，这里让 ended 事件单独处理
       if (!video.ended) {
-        showOverlay();
+        setOverlayVisible(true);
       }
     });
 
-    // 视频播放结束：回到封面，并显示按钮
+    // 视频播放结束：回到 0 秒并显示按钮（不再调用 video.load()，避免闪烁）
     video.addEventListener("ended", () => {
-      // 回到封面：重置时间并重新加载，让 poster 显示
       video.currentTime = 0;
-      video.load(); // 重新加载后，会显示 poster
-      showOverlay();
+      video.pause();
+      setOverlayVisible(true);
     });
   }
 </script>
