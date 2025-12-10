@@ -86,12 +86,8 @@ const BRAND_HEX = "#D46A22";
 
                 <div class="mb-8">
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Card Details</h3>
-                        <div class="flex gap-2 opacity-30 grayscale">
-                             <img src="https://cdn.branding.stripe.com/v3/assets/images/logos/visa.svg" class="h-3" alt="Visa">
-                             <img src="https://cdn.branding.stripe.com/v3/assets/images/logos/mastercard.svg" class="h-3" alt="Mastercard">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Payment Details</h3>
                         </div>
-                    </div>
                     
                     <div id="payment-element-container" class="min-h-[50px]">
                         <div class="animate-pulse h-[50px] bg-[#0A0A0A] border border-[#333] rounded-lg w-full"></div>
@@ -134,7 +130,7 @@ const BRAND_HEX = "#D46A22";
     <script define:vars={{ brandColor: BRAND_HEX }}>
     // @ts-nocheck
     document.addEventListener('DOMContentLoaded', function () {
-      // ⚠️ 记得换 Live Key
+      // ⚠️ 记得换成你的 Live Key
       var stripe = Stripe('pk_test_51QkM6jJrrVdgshd2MDfLWbtSQ9spW0T04calhNKj2x5Sg264hHIHESnwzOGziGpDl77AVWomFyKxkrW1EYbbbCEs00Fd6DRAFq');
 
       var elements;
