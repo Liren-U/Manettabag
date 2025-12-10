@@ -1,0 +1,163 @@
+---
+/**
+ * ManettaBag-Specs-Islands.astro
+ * Specs 区块：Engineered to Endure.
+ * 说明：
+ * - 保持与原 HTML 结构 & Tailwind class 完全一致
+ * - 图片路径用 /image_de995e.png，你需要把图片放到 /public/image_de995e.png
+ */
+---
+
+<section
+  id="specs"
+  class="py-40 bg-dark-sec relative z-10 overflow-hidden"
+>
+  <div class="max-w-limit mx-auto px-6 lg:px-gutter">
+    <!-- 标题区域 -->
+    <div class="text-center mb-20">
+      <h2 class="font-display font-bold text-5xl mb-6">
+        Engineered to Endure.
+      </h2>
+      <p class="text-light-muted text-xl max-w-2xl mx-auto">
+        Every stitch, buckle, and zipper is stress-tested for the harshest environments.
+      </p>
+    </div>
+
+    <!-- 灵动岛 三张卡片容器 -->
+    <div
+      class="island-container w-full h-[600px] rounded-[4rem] bg-dark-main/50 backdrop-blur-2xl border border-white/10 p-3 flex gap-3 shadow-island overflow-hidden relative group/island hover:shadow-glow/30 transition-all duration-700"
+    >
+      <!-- 卡片 1：Premium Zippers -->
+      <div
+        class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
+      >
+        <img
+          src="/image_de995e.png"
+          alt="Premium Zippers"
+          class="absolute inset-0 w-full h-full object-cover object-left grayscale group-hover/item:grayscale-0 transition-all duration-700 scale-110 group-hover/item:scale-100"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-dark-main via-dark-main/50 to-transparent p-10 flex flex-col justify-end opacity-80 group-hover/item:opacity-100 transition-opacity"
+        >
+          <div
+            class="w-12 h-12 mb-4 rounded-full bg-brand/20 flex items-center justify-center backdrop-blur-sm border border-brand/30"
+          >
+            <svg
+              class="w-6 h-6 text-brand"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+          </div>
+          <h3
+            class="text-white font-display font-bold text-3xl mb-2 leading-tight group-hover/item:text-brand transition-colors"
+          >
+            Premium Zippers
+          </h3>
+          <p
+            class="text-light-muted text-lg group-hover/item:text-white transition-colors"
+          >
+            Waterproof &amp; Self-locking
+          </p>
+        </div>
+      </div>
+
+      <!-- 卡片 2：Alloy Hardware -->
+      <div
+        class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
+      >
+        <img
+          src="/image_de995e.png"
+          alt="Alloy Hardware"
+          class="absolute inset-0 w-full h-full object-cover object-center grayscale group-hover/item:grayscale-0 transition-all duration-700 scale-110 group-hover/item:scale-100"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-dark-main via-dark-main/50 to-transparent p-10 flex flex-col justify-end opacity-80 group-hover/item:opacity-100 transition-opacity"
+        >
+          <div
+            class="w-12 h-12 mb-4 rounded-full bg-brand/20 flex items-center justify-center backdrop-blur-sm border border-brand/30"
+          >
+            <svg
+              class="w-6 h-6 text-brand"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <h3
+            class="text-white font-display font-bold text-3xl mb-2 leading-tight group-hover/item:text-brand transition-colors"
+          >
+            Alloy Hardware
+          </h3>
+          <p
+            class="text-light-muted text-lg group-hover/item:text-white transition-colors"
+          >
+            Indestructible Zinc Alloy
+          </p>
+        </div>
+      </div>
+
+      <!-- 卡片 3：Ripstop Lining -->
+      <div
+        class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
+      >
+        <img
+          src="/image_de995e.png"
+          alt="Ripstop Lining"
+          class="absolute inset-0 w-full h-full object-cover object-right grayscale group-hover/item:grayscale-0 transition-all duration-700 scale-110 group-hover/item:scale-100"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-dark-main via-dark-main/50 to-transparent p-10 flex flex-col justify-end opacity-80 group-hover/item:opacity-100 transition-opacity"
+        >
+          <div
+            class="w-12 h-12 mb-4 rounded-full bg-brand/20 flex items-center justify-center backdrop-blur-sm border border-brand/30"
+          >
+            <svg
+              class="w-6 h-6 text-brand"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+          </div>
+          <h3
+            class="text-white font-display font-bold text-3xl mb-2 leading-tight group-hover/item:text-brand transition-colors"
+          >
+            Ripstop Lining
+          </h3>
+          <p
+            class="text-light-muted text-lg group-hover/item:text-white transition-colors"
+          >
+            High-Visibility Interior
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
