@@ -1,17 +1,15 @@
 ---
 /**
- * ManettaBag-Feature-Video.astro（升级版）
- * 播放时隐藏按钮，暂停/结束时显示按钮
+ * ManettaBag-Feature-Video.astro（最终保证可运行版）
+ * 不依赖 Tailwind class 切换，完全用 inline style 控制显示隐藏
  */
 ---
 
 <section id="video" class="py-40 bg-dark-main relative overflow-hidden">
-  <!-- 背景橙色虚光 -->
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[50%] bg-brand/20 blur-[200px] rounded-full pointer-events-none opacity-40"></div>
 
   <div class="max-w-limit mx-auto px-6 lg:px-gutter text-center relative z-10">
     
-    <span class="text-brand font-bold tracking-[0.3em] uppercase text-sm mb-8 block animate-pulse">
+    <span class="text-brand font-bold tracking-[0.3em] uppercase text-sm mb-8 block">
       Capacity Test
     </span>
 
@@ -19,53 +17,60 @@
       What Fits Inside?
     </h2>
 
-    <!-- 视频容器 -->
-    <div class="reveal active relative w-full aspect-video rounded-[2.5rem] overflow-hidden border-2 border-brand/30 bg-dark-card shadow-glow">
+    <div class="relative w-full aspect-video rounded-[2.5rem] overflow-hidden border-2 border-brand/30 bg-dark-card">
 
+      <!-- 视频 -->
       <video
         id="manetta-video"
         class="w-full h-full object-cover"
         controls
-        poster=""
+        playsinline
+        webkit-playsinline
       >
         <source src="https://cdn.shopify.com/videos/c/o/v/f586f1d516e14c6c843580287f165454.mp4" type="video/mp4" />
         Your browser does not support HTML5 video.
       </video>
 
-      <!-- 自定义播放按钮（暂停时出现） -->
+      <!-- 按钮（默认显示） -->
       <div
         id="video-overlay"
-        class="absolute inset-0 flex items-center justify-center bg-transparent 
-               transition-opacity duration-300 opacity-100"
+        style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:opacity .3s; opacity:1;"
       >
-        <div class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40">
+        <div
+          class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40"
+        >
           <svg class="w-10 h-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
           </svg>
         </div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- 交互逻辑：播放时隐藏按钮，暂停时再出现 -->
 <script is:inline>
   const video = document.getElementById("manetta-video");
   const overlay = document.getElementById("video-overlay");
 
   if (video && overlay) {
+
+    // 显示按钮
     const showOverlay = () => {
-      overlay.classList.remove("opacity-0", "pointer-events-none");
+      overlay.style.opacity = "1";
+      overlay.style.pointerEvents = "auto";
     };
 
+    // 隐藏按钮
     const hideOverlay = () => {
-      overlay.classList.add("opacity-0", "pointer-events-none");
+      overlay.style.opacity = "0";
+      overlay.style.pointerEvents = "none";
     };
 
-    // 初始：显示按钮
+    // 初始显示
     showOverlay();
 
-    // 点击按钮 → 播放
+    // 点击按钮播放
     overlay.addEventListener("click", () => {
       video.play();
     });
@@ -75,14 +80,17 @@
       hideOverlay();
     });
 
-    // 视频暂停 → 显示按钮
+    // 暂停 → 显示按钮
     video.addEventListener("pause", () => {
-      if (!video.ended) showOverlay();
+      if (!video.ended) {
+        showOverlay();
+      }
     });
 
-    // 视频播放结束 → 回到开头并显示按钮
+    // 播放结束 → 回到0并显示按钮
     video.addEventListener("ended", () => {
       video.currentTime = 0;
+      video.pause();
       showOverlay();
     });
   }

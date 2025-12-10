@@ -3,6 +3,7 @@
 module.exports = {
   content: [
     "./src/**/*.{astro,html,js,jsx,ts,tsx}",
+    "./public/**/*.html",
   ],
   theme: {
     extend: {
@@ -37,5 +38,15 @@ module.exports = {
       },
     },
   },
+
+  // ⭐ 关键：强制保留这些“只在 JS 里出现”的类名，避免被生产环境裁掉
+  safelist: [
+    "opacity-0",
+    "pointer-events-none",
+
+    // FAQ 折叠动画里 JS 切换用到的类（如果你用了我之前给你的脚本）
+    "max-h-[1000px]",
+  ],
+
   plugins: [],
 };
