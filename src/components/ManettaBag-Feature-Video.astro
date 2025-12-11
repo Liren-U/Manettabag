@@ -1,15 +1,43 @@
 ---
 /**
- * ManettaBag-Feature-Video.astro（最终保证可运行版）
- * 不依赖 Tailwind class 切换，完全用 inline style 控制显示隐藏
+ * ManettaBag-Feature-Video.astro
+ * 状态：【发光边框版】
+ * 修改：
+ * 1. 添加了 CSS @keyframes 动画实现呼吸发光。
+ * 2. 给视频容器应用了 .video-glow 类。
+ * 3. 保持原有 JS 逻辑完全不变。
  */
 ---
+
+<style>
+  /* === 边框呼吸发光特效 === */
+  @keyframes video-pulse {
+    0%, 100% {
+      /* 初始状态：微弱光晕，边框较暗 */
+      box-shadow: 0 0 20px -5px rgba(212, 106, 34, 0.2);
+      border-color: rgba(212, 106, 34, 0.3);
+    }
+    50% {
+      /* 中间状态：强烈光晕，边框变亮 */
+      box-shadow: 0 0 50px -5px rgba(212, 106, 34, 0.6);
+      border-color: rgba(212, 106, 34, 0.8);
+    }
+  }
+
+  .video-glow {
+    /* 基础边框设置 */
+    border-width: 2px;
+    border-style: solid;
+    /* 应用动画：4秒循环，丝滑缓动 */
+    animation: video-pulse 4s infinite ease-in-out;
+  }
+</style>
 
 <section id="video" class="py-40 bg-dark-main relative overflow-hidden">
 
   <div class="max-w-limit mx-auto px-6 lg:px-gutter text-center relative z-10">
     
-    <span class="text-brand font-bold tracking-[0.3em] uppercase text-sm mb-8 block">
+    <span class="text-brand font-bold tracking-[0.3em] uppercase text-sm mb-8 block animate-pulse">
       Capacity Test
     </span>
 
@@ -17,9 +45,8 @@
       What Fits Inside?
     </h2>
 
-    <div class="relative w-full aspect-video rounded-[2.5rem] overflow-hidden border-2 border-brand/30 bg-dark-card">
+    <div class="video-glow relative w-full aspect-video rounded-[2.5rem] overflow-hidden bg-dark-card">
 
-      <!-- 视频 -->
       <video
         id="manetta-video"
         class="w-full h-full object-cover"
@@ -31,13 +58,12 @@
         Your browser does not support HTML5 video.
       </video>
 
-      <!-- 按钮（默认显示） -->
       <div
         id="video-overlay"
         style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:opacity .3s; opacity:1;"
       >
         <div
-          class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40"
+          class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40 shadow-[0_0_30px_rgba(212,106,34,0.4)] transition-transform duration-300 hover:scale-110 cursor-pointer"
         >
           <svg class="w-10 h-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
