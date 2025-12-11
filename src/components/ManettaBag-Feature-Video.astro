@@ -1,11 +1,10 @@
 ---
 /**
  * ManettaBag-Feature-Video.astro
- * 状态：【发光边框版】
+ * 状态：【发光边框 + 视频封面 + 播放完重显封面版】
  * 修改：
- * 1. 添加了 CSS @keyframes 动画实现呼吸发光。
- * 2. 给视频容器应用了 .video-glow 类。
- * 3. 保持原有 JS 逻辑完全不变。
+ * 1. JS: "ended" 事件中改为 video.load()，强制让封面重新显示。
+ * 2. 保持了 poster 属性和发光特效。
  */
 ---
 
@@ -13,22 +12,18 @@
   /* === 边框呼吸发光特效 === */
   @keyframes video-pulse {
     0%, 100% {
-      /* 初始状态：微弱光晕，边框较暗 */
       box-shadow: 0 0 20px -5px rgba(212, 106, 34, 0.2);
       border-color: rgba(212, 106, 34, 0.3);
     }
     50% {
-      /* 中间状态：强烈光晕，边框变亮 */
       box-shadow: 0 0 50px -5px rgba(212, 106, 34, 0.6);
       border-color: rgba(212, 106, 34, 0.8);
     }
   }
 
   .video-glow {
-    /* 基础边框设置 */
     border-width: 2px;
     border-style: solid;
-    /* 应用动画：4秒循环，丝滑缓动 */
     animation: video-pulse 4s infinite ease-in-out;
   }
 </style>
@@ -82,13 +77,11 @@
 
   if (video && overlay) {
 
-    // 显示按钮
     const showOverlay = () => {
       overlay.style.opacity = "1";
       overlay.style.pointerEvents = "auto";
     };
 
-    // 隐藏按钮
     const hideOverlay = () => {
       overlay.style.opacity = "0";
       overlay.style.pointerEvents = "none";
@@ -109,15 +102,16 @@
 
     // 暂停 → 显示按钮
     video.addEventListener("pause", () => {
+      // 只有在不是因为播放结束而暂停时，才显示按钮
+      // (因为 ended 事件会单独处理)
       if (!video.ended) {
         showOverlay();
       }
     });
 
-    // 播放结束 → 回到0并显示按钮
+    // ⭐⭐ 关键修改：播放结束 → 重载视频 (video.load()) 以显示封面 ⭐⭐
     video.addEventListener("ended", () => {
-      video.currentTime = 0;
-      video.pause();
+      video.load(); // 这行代码会让视频回到初始状态，从而显示 poster
       showOverlay();
     });
   }
