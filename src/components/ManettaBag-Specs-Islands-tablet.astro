@@ -1,0 +1,223 @@
+---
+/**
+ * ManettaBag-Specs-Islands-tablet.astro
+ * 平板端专属 (Tablet Exclusive) - Spacious Edition
+ * 状态：
+ * 1. 布局：垂直堆叠
+ * 2. 边距优化：py-40 (手机) / py-64 (平板)，大幅增加留白，消除拥挤感
+ * 3. 特效：保留流光边框 + 悬浮座舱 + 全息数字
+ * 4. 兼容：lg:hidden (电脑端隐藏)
+ */
+---
+
+<style>
+  /* === 1. 强制隐藏锁 (电脑端绝对看不见) === */
+  @media (min-width: 1024px) {
+    #specs-tablet-container { display: none !important; }
+  }
+
+  /* === 2. 物理阻尼入场动画 === */
+  .reveal-element {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .reveal-element.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* === 3. 流光边框动画 === */
+  @keyframes border-rotate {
+    from { --angle: 0deg; }
+    to   { --angle: 360deg; }
+  }
+  
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  .tech-card-wrapper {
+    position: relative;
+    border-radius: 3rem;
+    background: #141414;
+    z-index: 1;
+  }
+
+  /* 流光层 */
+  .tech-card-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 3.1rem; 
+    background: conic-gradient(from var(--angle), transparent 70%, rgba(212, 106, 34, 0.8), transparent);
+    animation: border-rotate 4s linear infinite;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  /* 遮罩层 */
+  .tech-card-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: #0A0A0A;
+    border-radius: 3rem;
+    z-index: -1;
+  }
+
+  /* === 4. 全息悬浮 === */
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  .animate-float {
+    animation: float-y 6s ease-in-out infinite;
+  }
+
+  /* === 5. 呼吸辉光 === */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 15px -5px rgba(212, 106, 34, 0.2); }
+    50% { box-shadow: 0 0 30px -5px rgba(212, 106, 34, 0.6); }
+  }
+  .animate-glow {
+    animation: pulse-glow 3s infinite ease-in-out;
+  }
+
+  .delay-100 { transition-delay: 150ms; }
+  .delay-200 { transition-delay: 300ms; }
+</style>
+
+<section
+  id="specs-tablet-container"
+  class="lg:hidden py-40 md:py-64 bg-dark-sec relative z-10 overflow-hidden"
+>
+  <div class="absolute top-0 left-[-20%] w-[600px] h-[600px] bg-brand/5 blur-[120px] rounded-full pointer-events-none mix-blend-screen animate-pulse"></div>
+  <div class="absolute bottom-0 right-[-20%] w-[500px] h-[500px] bg-white/5 blur-[100px] rounded-full pointer-events-none"></div>
+
+  <div class="max-w-[900px] mx-auto px-6 md:px-8 relative z-10">
+    
+    <div class="text-center mb-24 md:mb-32 reveal-element">
+      <span class="inline-block px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-brand font-bold tracking-[0.2em] uppercase text-[10px] md:text-xs mb-6 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(212,106,34,0.3)]">
+        Technical Specs
+      </span>
+      <h2 class="font-display font-bold text-4xl md:text-5xl mb-6 text-white leading-tight">
+        Engineered <br class="md:hidden"/> to Endure.
+      </h2>
+      <p class="text-light-muted text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+        Precision engineering tested for the harshest environments.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12 md:gap-16 w-full">
+      
+      <div class="reveal-element group tech-card-wrapper w-full h-[500px] shadow-2xl">
+        <div class="relative w-full h-full rounded-[3rem] overflow-hidden">
+          <img 
+            src="/image_de995e.png" 
+            alt="Premium Zippers" 
+            class="absolute inset-0 w-full h-full object-cover object-left grayscale group-hover:grayscale-0 transition-all duration-[2s] ease-out scale-105 group-hover:scale-100 opacity-90 group-hover:opacity-100" 
+          />
+          
+          <div class="absolute top-6 right-8 text-[6rem] md:text-[9rem] font-display font-bold text-white/10 mix-blend-overlay leading-none pointer-events-none select-none animate-float">
+            01
+          </div>
+
+          <div class="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10">
+            <div class="bg-[#050505]/85 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-8 flex items-center gap-5 shadow-2xl relative overflow-hidden group-hover:border-white/20 transition-colors">
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+              <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-brand flex items-center justify-center shrink-0 shadow-[0_0_30px_-5px_rgba(212,106,34,0.5)] text-white relative z-10 animate-glow">
+                <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div class="relative z-10">
+                <h3 class="text-white font-display font-bold text-2xl md:text-3xl mb-1 tracking-tight">Premium Zippers</h3>
+                <p class="text-gray-400 text-sm md:text-base font-medium tracking-wide group-hover:text-white transition-colors duration-500">YKK® AquaGuard Protection</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-element delay-100 group tech-card-wrapper w-full h-[500px] shadow-2xl">
+        <style>.group:nth-child(2).tech-card-wrapper::before { animation-delay: -1s; }</style>
+        
+        <div class="relative w-full h-full rounded-[3rem] overflow-hidden">
+          <img src="/image_de995e.png" alt="Alloy Hardware" class="absolute inset-0 w-full h-full object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-[2s] ease-out scale-105 group-hover:scale-100 opacity-90 group-hover:opacity-100" />
+          
+          <div class="absolute top-6 right-8 text-[6rem] md:text-[9rem] font-display font-bold text-white/10 mix-blend-overlay leading-none pointer-events-none select-none animate-float" style="animation-delay: -2s;">
+            02
+          </div>
+
+          <div class="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10">
+            <div class="bg-[#050505]/85 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-8 flex items-center gap-5 shadow-2xl relative overflow-hidden group-hover:border-white/20 transition-colors">
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+              <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-brand flex items-center justify-center shrink-0 shadow-[0_0_30px_-5px_rgba(212,106,34,0.5)] text-white relative z-10 animate-glow" style="animation-delay: -1s;">
+                <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div class="relative z-10">
+                <h3 class="text-white font-display font-bold text-2xl md:text-3xl mb-1 tracking-tight">Whole Gear Loops</h3>
+                <p class="text-gray-400 text-sm md:text-base font-medium tracking-wide group-hover:text-white transition-colors duration-500">Indestructible Zinc Alloy</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-element delay-200 group tech-card-wrapper w-full h-[500px] shadow-2xl">
+        <style>.group:nth-child(3).tech-card-wrapper::before { animation-delay: -2s; }</style>
+
+        <div class="relative w-full h-full rounded-[3rem] overflow-hidden">
+          <img src="/image_de995e.png" alt="Ripstop Lining" class="absolute inset-0 w-full h-full object-cover object-right grayscale group-hover:grayscale-0 transition-all duration-[2s] ease-out scale-105 group-hover:scale-100 opacity-90 group-hover:opacity-100" />
+          
+          <div class="absolute top-6 right-8 text-[6rem] md:text-[9rem] font-display font-bold text-white/10 mix-blend-overlay leading-none pointer-events-none select-none animate-float" style="animation-delay: -4s;">
+            03
+          </div>
+
+          <div class="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10">
+            <div class="bg-[#050505]/85 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-8 flex items-center gap-5 shadow-2xl relative overflow-hidden group-hover:border-white/20 transition-colors">
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+              <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-brand flex items-center justify-center shrink-0 shadow-[0_0_30px_-5px_rgba(212,106,34,0.5)] text-white relative z-10 animate-glow" style="animation-delay: -2s;">
+                <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <div class="relative z-10">
+                <h3 class="text-white font-display font-bold text-2xl md:text-3xl mb-1 tracking-tight">Divider System</h3>
+                <p class="text-gray-400 text-sm md:text-base font-medium tracking-wide group-hover:text-white transition-colors duration-500">Padded Protection</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const targets = document.querySelectorAll('.reveal-element');
+    if (targets.length === 0) return;
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+    targets.forEach(el => observer.observe(el));
+  });
+</script>

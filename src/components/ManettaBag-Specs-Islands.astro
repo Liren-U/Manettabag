@@ -1,19 +1,19 @@
 ---
 /**
  * ManettaBag-Specs-Islands.astro
- * Specs 区块：Engineered to Endure.
+ * 电脑端专属组件 (Desktop Exclusive)
+ * 核心控制：hidden lg:block (仅在 1024px 以上显示，手机平板自动隐藏)
  * 说明：
  * - 保持与原 HTML 结构 & Tailwind class 完全一致
- * - 图片路径用 /image_de995e.png，你需要把图片放到 /public/image_de995e.png
+ * - 图片路径用 /image_de995e.png
  */
 ---
 
 <section
   id="specs"
-  class="py-40 bg-dark-sec relative z-10 overflow-hidden"
+  class="hidden lg:block py-40 bg-dark-sec relative z-10 overflow-hidden"
 >
   <div class="max-w-limit mx-auto px-6 lg:px-gutter">
-    <!-- 标题区域 -->
     <div class="text-center mb-20">
       <h2 class="font-display font-bold text-5xl mb-6">
         Engineered to Endure.
@@ -23,11 +23,9 @@
       </p>
     </div>
 
-    <!-- 灵动岛 三张卡片容器 -->
     <div
       class="island-container w-full h-[600px] rounded-[4rem] bg-dark-main/50 backdrop-blur-2xl border border-white/10 p-3 flex gap-3 shadow-island overflow-hidden relative group/island hover:shadow-glow/30 transition-all duration-700"
     >
-      <!-- 卡片 1：Premium Zippers -->
       <div
         class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
       >
@@ -69,7 +67,6 @@
         </div>
       </div>
 
-      <!-- 卡片 2：Alloy Hardware -->
       <div
         class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
       >
@@ -111,7 +108,6 @@
         </div>
       </div>
 
-      <!-- 卡片 3：Ripstop Lining -->
       <div
         class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
       >
