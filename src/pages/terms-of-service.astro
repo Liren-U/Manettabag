@@ -1,0 +1,216 @@
+---
+// 确保组件路径与您的项目一致
+import ManettaBagHeaderOther from "../components/ManettaBag-Header-other.astro";
+import Footer from "../components/Footer.astro";
+import '../styles/global.css';
+
+const title = "Terms of Service - MANETTA";
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
+    <link rel="stylesheet" href="/tailwind.css" />
+</head>
+<body class="bg-dark-main text-white antialiased selection:bg-brand selection:text-white flex flex-col min-h-screen overflow-x-hidden">
+
+    <div class="print:hidden">
+        <ManettaBagHeaderOther />
+    </div>
+
+    <main class="relative z-10 flex-grow pt-24 pb-20 px-5 md:pt-32 md:pb-24 md:px-6">
+        
+        <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[90vw] h-[400px] md:w-[1000px] md:h-[600px] bg-brand/5 blur-[80px] md:blur-[120px] rounded-full pointer-events-none print:hidden"></div>
+        <div class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==')] opacity-20 pointer-events-none print:hidden"></div>
+
+        <article class="max-w-3xl mx-auto relative z-10">
+            
+            <nav class="mb-8 md:mb-12 print:hidden">
+                <a href="/" class="group inline-flex items-center gap-2 text-sm text-light-muted/60 hover:text-brand transition-all duration-300 ease-out p-2 -ml-2 rounded-lg active:bg-white/5">
+                    <span class="p-1 rounded-full bg-white/5 group-hover:bg-brand/10 transition-colors">
+                        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                    Back to Homepage
+                </a>
+            </nav>
+
+            <header class="mb-10 md:mb-16 border-b border-white/10 pb-8 md:pb-10">
+                <h1 class="font-display font-bold text-3xl sm:text-4xl md:text-6xl mb-4 md:mb-6 tracking-tight text-white leading-tight">
+                    Terms of Service<span class="text-brand">.</span>
+                </h1>
+                <p class="text-light-muted/80 text-base md:text-lg leading-relaxed text-left">
+                    Please read these terms carefully before participating in our Pre-Launch Event or reserving your VIP spot. By accessing this site, you agree to be bound by these terms.
+                </p>
+            </header>
+
+            <div class="space-y-10 md:space-y-16 text-gray-300 text-base md:text-lg leading-relaxed">
+                
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">01</span>
+                        General Conditions
+                    </h2>
+                    <p class="text-left mb-4">
+                        MANETTA ("we," "us," or "our") operates this website. We reserve the right to refuse service to anyone for any reason at any time. You understand that your content (not including credit card information), may be transferred unencrypted and involve transmissions over various networks.
+                    </p>
+                    <p class="text-left">
+                        We reserve the right to update, change or replace any part of these Terms of Service by posting updates to our website.
+                    </p>
+                </section>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div> 
+
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">02</span>
+                        VIP Reservations & Pricing
+                    </h2>
+                    <p class="mb-6 md:mb-8 text-left">
+                        Our VIP Reservation program allows users to pay a nominal fee (the "Reservation Fee") to secure exclusive benefits.
+                    </p>
+                    
+                    <ul class="space-y-4 md:space-y-6">
+                        <li class="flex items-start gap-4 p-4 rounded-lg bg-brand/[0.05] border border-brand/20 transition-colors duration-300">
+                            <span class="mt-1.5 w-1.5 h-1.5 bg-brand rounded-full shadow-[0_0_10px_#D46A22] shrink-0"></span>
+                            <span>
+                                <strong class="text-white block mb-1">Reservation Nature</strong> 
+                                The Reservation Fee is a deposit to lock in your eligibility for our "Super Early Bird" discount. It is <strong class="text-brand">not</strong> a purchase of the final physical product.
+                            </span>
+                        </li>
+
+                        <li class="flex items-start gap-4 p-4 rounded-lg bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-colors duration-300">
+                            <span class="mt-1.5 w-1.5 h-1.5 bg-brand rounded-full shadow-[0_0_10px_#D46A22] shrink-0"></span>
+                            <span>
+                                <strong class="text-white block mb-1">Secure Processing via Stripe</strong> 
+                                All financial transactions are processed exclusively through <strong class="text-white">Stripe</strong>. We do not store or have access to your full credit card information or CVV codes.
+                            </span>
+                        </li>
+                        
+                        <li class="flex items-start gap-4 p-4 rounded-lg bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-colors duration-300">
+                            <span class="mt-1.5 w-1.5 h-1.5 bg-brand rounded-full shadow-[0_0_10px_#D46A22] shrink-0"></span>
+                            <span>
+                                <strong class="text-white block mb-1">Pricing Modifications</strong> 
+                                Prices for our products are subject to change without notice. We reserve the right at any time to modify or discontinue the Service without notice at any time.
+                            </span>
+                        </li>
+
+                         <li class="flex items-start gap-4 p-4 rounded-lg bg-white/[0.02] border border-white/5 hover:border-brand/30 transition-colors duration-300">
+                            <span class="mt-1.5 w-1.5 h-1.5 bg-brand rounded-full shadow-[0_0_10px_#D46A22] shrink-0"></span>
+                            <span>
+                                <strong class="text-white block mb-1">Discount Validity</strong> 
+                                The "Super Early Bird" discount is valid only for the duration of our specific crowdfunding campaign and is subject to the platform's (e.g., Kickstarter) terms and conditions.
+                            </span>
+                        </li>
+                    </ul>
+                </section>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">03</span>
+                        Refund Policy
+                    </h2>
+                    <p class="mb-6 text-left">
+                        We aim for complete transparency. Our refund policy regarding the Reservation Fee is as follows:
+                    </p>
+                    
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-5 md:p-8">
+                        <h3 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-brand shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Guaranteed Refunds
+                        </h3>
+                        <p class="text-gray-300 mb-4 text-sm md:text-lg text-left">
+                            You are entitled to a full refund of your Reservation Fee at any time prior to the conclusion of our crowdfunding campaign. If you decide not to proceed with the purchase, simply contact us.
+                        </p>
+                        <p class="text-xs md:text-sm text-gray-400 text-left">
+                            Refunds are processed to the original method of payment (via Stripe) within a reasonable timeframe (typically 5-10 business days).
+                        </p>
+                    </div>
+                </section>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">04</span>
+                        Product & Crowdfunding Disclaimers
+                    </h2>
+                    <p class="text-left mb-6">
+                        By participating in this launch, you acknowledge that you are supporting a crowdfunding project.
+                    </p>
+                    <ul class="space-y-4 pl-2">
+                         <li class="flex items-start gap-3 text-gray-300">
+                            <svg class="w-5 h-5 text-brand shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="text-sm md:text-lg"><strong>Estimates & Projections:</strong> Any delivery dates provided are estimates only. Unforeseen manufacturing or shipping delays may occur.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-gray-300">
+                            <svg class="w-5 h-5 text-brand shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="text-sm md:text-lg"><strong>Final Product Variation:</strong> The final product may differ slightly from the prototypes shown on this website in terms of color, materials, or minor design features for the purpose of improvement.</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">05</span>
+                        Limitation of Liability
+                    </h2>
+                    <p class="text-left text-sm md:text-lg text-gray-400">
+                        In no case shall MANETTA, our directors, officers, employees, affiliates, agents, contractors, suppliers, service providers or licensors be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, including, without limitation lost profits, lost revenue, lost savings, loss of data, replacement costs, or any similar damages, whether based in contract, tort (including negligence), strict liability or otherwise, arising from your use of any of the service or any products procured using the service.
+                    </p>
+                </section>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">06</span>
+                        Governing Law
+                    </h2>
+                    <p class="text-left">
+                        These Terms of Service and any separate agreements whereby we provide you Services shall be governed by and construed in accordance with the laws of the jurisdiction in which our company is registered.
+                    </p>
+                </section>
+
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+                <section>
+                    <h2 class="text-white font-display font-bold text-lg md:text-2xl mb-4 md:mb-6 flex items-start md:items-center gap-3 md:gap-4">
+                        <span class="text-brand text-xs md:text-sm font-mono border border-brand/30 px-2 py-1 rounded bg-brand/5 mt-0.5 md:mt-0 shrink-0">07</span>
+                        Contact Information
+                    </h2>
+                    
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-8 text-center md:text-left">
+                        <p class="text-base md:text-lg md:max-w-md">
+                            Questions about the Terms of Service should be sent to us at our support email.
+                        </p>
+                        <a href="mailto:support@manettabag.com" class="inline-flex w-full md:w-auto justify-center items-center gap-2 text-base md:text-lg font-bold text-white bg-brand/10 px-6 py-4 md:py-3 rounded-lg border border-brand/20 hover:bg-brand hover:border-brand transition-all duration-300 group active:scale-95">
+                            <svg class="w-5 h-5 text-brand group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            support@manettabag.com
+                        </a>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <div class="print:hidden">
+        <Footer />
+    </div>
+
+</body>
+</html>
