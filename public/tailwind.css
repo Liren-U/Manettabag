@@ -3215,6 +3215,11 @@ a {
     padding-bottom: 0.75rem;
   }
 
+  .md\:px-10{
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+
   .md\:pb-24{
     padding-bottom: 6rem;
   }
@@ -3385,6 +3390,11 @@ a {
   .lg\:py-5{
     padding-top: 1.25rem;
     padding-bottom: 1.25rem;
+  }
+
+  .lg\:px-6{
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   .lg\:pb-0{
