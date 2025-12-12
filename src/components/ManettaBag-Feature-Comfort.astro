@@ -1,19 +1,24 @@
 ---
 /**
  * ManettaBag-Feature-Comfort.astro
- * 第二个功能区块：Carries Heavy. Feels Light.
+ * 🚀 性能优化版 (Below the Fold Optimization)
+ * 1. [Lazy Load] 图片懒加载
+ * 2. [CLS] 显式宽高比，防止布局抖动
+ * 3. [Rendering] content-visibility: auto 跳过不可见区域渲染
  */
 ---
 
-<section class="py-40 bg-dark-sec relative">
-  <!-- 顶部径向渐变背景 -->
+<section 
+  class="py-40 bg-dark-sec relative contain-layout"
+  style="content-visibility: auto; contain-intrinsic-size: 800px;"
+>
   <div
     class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand/10 via-transparent to-transparent opacity-50 pointer-events-none"
   ></div>
 
   <div class="max-w-limit mx-auto px-6 lg:px-gutter relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-20 items-center">
-      <!-- 左侧文案 -->
+      
       <div class="lg:col-span-5 reveal active order-2 lg:order-1">
         <h2 class="font-display font-bold text-5xl mb-8 leading-tight">
           Carries Heavy.<br />
@@ -23,7 +28,7 @@
         <p class="text-light-muted text-xl leading-relaxed mb-10">
           <span class="font-semibold italic"> Air-Mesh </span>
            back panel keeps you cool. Chest and shoulder straps
-            balance the load—so 20kg feels like 10kg.
+           balance the load—so 20kg feels like 10kg.
              Top grab handle makes carrying even easier.
         </p>
 
@@ -52,15 +57,19 @@
         </div>
       </div>
 
-      <!-- 右侧大图 -->
       <div class="lg:col-span-7 reveal active delay-100 order-1 lg:order-2">
         <div
           class="group relative rounded-[3rem] overflow-hidden bg-dark-main border border-white/10 shadow-2xl"
         >
           <img
             src="/images/ManettaBag-Feature-Comfort.png"
-            alt="Comfort"
+            alt="Ergonomic Air-Mesh Back Panel System"
             class="w-full h-auto transform group-hover:scale-105 group-hover:-rotate-1 transition-all duration-1000 ease-out"
+            width="800"
+            height="600"
+            loading="lazy"
+            decoding="async"
+            fetchpriority="low"
           />
         </div>
       </div>

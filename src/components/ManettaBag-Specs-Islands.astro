@@ -1,17 +1,19 @@
 ---
 /**
  * ManettaBag-Specs-Islands.astro
- * 电脑端专属组件 (Desktop Exclusive)
- * 核心控制：hidden lg:block (仅在 1024px 以上显示，手机平板自动隐藏)
- * 说明：
- * - 保持与原 HTML 结构 & Tailwind class 完全一致
- * - 图片路径用 /image_de995e.png
+ * 🚀 极致性能优化版 (Desktop Exclusive)
+ * 优化点：
+ * 1. [Network] loading="lazy" + fetchpriority="low" (不抢占首屏带宽)
+ * 2. [Rendering] content-visibility: auto (屏幕外不渲染，降低 TBT)
+ * 3. [CLS] 显式宽高比 (width/height)
+ * 4. [UX] 保持原有悬浮交互和视觉效果
  */
 ---
 
 <section
   id="specs"
-  class="hidden lg:block py-40 bg-dark-sec relative z-10 overflow-hidden"
+  class="hidden lg:block py-40 bg-dark-sec relative z-10 overflow-hidden contain-layout"
+  style="content-visibility: auto; contain-intrinsic-size: 600px;"
 >
   <div class="max-w-limit mx-auto px-6 lg:px-gutter">
     <div class="text-center mb-20">
@@ -26,6 +28,7 @@
     <div
       class="island-container w-full h-[600px] rounded-[4rem] bg-dark-main/50 backdrop-blur-2xl border border-white/10 p-3 flex gap-3 shadow-island overflow-hidden relative group/island hover:shadow-glow/30 transition-all duration-700"
     >
+      
       <div
         class="island-item relative rounded-[3.5rem] overflow-hidden bg-dark-card border border-white/5 group/item"
       >
@@ -33,6 +36,11 @@
           src="images/ManettaBag-Specs-Islands-1.png"
           alt="Premium Zippers"
           class="absolute inset-0 w-full h-full object-cover object-left grayscale group-hover/item:grayscale-0 transition-all duration-700 scale-110 group-hover/item:scale-100"
+          width="400"
+          height="600"
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
         />
         <div
           class="absolute inset-0 bg-gradient-to-t from-dark-main via-dark-main/50 to-transparent p-10 flex flex-col justify-end opacity-80 group-hover/item:opacity-100 transition-opacity"
@@ -74,6 +82,11 @@
           src="images/ManettaBag-Specs-Islands-2.png"
           alt="Alloy Hardware"
           class="absolute inset-0 w-full h-full object-cover object-center grayscale group-hover/item:grayscale-0 transition-all duration-700 scale-110 group-hover/item:scale-100"
+          width="400"
+          height="600"
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
         />
         <div
           class="absolute inset-0 bg-gradient-to-t from-dark-main via-dark-main/50 to-transparent p-10 flex flex-col justify-end opacity-80 group-hover/item:opacity-100 transition-opacity"
@@ -115,6 +128,11 @@
           src="images/ManettaBag-Specs-Islands-3.png"
           alt="Ripstop Lining"
           class="absolute inset-0 w-full h-full object-cover object-right grayscale group-hover/item:grayscale-0 transition-all duration-700 scale-110 group-hover/item:scale-100"
+          width="400"
+          height="600"
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
         />
         <div
           class="absolute inset-0 bg-gradient-to-t from-dark-main via-dark-main/50 to-transparent p-10 flex flex-col justify-end opacity-80 group-hover/item:opacity-100 transition-opacity"

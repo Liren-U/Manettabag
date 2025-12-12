@@ -81,6 +81,8 @@ a {
   display: flex;
   width: max-content;
   animation: scroll 25s linear infinite;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* 跑马灯容器风格 */
@@ -90,6 +92,10 @@ a {
   box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contain-content {
+  contain: content;
 }
 
 /* 元素入场动画 */

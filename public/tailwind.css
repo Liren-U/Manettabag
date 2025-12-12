@@ -2278,6 +2278,10 @@ video {
   will-change: transform;
 }
 
+.contain-content{
+  contain: content;
+}
+
 /* ② 全局 Reset & 排版 */
 
 * {

@@ -1,6 +1,7 @@
 ---
 // src/components/ManettaBag-MarqueeBanner.astro
-// MANETTA 跑马灯组件（走马灯）
+// 🚀 性能优化版 (High Performance Marquee)
+// 优化点：GPU合成层、布局隔离、自动双倍内容实现无缝循环
 
 interface Props {
   messages?: string[];
@@ -10,29 +11,38 @@ const { messages = [
   "⚡️ LAUNCHING SOON ON KICKSTARTER",
   "GET 34% OFF SUPER EARLY BIRD",
   "THE ULTIMATE 3-IN-1 MODULAR SYSTEM",
-  "⚡️ LAUNCHING SOON ON KICKSTARTER",
-  "GET 34% OFF SUPER EARLY BIRD",
 ] } = Astro.props;
+
+// ⭐ 关键优化：自动生成双份数据
+// CSS 动画是 translateX(-50%)，意味着我们需要两套完全一样的内容拼接
+// 第一套滚出屏幕时，第二套刚好补位，从而实现无缝重置
+const marqueeContent = [...messages, ...messages];
+const halfIndex = messages.length;
 ---
 
-<div class="marquee-container py-5 overflow-hidden select-none relative z-20">
-  <div class="animate-scroll whitespace-nowrap">
-    {messages.map((msg, index) => (
-      <>
-        <span
-          class="text-white font-display font-black italic text-3xl mx-10 tracking-tighter"
-        >
-          {msg}
-        </span>
+<div 
+  class="marquee-container py-5 overflow-hidden select-none relative z-20 w-full contain-content pointer-events-none"
+>
+  <div class="animate-scroll whitespace-nowrap flex items-center will-change-transform">
+    
+    {marqueeContent.map((msg, index) => {
+      // 判断是否为复制出来的第二份内容 (用于无障碍隐藏)
+      const isClone = index >= halfIndex;
 
-        {index !== messages.length - 1 && (
-          <span
-            class="text-dark-main font-display font-black text-3xl mx-10"
-          >
+      return (
+        /* aria-hidden="true" 对复制的克隆体隐藏，提升 A11Y 分数 */
+        <div class="flex items-center shrink-0" aria-hidden={isClone ? "true" : undefined}>
+          
+          <span class="text-white font-display font-black italic text-3xl mx-10 tracking-tighter">
+            {msg}
+          </span>
+
+          <span class="text-dark-main font-display font-black text-3xl mx-10 opacity-80">
             ///
           </span>
-        )}
-      </>
-    ))}
+          
+        </div>
+      );
+    })}
   </div>
 </div>

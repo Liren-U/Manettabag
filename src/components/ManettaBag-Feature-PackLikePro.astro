@@ -1,10 +1,18 @@
 ---
 // src/components/ManettaBag-Feature-PackLikePro.astro
+// 🚀 性能优化版 (Below the Fold Optimization)
+// 1. [Lazy Load] 图片懒加载，不占用首屏带宽
+// 2. [CLS] 显式宽高比，防止滚动时布局抖动
+// 3. [Rendering] content-visibility: auto 跳过不可见区域渲染
 ---
 
-<section class="py-40 overflow-hidden">
+<section 
+  class="py-40 overflow-hidden contain-layout"
+  style="content-visibility: auto; contain-intrinsic-size: 800px;" 
+>
   <div class="max-w-limit mx-auto px-6 lg:px-gutter">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-20 items-center">
+      
       {/* 左侧大图 */}
       <div class="lg:col-span-7 reveal active">
         <div
@@ -16,8 +24,13 @@
 
           <img
             src="/images/ManettaBag-Feature-PackLikePro.png"
-            alt="Packing"
+            alt="Professional Packing Mode - Open Clamshell View"
             class="w-full h-auto transform group-hover:scale-105 group-hover:rotate-1 transition-all duration-1000 ease-out"
+            width="800"
+            height="600"
+            loading="lazy"
+            decoding="async"
+            fetchpriority="low"
           />
         </div>
       </div>
@@ -50,10 +63,8 @@
         <p class="text-light-muted text-xl leading-relaxed mb-10">
           No more digging. The
           <span class="text-brand font-bold">
-            {" "}
             180° clamshell opening
           </span>
-          {" "}
           gives you instant visibility. It’s a portable studio drawer on your
           back.
         </p>

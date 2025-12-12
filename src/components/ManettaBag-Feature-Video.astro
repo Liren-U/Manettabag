@@ -1,10 +1,11 @@
 ---
 /**
  * ManettaBag-Feature-Video.astro
- * 状态：【发光边框 + 视频封面 + 播放完重显封面版】
- * 修改：
- * 1. JS: "ended" 事件中改为 video.load()，强制让封面重新显示。
- * 2. 保持了 poster 属性和发光特效。
+ * 🚀 极致性能优化版 (Lighthouse Optimized)
+ * 1. [Network] video 添加 preload="none"，彻底阻止预加载流量。
+ * 2. [Lighthouse] 将 poster 拆分为独立 <img> 以支持 loading="lazy"。
+ * 3. [Rendering] 使用 content-visibility: auto 跳过屏幕外渲染。
+ * 4. [UX] 保持发光边框 + 播放结束重显封面。
  */
 ---
 
@@ -28,7 +29,11 @@
   }
 </style>
 
-<section id="video" class="py-40 bg-dark-main relative overflow-hidden">
+<section 
+  id="video" 
+  class="py-40 bg-dark-main relative overflow-hidden contain-layout"
+  style="content-visibility: auto; contain-intrinsic-size: 800px;"
+>
 
   <div class="max-w-limit mx-auto px-6 lg:px-gutter text-center relative z-10">
     
@@ -44,8 +49,8 @@
 
       <video
         id="manetta-video"
-        class="w-full h-full object-cover"
-        poster="/images/ManettaBag-Video.png"
+        class="w-full h-full object-cover relative z-0"
+        preload="none"
         controls
         playsinline
         webkit-playsinline
@@ -54,12 +59,22 @@
         Your browser does not support HTML5 video.
       </video>
 
+      <img 
+        id="video-poster-img"
+        src="/images/ManettaBag-Video.png" 
+        alt="Manetta Bag Capacity Test Video Cover"
+        class="absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-300"
+        loading="lazy"
+        decoding="async"
+        fetchpriority="low"
+      />
+
       <div
         id="video-overlay"
-        style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:opacity .3s; opacity:1;"
+        class="absolute inset-0 flex items-center justify-center z-20 cursor-pointer transition-opacity duration-300"
       >
         <div
-          class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40 shadow-[0_0_30px_rgba(212,106,34,0.4)] transition-transform duration-300 hover:scale-110 cursor-pointer"
+          class="w-24 h-24 rounded-full bg-brand/20 backdrop-blur-md flex items-center justify-center border border-brand/40 shadow-[0_0_30px_rgba(212,106,34,0.4)] transition-transform duration-300 hover:scale-110"
         >
           <svg class="w-10 h-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z" />
@@ -74,45 +89,50 @@
 <script is:inline>
   const video = document.getElementById("manetta-video");
   const overlay = document.getElementById("video-overlay");
+  const posterImg = document.getElementById("video-poster-img");
 
-  if (video && overlay) {
+  if (video && overlay && posterImg) {
 
-    const showOverlay = () => {
+    // === 显示状态 (按钮 + 封面) ===
+    const showCover = () => {
       overlay.style.opacity = "1";
       overlay.style.pointerEvents = "auto";
+      posterImg.style.opacity = "1"; // 显示封面
+      posterImg.style.pointerEvents = "auto";
     };
 
-    const hideOverlay = () => {
+    // === 隐藏状态 (开始播放) ===
+    const hideCover = () => {
       overlay.style.opacity = "0";
       overlay.style.pointerEvents = "none";
+      posterImg.style.opacity = "0"; // 隐藏封面
+      posterImg.style.pointerEvents = "none";
     };
 
-    // 初始显示
-    showOverlay();
-
-    // 点击按钮播放
+    // 点击按钮 -> 播放
     overlay.addEventListener("click", () => {
       video.play();
     });
 
-    // 视频开始播放 → 隐藏按钮
+    // 视频真正开始播放 -> 隐藏封面和按钮
     video.addEventListener("play", () => {
-      hideOverlay();
+      hideCover();
     });
 
-    // 暂停 → 显示按钮
+    // 暂停 -> 如果没播完，显示按钮（但不显示封面，保持画面）
     video.addEventListener("pause", () => {
-      // 只有在不是因为播放结束而暂停时，才显示按钮
-      // (因为 ended 事件会单独处理)
       if (!video.ended) {
-        showOverlay();
+        overlay.style.opacity = "1";
+        overlay.style.pointerEvents = "auto";
       }
     });
 
-    // ⭐⭐ 关键修改：播放结束 → 重载视频 (video.load()) 以显示封面 ⭐⭐
+    // 播放结束 -> 重置视频 + 显示封面 + 显示按钮
     video.addEventListener("ended", () => {
-      video.load(); // 这行代码会让视频回到初始状态，从而显示 poster
-      showOverlay();
+      // load() 会重置视频资源，这对于节省内存和重置状态很有用
+      // 在 preload="none" 下，它也会停止缓冲
+      video.load(); 
+      showCover();
     });
   }
 </script>

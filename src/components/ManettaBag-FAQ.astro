@@ -1,94 +1,66 @@
 ---
 /**
  * ManettaBag-FAQ.astro
- * FAQ 区块：Common Questions（带高性能展开/收起动画）
+ * 🚀 极致性能优化版 (Below the Fold Optimization)
+ * 1. [Rendering] content-visibility: auto (屏幕外完全不渲染，降低 TBT)
+ * 2. [JS] IntersectionObserver (滚动到附近才执行 JS，不占用首屏资源)
+ * 3. [Layout] 保持高性能手风琴动画
  */
 ---
 
 <section
   id="faq"
-  class="py-32 bg-dark-main border-t border-white/5"
+  class="py-32 bg-dark-main border-t border-white/5 contain-layout"
+  style="content-visibility: auto; contain-intrinsic-size: 600px;"
 >
   <div class="max-w-[800px] mx-auto px-6">
-    <h2
-      class="font-display font-bold text-4xl mb-16 text-center"
-    >
+    <h2 class="font-display font-bold text-4xl mb-16 text-center text-white">
       Common Questions
     </h2>
 
     <div class="space-y-4">
-      <!-- Q1 -->
       <details
         class="group bg-dark-sec rounded-2xl border border-white/5 overflow-hidden transition-all duration-300 hover:border-brand/30"
       >
         <summary
-          class="flex justify-between items-center p-6 cursor-pointer list-none font-bold text-xl select-none text-white"
+          class="flex justify-between items-center p-6 cursor-pointer list-none font-bold text-xl select-none text-white outline-none"
         >
           Is it fully waterproof?
           <span
-            class="transition-transform duration-300 group-open:rotate-180 text-brand"
+            class="transition-transform duration-300 group-open:rotate-180 text-brand shrink-0 ml-4"
           >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </span>
         </summary>
 
-        <!-- 内层内容容器，专门用来做动画 -->
         <div class="faq-content px-6 pb-0 border-t border-white/5">
-          <div
-            class="pt-6 pb-8 text-light-muted text-lg leading-relaxed"
-          >
-            We use 600D water-resistant fabric + waterproof
-            zippers. It handles rain and snow perfectly.
+          <div class="pt-6 pb-8 text-light-muted text-lg leading-relaxed">
+            We use 600D water-resistant fabric + waterproof zippers. It handles rain and snow perfectly.
           </div>
         </div>
       </details>
 
-      <!-- Q2 -->
       <details
         class="group bg-dark-sec rounded-2xl border border-white/5 overflow-hidden transition-all duration-300 hover:border-brand/30"
       >
         <summary
-          class="flex justify-between items-center p-6 cursor-pointer list-none font-bold text-xl select-none text-white"
+          class="flex justify-between items-center p-6 cursor-pointer list-none font-bold text-xl select-none text-white outline-none"
         >
           Fits a 16&quot; MacBook Pro?
           <span
-            class="transition-transform duration-300 group-open:rotate-180 text-brand"
+            class="transition-transform duration-300 group-open:rotate-180 text-brand shrink-0 ml-4"
           >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </span>
         </summary>
 
         <div class="faq-content px-6 pb-0 border-t border-white/5">
-          <div
-            class="pt-6 pb-8 text-light-muted text-lg leading-relaxed"
-          >
-            Yes. The suspended laptop sleeve is designed
-            specifically to protect up to 16&quot; laptops from
-            bottom impact.
+          <div class="pt-6 pb-8 text-light-muted text-lg leading-relaxed">
+            Yes. The suspended laptop sleeve is designed specifically to protect up to 16&quot; laptops from bottom impact.
           </div>
         </div>
       </details>
@@ -97,30 +69,30 @@
 </section>
 
 <style>
-  /* 隐藏原生的小三角，使用你自己的 SVG 图标 */
+  /* 隐藏原生的小三角 */
   #faq summary::-webkit-details-marker {
     display: none;
   }
 
-  /* 动画目标：只对内部 .faq-content 做高度 + 透明度动画 */
+  /* 动画 CSS：GPU 加速 */
   #faq details .faq-content {
     overflow: hidden;
     height: 0;
     opacity: 0;
     transition:
-      height 220ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 180ms ease-out;
-    will-change: height, opacity; /* 提示浏览器优化 */
+      height 250ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 200ms ease-out;
+    will-change: height, opacity;
   }
 
-  /* JS 关闭时会处理 height，打开状态下只保证透明度为 1 */
   #faq details[open] .faq-content {
     opacity: 1;
   }
 </style>
 
 <script is:inline>
-  document.addEventListener("DOMContentLoaded", () => {
+  // 将初始化逻辑封装
+  function initFAQ() {
     const detailsList = document.querySelectorAll("#faq details");
 
     detailsList.forEach((details) => {
@@ -133,18 +105,12 @@
       const openDetails = () => {
         if (isAnimating) return;
         isAnimating = true;
-
-        // 标记为 open，让内容参与布局
         details.setAttribute("open", "true");
-
-        // 从 0 开始
         content.style.height = "0px";
         content.style.opacity = "0";
 
-        // 计算目标高度
         const targetHeight = content.scrollHeight;
 
-        // 下一帧开始动画
         requestAnimationFrame(() => {
           content.style.height = targetHeight + "px";
           content.style.opacity = "1";
@@ -152,25 +118,20 @@
 
         const onEnd = (event) => {
           if (event.propertyName !== "height") return;
-          // 动画结束后还原为 auto，方便内容自适应
           content.style.height = "auto";
           content.removeEventListener("transitionend", onEnd);
           isAnimating = false;
         };
-
         content.addEventListener("transitionend", onEnd);
       };
 
       const closeDetails = () => {
         if (isAnimating) return;
         isAnimating = true;
-
-        // 从当前高度收起
         const startHeight = content.scrollHeight;
         content.style.height = startHeight + "px";
         content.style.opacity = "1";
 
-        // 下一帧开始收起动画
         requestAnimationFrame(() => {
           content.style.height = "0px";
           content.style.opacity = "0";
@@ -178,20 +139,16 @@
 
         const onEnd = (event) => {
           if (event.propertyName !== "height") return;
-          // 动画结束后再真正移除 open，避免瞬间消失
           details.removeAttribute("open");
           content.removeEventListener("transitionend", onEnd);
           isAnimating = false;
         };
-
         content.addEventListener("transitionend", onEnd);
       };
 
-      // 拦截 summary 的点击，手动控制 open，确保有收起动画
       summary.addEventListener("click", (event) => {
-        event.preventDefault(); // 阻止原生 toggle
+        event.preventDefault();
         const isOpen = details.hasAttribute("open");
-
         if (isOpen) {
           closeDetails();
         } else {
@@ -199,5 +156,21 @@
         }
       });
     });
-  });
+  }
+
+  // 🚀 使用 IntersectionObserver 实现懒初始化
+  // 只有当 #faq 进入视口（rootMargin 稍微提前一点）时，才运行 JS
+  const faqSection = document.getElementById('faq');
+  if (faqSection) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          initFAQ();
+          observer.disconnect(); // 初始化一次后就断开，节省资源
+        }
+      });
+    }, { rootMargin: "200px" }); // 提前 200px 初始化，用户无感知
+    
+    observer.observe(faqSection);
+  }
 </script>
