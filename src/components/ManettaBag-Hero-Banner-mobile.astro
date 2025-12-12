@@ -123,7 +123,7 @@
     const form = document.querySelector("#hero-form-mobile");
     if (!form) return;
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       const input = form.querySelector("#hero-email-mobile");
@@ -142,8 +142,28 @@
         console.warn("Cannot access localStorage:", e);
       }
 
-      // ✅ Mobile 版保持原逻辑：直接跳转（不调用 API）
-      window.location.href = "/reservation?email=" + encodeURIComponent(email);
+      // ✅ 手机端也调用订阅 API（和电脑端一致）
+      try {
+        const res = await fetch("/api/klaviyo-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+          console.warn("[Hero subscribe mobile] failed:", data);
+          alert(data.error || "Subscription failed, please try again in a moment.");
+          return;
+        }
+
+        window.location.href = "/reservation?email=" + encodeURIComponent(email);
+      } catch (err) {
+        console.error("[Hero subscribe mobile] error:", err);
+        alert("Network error, please try again.");
+      }
     });
   })();
 </script>
+
