@@ -44,13 +44,9 @@
           <span
             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"
           ></span>
-          <span
-            class="relative inline-flex rounded-full h-3 w-3 bg-brand"
-          ></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-brand"></span>
         </span>
-        <span
-          class="text-xs font-bold tracking-widest text-light-muted uppercase"
-        >
+        <span class="text-xs font-bold tracking-widest text-light-muted uppercase">
           Kickstarter Launching Soon
         </span>
       </div>
@@ -69,20 +65,12 @@
       </p>
 
       <!-- 邮箱表单卡片 -->
-      <div
-        class="w-full max-w-md p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0"
-      >
-        <div
-          class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden"
-        >
-          <div
-            class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"
-          ></div>
+      <div class="w-full max-w-md p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
+        <div class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"></div>
 
           <div class="mb-8 relative">
-            <div
-              class="text-brand font-bold text-xs uppercase tracking-wider mb-2"
-            >
+            <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">
               Super Early Bird Offer
             </div>
             <div class="text-4xl font-display font-bold text-white">
@@ -90,11 +78,8 @@
             </div>
           </div>
 
-          <!-- 只能填写邮箱的表单 -->
-          <form
-            class="flex gap-3 relative"
-            onsubmit="event.preventDefault(); validateHeroEmail(this);"
-          >
+          <!-- ✅ 表单：去掉 onsubmit 内联（避免全局函数丢失） -->
+          <form id="hero-form" class="flex gap-3 relative">
             <input
               id="hero-email"
               type="email"
@@ -108,18 +93,8 @@
               type="submit"
               class="bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center"
             >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>
           </form>
@@ -128,15 +103,9 @@
     </div>
 
     <!-- 右侧产品图 -->
-    <div
-      class="reveal delay-200 relative lg:h-screen flex items-center justify-center perspective-1000 active"
-    >
-      <div
-        class="relative w-full max-w-[750px] transform-style-3d animate-float-slow"
-      >
-        <div
-          class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-brand/20 blur-[80px] rounded-full"
-        ></div>
+    <div class="reveal delay-200 relative lg:h-screen flex items-center justify-center perspective-1000 active">
+      <div class="relative w-full max-w-[750px] transform-style-3d animate-float-slow">
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-brand/20 blur-[80px] rounded-full"></div>
         <img
           src="/images/Manetta-hero-banner-product.png"
           alt="Manetta Backpack"
@@ -147,57 +116,55 @@
   </div>
 </section>
 
-<!-- 表单邮箱校验脚本（成功时直接跳转 reservation 并带上 email） -->
 <script is:inline>
-  async function validateHeroEmail(form) {
-    const input = form.querySelector("#hero-email");
-    const email = input.value.trim();
+  // ✅ 保证脚本执行：绑定 submit 事件，不依赖全局 onsubmit 字符串
+  (function () {
+    const form = document.querySelector("#hero-form");
+    if (!form) return;
 
-    // 1）基础邮箱格式校验
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    if (!emailPattern.test(email)) {
-      alert("Please enter a valid email address.");
-      input.focus();
-      return false;
-    }
+      const input = form.querySelector("#hero-email");
+      const email = (input?.value || "").trim();
 
-    // 2）可选：把邮箱存到 localStorage，后面 VIP 结账可以预填
-    try {
-      localStorage.setItem("manetta_email", email);
-    } catch (e) {
-      console.warn("Cannot access localStorage:", e);
-    }
-
-    // 3）调用你自己的后端 API -> Klaviyo main list
-    try {
-      const res = await fetch("/api/klaviyo-subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data.success) {
-        console.warn("[Hero subscribe] failed:", data);
-        // ❌ 出错时才提示，不再有成功提示
-        alert(
-          data.error ||
-            "Subscription failed, please try again in a moment."
-        );
-        return false;
+      // 1）基础邮箱格式校验
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        input && input.focus();
+        return;
       }
 
-      // 4）✅ 成功：直接跳转到 reservation 页面，并把 email 带过去
-      window.location.href =
-        "/reservation?email=" + encodeURIComponent(email);
+      // 2）可选：把邮箱存到 localStorage，后面 VIP 结账可以预填
+      try {
+        localStorage.setItem("manetta_email", email);
+      } catch (e) {
+        console.warn("Cannot access localStorage:", e);
+      }
 
-      return true;
-    } catch (err) {
-      console.error("[Hero subscribe] error:", err);
-      alert("Network error, please try again.");
-      return false;
-    }
-  }
+      // 3）调用你自己的后端 API -> Klaviyo main list
+      try {
+        const res = await fetch("/api/klaviyo-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+          console.warn("[Hero subscribe] failed:", data);
+          alert(data.error || "Subscription failed, please try again in a moment.");
+          return;
+        }
+
+        // 4）✅ 成功：直接跳转到 reservation 页面，并把 email 带过去
+        window.location.href = "/reservation?email=" + encodeURIComponent(email);
+      } catch (err) {
+        console.error("[Hero subscribe] error:", err);
+        alert("Network error, please try again.");
+      }
+    });
+  })();
 </script>
