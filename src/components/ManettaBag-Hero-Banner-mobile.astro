@@ -5,6 +5,7 @@
  * * 修改：
  * 1. [Layout] 表单布局响应式：手机端上下排列，电脑端左右排列。
  * 2. [LCP/GPU] 保留所有性能优化。
+ * ✅ 修复：不再依赖内联 onsubmit + 全局函数，改为 addEventListener 绑定 submit（保证触发）
  */
 ---
 
@@ -34,13 +35,9 @@
           <span
             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"
           ></span>
-          <span
-            class="relative inline-flex rounded-full h-3 w-3 bg-brand"
-          ></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-brand"></span>
         </span>
-        <span
-          class="text-xs font-bold tracking-widest text-light-muted uppercase"
-        >
+        <span class="text-xs font-bold tracking-widest text-light-muted uppercase">
           Kickstarter Launching Soon
         </span>
       </div>
@@ -61,9 +58,7 @@
     <div
       class="reveal delay-200 relative lg:h-screen flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 perspective-1000 active"
     >
-      <div
-        class="relative w-full max-w-[750px] transform-style-3d animate-float-slow"
-      >
+      <div class="relative w-full max-w-[750px] transform-style-3d animate-float-slow">
         <div
           class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-brand/20 blur-[80px] rounded-full transform-gpu"
         ></div>
@@ -80,20 +75,14 @@
         />
       </div>
 
-      <div
-        class="w-full max-w-md p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0"
-      >
-        <div
-          class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden"
-        >
+      <div class="w-full max-w-md p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
+        <div class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden">
           <div
             class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px] transform-gpu"
           ></div>
 
           <div class="mb-8 relative">
-            <div
-              class="text-brand font-bold text-xs uppercase tracking-wider mb-2"
-            >
+            <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">
               Super Early Bird Offer
             </div>
             <div class="text-4xl font-display font-bold text-white">
@@ -101,12 +90,10 @@
             </div>
           </div>
 
-          <form
-            class="flex flex-col lg:flex-row gap-3 relative"
-            onsubmit="event.preventDefault(); validateHeroEmail(this);"
-          >
+          <!-- ✅ 表单：去掉内联 onsubmit，改用 JS 绑定，保证触发 -->
+          <form id="hero-form-mobile" class="flex flex-col lg:flex-row gap-3 relative">
             <input
-              id="hero-email"
+              id="hero-email-mobile"
               type="email"
               inputmode="email"
               autocomplete="email"
@@ -120,18 +107,8 @@
               class="w-full lg:w-auto bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center shrink-0"
               aria-label="Subscribe"
             >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>
           </form>
@@ -142,25 +119,31 @@
 </section>
 
 <script is:inline>
-  async function validateHeroEmail(form) {
-    const input = form.querySelector("#hero-email");
-    const email = input.value.trim();
+  (function () {
+    const form = document.querySelector("#hero-form-mobile");
+    if (!form) return;
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
 
-    if (!emailPattern.test(email)) {
-      alert("Please enter a valid email address.");
-      input.focus();
-      return false;
-    }
+      const input = form.querySelector("#hero-email-mobile");
+      const email = (input?.value || "").trim();
 
-    try {
-      localStorage.setItem("manetta_email", email);
-    } catch (e) {
-      console.warn("Cannot access localStorage:", e);
-    }
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        input && input.focus();
+        return;
+      }
 
-    window.location.href = "/reservation?email=" + encodeURIComponent(email);
-    return true;
-  }
+      try {
+        localStorage.setItem("manetta_email", email);
+      } catch (e) {
+        console.warn("Cannot access localStorage:", e);
+      }
+
+      // ✅ Mobile 版保持原逻辑：直接跳转（不调用 API）
+      window.location.href = "/reservation?email=" + encodeURIComponent(email);
+    });
+  })();
 </script>
