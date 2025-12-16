@@ -18,7 +18,6 @@
   id="reserve"
   class="relative w-full min-h-screen pt-32 pb-20 lg:pt-0 lg:pb-0 flex items-center overflow-hidden bg-dark-main"
 >
-  <!-- 背景渐变光圈 -->
   <div
     class="absolute top-[-30%] right-[-20%] w-[1000px] h-[1000px] bg-gradient-radial from-brand/20 to-transparent rounded-full blur-[150px] pointer-events-none opacity-60"
   ></div>
@@ -26,7 +25,6 @@
     class="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-gradient-radial from-[#333]/30 to-transparent rounded-full blur-[120px] pointer-events-none"
   ></div>
 
-  <!-- 纹理背景 -->
   <div
     class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==')] opacity-20 pointer-events-none"
   ></div>
@@ -34,9 +32,7 @@
   <div
     class="max-w-limit mx-auto px-6 lg:px-gutter w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10"
   >
-    <!-- 左侧文案 + 表单 -->
     <div class="reveal active flex flex-col items-start">
-      <!-- 顶部小 Badge -->
       <div
         class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-md"
       >
@@ -51,7 +47,6 @@
         </span>
       </div>
 
-      <!-- 标题 -->
       <h1
         class="font-display font-bold text-6xl lg:text-[6.5rem] leading-[0.9] tracking-tight mb-8 text-white"
       >
@@ -59,12 +54,10 @@
         <span class="text-white/40">Camera Bag</span>
       </h1>
 
-      <!-- 副标题 -->
       <p class="text-xl text-light-muted mb-12 max-w-md leading-relaxed">
         Meet <strong class="text-white">MANETTA</strong> — a 3-in-1 modular system that expands from 22L to 42L in seconds. One bag, built for every shoot.
       </p>
 
-      <!-- 邮箱表单卡片 -->
       <div class="w-full max-w-md p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
         <div class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden">
           <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"></div>
@@ -78,7 +71,6 @@
             </div>
           </div>
 
-          <!-- ✅ 表单：去掉 onsubmit 内联（避免全局函数丢失） -->
           <form id="hero-form" class="flex gap-3 relative">
             <input
               id="hero-email"
@@ -91,6 +83,7 @@
             />
             <button
               type="submit"
+              aria-label="Subscribe to newsletter"
               class="bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center"
             >
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,7 +95,6 @@
       </div>
     </div>
 
-    <!-- 右侧产品图 -->
     <div class="reveal delay-200 relative lg:h-screen flex items-center justify-center perspective-1000 active">
       <div class="relative w-full max-w-[750px] transform-style-3d animate-float-slow">
         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-brand/20 blur-[80px] rounded-full"></div>
@@ -159,8 +151,24 @@
           return;
         }
 
-        // 4）✅ 成功：直接跳转到 reservation 页面，并把 email 带过去
-        window.location.href = "/reservation?email=" + encodeURIComponent(email);
+        // =================================================================
+        // ✅ 修改 2：成功订阅后，触发自定义 Facebook Pixel 事件
+        // =================================================================
+        if (typeof fbq === 'function') {
+          // 使用标准事件 'Lead'，并添加自定义参数
+          fbq('track', 'Lead', {
+            content_name: 'Hero Banner Email Subscribe', // 自定义内容名称
+            source: 'HomePageHero' // 自定义来源
+          });
+          console.log("[Pixel] Lead event fired for hero subscription.");
+        }
+        
+        // ✅ 修改 3：添加短暂延时，确保 Pixel 请求发送成功后再跳转
+        setTimeout(() => {
+            // 4）跳转到 reservation 页面，并把 email 带过去
+            window.location.href = "/reservation?email=" + encodeURIComponent(email);
+        }, 300); // 300ms 延迟
+
       } catch (err) {
         console.error("[Hero subscribe] error:", err);
         alert("Network error, please try again.");
