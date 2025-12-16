@@ -32,33 +32,33 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
     src="https://www.facebook.com/tr?id=1524843261893492&ev=PageView&noscript=1"
     /></noscript>
     <script is:inline>
-      (function() {
-        // 1. 获取 URL 中的 email 参数，确认是否是支付成功跳转过来的
+      // 使用 DOMContentLoaded 确保在页面加载完毕后再执行，避免 Pixel 未就绪的问题
+      document.addEventListener('DOMContentLoaded', function() {
+        // 1. 获取 URL 中的 email 参数
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get('email');
 
-        // 2. 如果包含 email 参数，说明是刚支付成功跳转过来的
+        // 2. 核心判断：只有当 URL 里有 email 参数时，才认为是购买成功
         if (email) {
-          console.log("[Conversion] VIP Purchase successful for:", email);
+          console.log("[Conversion] VIP Purchase condition met for:", email);
 
-          // --- Facebook Pixel Purchase 事件 ---
-          // 检查 fbq 函数是否存在，防止报错
+          // 3. 再次检查 fbq 是否就绪 (双重保险)
           if (typeof fbq === 'function') {
-            // 使用 'Purchase' 事件记录购买成功
+            console.log("[Pixel] Sending Purchase event...");
+            // 发送购买事件
             fbq('track', 'Purchase', {
               content_name: 'VIP Access Reservation', // 产品名称
               currency: 'USD', // 货币单位
               value: 5.00,     // 支付金额
             });
+          } else {
+            console.warn("[Pixel] Error: fbq is not defined yet.");
           }
-
-          // 你可以在这里添加其他平台的 Pixel 代码 (Google Ads, TikTok 等)
-          
-          // 可选：为了保持 URL 整洁，追踪完成后可以移除 URL 中的参数
-          // const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-          // window.history.replaceState({path: newUrl}, '', newUrl);
+        } else {
+            // 如果没有 email 参数，说明可能不是支付跳转过来的，仅记录日志
+            console.log("[Conversion] No email param found, skipping Purchase event.");
         }
-      })();
+      });
     </script>
     </head>
   
