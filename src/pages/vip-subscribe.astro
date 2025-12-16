@@ -30,7 +30,7 @@ const BRAND_HEX = "#D46A22";
         animation: shine-sweep 1s ease-in-out forwards;
       }
     </style>
-    <!-- Meta Pixel Code -->
+    
     <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -41,13 +41,26 @@ const BRAND_HEX = "#D46A22";
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1524843261893492');
-    fbq('track', 'PageView');
+
+    // =================================================================
+    // ✅ 关键修改：将默认的 'PageView' 事件修改为 'InitiateCheckout'
+    // =================================================================
+    // fbq('track', 'PageView'); // 原有的 PageView 事件已注释掉
+
+    // 发送“发起结账”事件
+    // 这告诉 Facebook 用户已经到达了结账流程的开始
+    fbq('track', 'InitiateCheckout', {
+        content_name: 'VIP Access Reservation', // 可以添加产品名称
+        currency: 'USD', // 货币单位
+        value: 5.00 // 预计的结账金额
+    });
+    // =================================================================
+
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1524843261893492&ev=PageView&noscript=1"
     /></noscript>
-    <!-- End Meta Pixel Code -->
-</head>
+    </head>
 
 <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased">
 
@@ -241,7 +254,7 @@ const BRAND_HEX = "#D46A22";
           });
 
           var paymentElement = elements.create('payment', {
-            wallets: { link: 'never' },
+            walettes: { link: 'never' },
             fields: { billingDetails: { name: 'never', email: 'never' } }
           });
 
