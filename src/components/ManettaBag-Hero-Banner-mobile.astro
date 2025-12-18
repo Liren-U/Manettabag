@@ -2,12 +2,25 @@
 /**
  * ManettaBag-Hero-Banner-Mobile.astro
  * 🚀 极速性能版 (High Performance Cinematic Hero)
- * * 修改：
- * 1. [Layout] 表单布局响应式：手机端上下排列，电脑端左右排列。
- * 2. [LCP/GPU] 保留所有性能优化。
- * ✅ 修复：不再依赖内联 onsubmit + 全局函数，改为 addEventListener 绑定 submit（保证触发）
+ * - 专为移动端优化
+ * - ✅ 已添加：表单提交成功后代码触发 Facebook Pixel 'Lead' 事件
  */
 ---
+
+<style is:inline>
+  /* 确保 sr-only 类生效，用于隐藏辅助文本，提高无障碍性 */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
 
 <section
   class="relative w-full min-h-screen pt-32 pb-20 lg:pt-0 lg:pb-0 flex items-center overflow-hidden bg-dark-main lg:hidden"
@@ -23,7 +36,6 @@
     class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==')] opacity-20 pointer-events-none"
   ></div>
 
-  <!-- ✅ 手机端：文字更贴近图片 -->
   <div
     class="max-w-limit mx-auto px-6 lg:px-gutter w-full grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center relative z-10"
   >
@@ -54,7 +66,6 @@
       </p>
     </div>
 
-    <!-- ✅ 手机端：图片与表格保留呼吸感 -->
     <div
       class="reveal delay-200 relative lg:h-screen flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 perspective-1000 active"
     >
@@ -90,7 +101,6 @@
             </div>
           </div>
 
-          <!-- ✅ 表单：去掉内联 onsubmit，改用 JS 绑定，保证触发 -->
           <form id="hero-form-mobile" class="flex flex-col lg:flex-row gap-3 relative">
             <input
               id="hero-email-mobile"
@@ -103,11 +113,12 @@
             />
 
             <button
+              id="hero-submit-btn-mobile"
               type="submit"
-              class="w-full lg:w-auto bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center shrink-0"
-              aria-label="Subscribe"
+              class="w-full lg:w-auto bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center shrink-0 group"
             >
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <span class="sr-only">Subscribe Now</span>
+              <svg class="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>
@@ -119,6 +130,7 @@
 </section>
 
 <script is:inline>
+  // ✅ 保证脚本执行：绑定 submit 事件
   (function () {
     const form = document.querySelector("#hero-form-mobile");
     if (!form) return;
@@ -142,8 +154,8 @@
         console.warn("Cannot access localStorage:", e);
       }
 
-      // ✅ 手机端也调用订阅 API（和电脑端一致）
       try {
+        // 调用订阅 API
         const res = await fetch("/api/klaviyo-subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -157,8 +169,25 @@
           alert(data.error || "Subscription failed, please try again in a moment.");
           return;
         }
+        
+        // =================================================================
+        // ✅ 修改重点：成功订阅后，代码触发 Facebook Pixel 'Lead' 事件
+        // =================================================================
+        if (typeof fbq === 'function') {
+          // 使用标准事件 'Lead'
+          fbq('track', 'Lead', {
+            content_name: 'Hero Banner Mobile Email Subscribe', // 区分来源是手机端
+            source: 'HomePageHeroMobile'
+          });
+          console.log("[Pixel] Lead event fired programmatically (Mobile).");
+        }
 
-        window.location.href = "/reservation?email=" + encodeURIComponent(email);
+        // ✅ 添加短暂延时，确保 Pixel 请求在跳转前发送成功
+        setTimeout(() => {
+           // 订阅成功，跳转到 reservation 页面
+           window.location.href = "/reservation?email=" + encodeURIComponent(email);
+        }, 300); // 300ms 延迟通常足够
+
       } catch (err) {
         console.error("[Hero subscribe mobile] error:", err);
         alert("Network error, please try again.");
@@ -166,4 +195,3 @@
     });
   })();
 </script>
-
