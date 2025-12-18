@@ -31,7 +31,16 @@ const BRAND_HEX = "#D46A22";
       }
     </style>
     
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
     <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-6D5EX8ZZ35');
+    </script>
+    <script>
+    // --- Meta Pixel Init ---
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -42,27 +51,35 @@ const BRAND_HEX = "#D46A22";
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1524843261893492');
 
-    // 记录用户到达了结账流程的开始
+    // --- Page Load Events ---
+
+    // 1. Meta Pixel: InitiateCheckout (保持不变)
     fbq('track', 'InitiateCheckout', {
         content_name: 'VIP Access Reservation', 
         currency: 'USD', 
         value: 5.00 
     });
+
+    // 2. ✅ 新增 GA4 Event: begin_checkout (对应 FB 的 InitiateCheckout)
+    // 确保 gtag 已定义
+    if (typeof gtag === 'function') {
+        gtag('event', 'begin_checkout', {
+          currency: 'USD',
+          value: 5.00,
+          items: [
+            {
+              item_id: 'vip-access-reservation', // 定义一个固定的商品ID
+              item_name: 'VIP Access Reservation',
+              price: 5.00,
+              quantity: 1
+            }
+          ]
+        });
+    }
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1524843261893492&ev=PageView&noscript=1"
     /></noscript>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-6D5EX8ZZ35');
-    </script>
-    <!-- End Google tag (gtag.js) -->
     </head>
 
 <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased">
@@ -304,7 +321,7 @@ const BRAND_HEX = "#D46A22";
                 await subscribeToKlaviyo(emailVal, nameVal);
 
                 // =================================================================
-                // ✅ 关键修改：触发 Facebook Pixel 'Subscribe' 事件 (含价值 5.00)
+                // ✅ TRACKING: 触发 Facebook Pixel 'Subscribe' 事件 (含价值 5.00)
                 // =================================================================
                 if (typeof fbq === 'function') {
                     fbq('track', 'Subscribe', {
@@ -314,14 +331,33 @@ const BRAND_HEX = "#D46A22";
                     });
                     console.log("Pixel 'Subscribe' event fired for $5.00");
                 }
+
+                // =================================================================
+                // ✅ TRACKING: 新增 GA4 'purchase' 事件 (含价值 5.00 和交易 ID)
+                // =================================================================
+                if (typeof gtag === 'function') {
+                    gtag('event', 'purchase', {
+                        transaction_id: paymentIntent.id, // 使用 Stripe 的交易 ID 进行去重
+                        currency: 'USD',
+                        value: 5.00,
+                        items: [
+                            {
+                                item_id: 'vip-access-reservation',
+                                item_name: 'VIP Access Reservation',
+                                price: 5.00,
+                                quantity: 1
+                            }
+                        ]
+                    });
+                    console.log("GA4 'purchase' event fired for $5.00, ID:", paymentIntent.id);
+                }
                 // =================================================================
 
                 var thankyouUrl = 'https://manettabag.com/thankyou' 
                     + '?email=' + encodeURIComponent(emailVal)
                     + '&name=' + encodeURIComponent(nameVal);
                 
-                // ✅ 关键：添加短暂延时，确保 Pixel 请求发送成功后再跳转
-                // 如果立即跳转，浏览器可能会取消尚未完成的 Pixel 网络请求
+                // ✅ 关键：添加短暂延时，确保 Pixel/GA4 请求发送成功后再跳转
                 setTimeout(function() {
                     window.location.href = thankyouUrl;
                 }, 500); // 500毫秒延迟通常足够
