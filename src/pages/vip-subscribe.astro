@@ -42,20 +42,12 @@ const BRAND_HEX = "#D46A22";
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1524843261893492');
 
-    // =================================================================
-    // ✅ 关键修改：将默认的 'PageView' 事件修改为 'InitiateCheckout'
-    // =================================================================
-    // fbq('track', 'PageView'); // 原有的 PageView 事件已注释掉
-
-    // 发送“发起结账”事件
-    // 这告诉 Facebook 用户已经到达了结账流程的开始
+    // 记录用户到达了结账流程的开始
     fbq('track', 'InitiateCheckout', {
-        content_name: 'VIP Access Reservation', // 可以添加产品名称
-        currency: 'USD', // 货币单位
-        value: 5.00 // 预计的结账金额
+        content_name: 'VIP Access Reservation', 
+        currency: 'USD', 
+        value: 5.00 
     });
-    // =================================================================
-
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1524843261893492&ev=PageView&noscript=1"
@@ -161,7 +153,7 @@ const BRAND_HEX = "#D46A22";
     <script define:vars={{ brandColor: BRAND_HEX }}>
     // @ts-nocheck
     document.addEventListener('DOMContentLoaded', function () {
-      // ⚠️ 记得换成你的 Live Key
+      // ⚠️ 记得确保这里是你的 Live Key (如果已上线) 或 Test Key (如果还在测试)
       var stripe = Stripe('pk_live_51QkM6jJrrVdgshd2SopK4pf9x8DeLu8ocJWJNtbGNveVkQcnRQcAM3TQbTohIchI0HqCT6lh474GILSFKfLxUtrj00XeN0aHoY');
 
       var elements;
@@ -211,25 +203,24 @@ const BRAND_HEX = "#D46A22";
           }
 
           // ⭐⭐ Stripe 配置：完美同步 HTML 输入框样式 ⭐⭐
-          // Background: #0A0A0A | Border: #333333
           const appearance = {
             theme: 'night', 
             variables: {
               colorPrimary: brandColor,
-              colorBackground: '#0A0A0A', // 必须与 input bg-[#0A0A0A] 一致
+              colorBackground: '#0A0A0A', 
               colorText: '#ffffff',
               colorDanger: brandColor,
               fontFamily: 'Inter, system-ui, sans-serif',
               borderRadius: '8px', 
               spacingUnit: '4px',
-              placeholderColor: '#525252' // gray-600
+              placeholderColor: '#525252' 
             },
             rules: {
                 '.Input': {
-                    border: '1px solid #333333', // 必须与 input border-[#333] 一致
+                    border: '1px solid #333333', 
                     backgroundColor: '#0A0A0A',
                     color: '#ffffff',
-                    paddingTop: '12px',  // 对应 h-[50px]
+                    paddingTop: '12px', 
                     paddingBottom: '12px',
                     fontSize: '16px',
                 },
@@ -238,11 +229,11 @@ const BRAND_HEX = "#D46A22";
                     boxShadow: 'none'
                 },
                 '.Label': {
-                    color: '#9ca3af', // text-gray-400
-                    fontSize: '12px', // text-xs
-                    fontWeight: '700', // font-bold
+                    color: '#9ca3af', 
+                    fontSize: '12px', 
+                    fontWeight: '700', 
                     textTransform: 'uppercase',
-                    letterSpacing: '0.1em', // tracking-widest
+                    letterSpacing: '0.1em', 
                     marginBottom: '8px'
                 }
             }
@@ -253,8 +244,9 @@ const BRAND_HEX = "#D46A22";
               appearance: appearance 
           });
 
+          // ✅ 修复拼写错误: walettes -> wallets
           var paymentElement = elements.create('payment', {
-            walettes: { link: 'never' },
+            wallets: { link: 'never' },
             fields: { billingDetails: { name: 'never', email: 'never' } }
           });
 
@@ -295,13 +287,34 @@ const BRAND_HEX = "#D46A22";
                 showMessage(error.message);
                 setLoading(false);
             } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                await subscribeToKlaviyo(emailVal, nameVal);
+                // ✅ 支付成功！
                 
+                // 1. 先触发 Klaviyo 订阅（后端）
+                await subscribeToKlaviyo(emailVal, nameVal);
+
+                // =================================================================
+                // ✅ 关键修改：触发 Facebook Pixel 'Subscribe' 事件 (含价值 5.00)
+                // =================================================================
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Subscribe', {
+                        value: 5.00,       // 确认为 5.00 USD
+                        currency: 'USD',   // 货币单位
+                        content_name: 'VIP Access Reservation', // 添加内容名称以便区分
+                    });
+                    console.log("Pixel 'Subscribe' event fired for $5.00");
+                }
+                // =================================================================
+
                 var thankyouUrl = 'https://manettabag.com/thankyou' 
                     + '?email=' + encodeURIComponent(emailVal)
                     + '&name=' + encodeURIComponent(nameVal);
                 
-                window.location.href = thankyouUrl;
+                // ✅ 关键：添加短暂延时，确保 Pixel 请求发送成功后再跳转
+                // 如果立即跳转，浏览器可能会取消尚未完成的 Pixel 网络请求
+                setTimeout(function() {
+                    window.location.href = thankyouUrl;
+                }, 500); // 500毫秒延迟通常足够
+
             } else {
                 showMessage('Payment failed. Please try again.');
                 setLoading(false);
