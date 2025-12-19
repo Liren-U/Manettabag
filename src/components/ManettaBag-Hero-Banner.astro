@@ -2,6 +2,10 @@
 /**
  * ManettaBag-Hero-Banner.astro
  * Hero banner 模块（带邮箱表单，只能填写 Email）
+ * ✅ 修改：表单容器宽度实现完全响应式适应
+ * - 平板 (md): max-w-md (紧凑)
+ * - 桌面 (lg): max-w-lg (标准)
+ * - 大屏 (xl): max-w-xl (宽敞)
  */
 ---
 
@@ -70,7 +74,7 @@
         Meet <strong class="text-white">MANETTA</strong> — a 3-in-1 modular system that expands from 22L to 42L in seconds. One bag, built for every shoot.
       </p>
 
-      <div class="w-full max-w-md p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
+      <div class="w-full max-w-md lg:max-w-lg xl:max-w-xl p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
         <div class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden">
           <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"></div>
 
@@ -83,26 +87,40 @@
             </div>
           </div>
 
-          <form id="hero-form" class="flex gap-3 relative">
+          <form id="hero-form" class="flex flex-col sm:flex-row gap-3 relative">
+            
             <input
               id="hero-email"
               type="email"
               inputmode="email"
               autocomplete="email"
               placeholder="Your email address"
-              class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-light-muted/50 focus:outline-none focus:border-brand/50 focus:bg-white/10 transition-all"
+              class="
+                w-full sm:flex-1 
+                bg-white/5 border border-white/10 rounded-xl px-5 py-4 
+                text-white placeholder-light-muted/50 
+                focus:outline-none focus:border-brand/50 focus:bg-white/10 
+                transition-all
+                min-w-0 /* ✅ 关键：允许输入框在弹性布局中收缩到比内容更小，防止顶出按钮 */
+              "
               required
             />
+            
             <button
               id="hero-submit-btn"
               type="submit"
-              class="bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center group"
+              class="
+                w-full sm:w-auto /* ✅ 窄屏时按钮撑满，宽屏时自适应 */
+                bg-brand hover:bg-brand/90 text-white 
+                px-6 py-4 rounded-xl font-bold 
+                transition-all duration-300 shadow-glow 
+                flex items-center justify-center 
+                whitespace-nowrap shrink-0 /* ✅ 关键：防止按钮被挤压换行或变形 */
+              "
             >
-              <span class="sr-only">Subscribe Now</span>
-              <svg class="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              Subscribe Now
             </button>
+
           </form>
         </div>
       </div>

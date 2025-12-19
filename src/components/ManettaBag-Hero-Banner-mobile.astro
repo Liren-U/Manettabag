@@ -3,12 +3,13 @@
  * ManettaBag-Hero-Banner-Mobile.astro
  * 🚀 极速性能版 (High Performance Cinematic Hero)
  * - 专为移动端优化
- * - ✅ 已添加：表单提交成功后代码触发 Facebook Pixel 'Lead' 事件
+ * - ✅ 修改：按钮由图标改为文字 "Subscribe Now"
+ * - ✅ 已包含：表单提交成功后代码触发 Facebook Pixel 'Lead' 事件
  */
 ---
 
 <style is:inline>
-  /* 确保 sr-only 类生效，用于隐藏辅助文本，提高无障碍性 */
+  /* 确保 sr-only 类生效，虽然按钮不再使用它，但保留以防万一 */
   .sr-only {
     position: absolute;
     width: 1px;
@@ -115,12 +116,9 @@
             <button
               id="hero-submit-btn-mobile"
               type="submit"
-              class="w-full lg:w-auto bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center shrink-0 group"
+              class="w-full lg:w-auto bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center shrink-0 group whitespace-nowrap"
             >
-              <span class="sr-only">Subscribe Now</span>
-              <svg class="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              Subscribe Now
             </button>
           </form>
         </div>
@@ -171,7 +169,7 @@
         }
         
         // =================================================================
-        // ✅ 修改重点：成功订阅后，代码触发 Facebook Pixel 'Lead' 事件
+        // ✅ 成功订阅后，代码触发 Facebook Pixel 'Lead' 事件
         // =================================================================
         if (typeof fbq === 'function') {
           // 使用标准事件 'Lead'
