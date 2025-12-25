@@ -2,14 +2,14 @@
 /**
  * ManettaBag-Hero-Banner.astro
  * Hero banner 模块
- * ✅ 修改：邮箱更新为 bagmanetta@gmail.com
- * ✅ 修改：增加 Pinterest 按钮 (共5个按钮)
- * ✅ 修改：Copy Link 按钮在手机端整行显示
+ * ✅ 适配：桌面端一行5个按钮
+ * ✅ 适配：手机端优化为 2列布局 + Copy Link 独占一行
+ * ✅ 功能：包含 FB, TW, IG, PIN, Copy Link
  */
 ---
 
 <style is:inline>
-  /* --- 响应式隐藏逻辑 --- */
+  /* --- 响应式隐藏逻辑 (原有) --- */
   @media (max-width: 767px) {
     #reserve {
       display: none !important;
@@ -27,7 +27,7 @@
     border-width: 0;
   }
 
-  /* --- 弹窗样式 --- */
+  /* --- 弹窗核心样式 --- */
   .popup-overlay {
     display: none;
     position: fixed;
@@ -47,12 +47,12 @@
     background: #fff;
     color: #1a1a1a;
     display: flex;
-    border-radius: 4px;
+    border-radius: 8px; /*稍微圆润一点*/
     overflow: hidden;
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
   }
 
-  /* 左侧图片 */
+  /* 左侧图片区 */
   .popup-left {
     flex: 1;
     background: #2a2a2a;
@@ -76,9 +76,10 @@
     font-weight: bold;
     letter-spacing: 1px;
     text-transform: uppercase;
+    z-index: 2;
   }
 
-  /* 右侧内容 */
+  /* 右侧内容区 */
   .popup-right {
     flex: 1.3;
     padding: 40px 50px;
@@ -134,11 +135,11 @@
     flex-shrink: 0;
   }
 
-  /* ✅ 修改：按钮组样式 (电脑端 5 列) */
+  /* --- 按钮组 (桌面默认) --- */
   .action-group {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 电脑端一行5个 */
-    gap: 8px;
+    grid-template-columns: repeat(5, 1fr); /* 电脑端：一行5个均匀分布 */
+    gap: 10px;
     margin-bottom: 15px;
   }
 
@@ -147,7 +148,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px 4px;
+    padding: 12px 5px;
     border: 1px solid #ddd;
     text-decoration: none;
     color: #555;
@@ -156,9 +157,9 @@
     transition: 0.2s;
     border-radius: 6px;
     text-transform: uppercase;
-    background: #f9f9f9;
+    background: #fcfcfc;
     cursor: pointer;
-    min-width: 0; /* 防止溢出 */
+    min-width: 0;
   }
   
   .btn-share:hover {
@@ -167,7 +168,6 @@
     border-color: #1a1a1a;
   }
 
-  /* 图标样式 */
   .btn-share svg {
     width: 20px;
     height: 20px;
@@ -175,7 +175,7 @@
     fill: currentColor;
   }
   
-  /* 按钮文字不允许换行，溢出省略，保持整齐 */
+  /* 防止文字换行 */
   .btn-share span {
       white-space: nowrap;
       overflow: hidden;
@@ -200,6 +200,7 @@
     border: none; background: none;
     z-index: 10;
     line-height: 1;
+    padding: 10px; /* 增加点击区域 */
   }
   .close-x:hover { color: #1a1a1a; }
 
@@ -208,22 +209,46 @@
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* 手机端适配 */
+  /* ========================================= */
+  /* ✅ 手机端深度适配 (Mobile Optimization) */
+  /* ========================================= */
   @media (max-width: 768px) {
-    .popup-container { flex-direction: column; height: auto; max-height: 90vh; width: 90%; }
-    .popup-left { min-height: 150px; display: none; }
-    .popup-right { padding: 30px 20px; overflow-y: auto; }
-    
-    /* ✅ 手机端改为 2 列 */
+    .popup-container { 
+        flex-direction: column; 
+        width: 90%; 
+        max-height: 90vh; /* 防止超过屏幕高度 */
+        overflow: hidden; /* 容器本身不滚动 */
+    }
+
+    /* 手机端隐藏左侧大图，节省宝贵空间，专注内容 */
+    .popup-left { 
+        display: none; 
+    }
+
+    /* 右侧内容区增加滚动，防止小屏幕内容被截断 */
+    .popup-right { 
+        padding: 35px 20px 25px 20px; /* 调整内边距 */
+        overflow-y: auto; /* 内容过多时允许内部滚动 */
+        width: 100%;
+    }
+
+    .popup-right h2 { font-size: 22px; } /* 标题稍微调小 */
+    .step-item { font-size: 12px; }
+
+    /* ✅ 按钮组改为 2列布局 */
     .action-group { 
-        grid-template-columns: 1fr 1fr; 
+        grid-template-columns: 1fr 1fr; /* 两列 */
+        gap: 8px;
     }
     
-    /* ✅ 关键：让最后一个元素 (Copy Link) 横跨两列，占满整行 */
+    /* ✅ 关键：让第5个按钮 (Copy Link) 横跨两列，变成长按钮 */
     .action-group > :last-child {
-        grid-column: span 2;
-        background: #f0f0f0; /* 稍微深一点强调 */
+        grid-column: span 2; 
+        background-color: #f3f3f3; /* 稍微加深背景突出 */
+        flex-direction: row; /* 图标和文字横向排列，节省高度 */
+        gap: 8px;
     }
+    .action-group > :last-child svg { margin-bottom: 0; } /* 修正横向排列时的间距 */
   }
 </style>
 
@@ -343,7 +368,7 @@
             </a>
             
             <a href="https://www.instagram.com/" target="_blank" class="btn-share">
-              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               <span>Instagram</span>
             </a>
 
@@ -393,7 +418,6 @@
         copyBtn.addEventListener("click", () => {
             const currentUrl = window.location.href;
             
-            // 使用 Clipboard API
             navigator.clipboard.writeText(currentUrl).then(() => {
                 const originalHtml = copyBtn.innerHTML; 
                 
@@ -404,7 +428,6 @@
                 `;
                 copyBtn.style.borderColor = "#22c55e"; 
 
-                // 2秒后恢复原状
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHtml;
                     copyBtn.style.borderColor = "#ddd";
