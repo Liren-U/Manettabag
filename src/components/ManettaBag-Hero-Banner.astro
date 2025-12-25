@@ -1,8 +1,10 @@
 ---
 /**
  * ManettaBag-Hero-Banner.astro
- * Hero banner 模块（带邮箱表单 + 分享裂变弹窗）
- * ✅ 修改：添加社交媒体图标 + Copy Link 功能
+ * Hero banner 模块
+ * ✅ 修改：邮箱更新为 bagmanetta@gmail.com
+ * ✅ 修改：增加 Pinterest 按钮 (共5个按钮)
+ * ✅ 修改：Copy Link 按钮在手机端整行显示
  */
 ---
 
@@ -132,11 +134,11 @@
     flex-shrink: 0;
   }
 
-  /* ✅ 修改：按钮组样式 */
+  /* ✅ 修改：按钮组样式 (电脑端 5 列) */
   .action-group {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr; /* 电脑端一行4个 */
-    gap: 10px;
+    grid-template-columns: repeat(5, 1fr); /* 电脑端一行5个 */
+    gap: 8px;
     margin-bottom: 15px;
   }
 
@@ -145,7 +147,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px 5px;
+    padding: 10px 4px;
     border: 1px solid #ddd;
     text-decoration: none;
     color: #555;
@@ -155,7 +157,8 @@
     border-radius: 6px;
     text-transform: uppercase;
     background: #f9f9f9;
-    cursor: pointer; /* 确保 Copy Link 看起来像按钮 */
+    cursor: pointer;
+    min-width: 0; /* 防止溢出 */
   }
   
   .btn-share:hover {
@@ -169,7 +172,15 @@
     width: 20px;
     height: 20px;
     margin-bottom: 6px;
-    fill: currentColor; /* 图标颜色跟随文字颜色 */
+    fill: currentColor;
+  }
+  
+  /* 按钮文字不允许换行，溢出省略，保持整齐 */
+  .btn-share span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
   }
 
   .popup-footer {
@@ -202,8 +213,17 @@
     .popup-container { flex-direction: column; height: auto; max-height: 90vh; width: 90%; }
     .popup-left { min-height: 150px; display: none; }
     .popup-right { padding: 30px 20px; overflow-y: auto; }
-    /* 手机端变为2行2列，更大更好点 */
-    .action-group { grid-template-columns: 1fr 1fr; } 
+    
+    /* ✅ 手机端改为 2 列 */
+    .action-group { 
+        grid-template-columns: 1fr 1fr; 
+    }
+    
+    /* ✅ 关键：让最后一个元素 (Copy Link) 横跨两列，占满整行 */
+    .action-group > :last-child {
+        grid-column: span 2;
+        background: #f0f0f0; /* 稍微深一点强调 */
+    }
   }
 </style>
 
@@ -303,7 +323,7 @@
             </li>
             <li class="step-item">
                 <div class="step-num">2</div>
-                <div>Send a screenshot to <b>hello@manettabag.com</b>.</div>
+                <div>Send a screenshot to <b>bagmanetta@gmail.com</b>.</div>
             </li>
             <li class="step-item">
                 <div class="step-num">3</div>
@@ -327,6 +347,11 @@
               <span>Instagram</span>
             </a>
 
+            <a href="http://pinterest.com/pin/create/button/?url=manettabag.com" target="_blank" class="btn-share">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 4.99 3.125 9.255 7.502 11.047-.104-.943-.197-2.396.042-3.428.217-.937 1.402-5.938 1.402-5.938s-.358-.716-.358-1.774c0-1.663.964-2.903 2.163-2.903 1.021 0 1.513.766 1.513 1.685 0 1.026-.653 2.56-.99 3.982-.283 1.19.596 2.158 1.769 2.158 2.123 0 3.757-2.238 3.757-5.47 0-2.852-2.057-4.854-4.992-4.854-3.633 0-5.771 2.724-5.771 5.54 0 1.098.423 2.277.948 2.918.104.124.119.235.088.429l-.353 1.423c-.057.235-.213.285-.49.172-1.832-.852-2.977-3.514-2.977-5.68 0-4.627 3.366-8.883 9.704-8.883 5.093 0 9.048 3.632 9.048 8.502 0 5.074-3.2 9.155-7.645 9.155-1.493 0-2.899-.775-3.381-1.69l-.92 3.507c-.34 1.302-1.264 2.931-1.885 3.924 1.414.416 2.91.635 4.452.635 6.6 0 11.963-5.363 11.963-11.963S18.6 0 12 0z"/></svg>
+                <span>Pinterest</span>
+            </a>
+
             <button id="btn-copy-link" class="btn-share" type="button">
               <svg viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg>
               <span id="copy-text">Copy Link</span>
@@ -347,7 +372,7 @@
     const form = document.querySelector("#hero-form");
     const popup = document.querySelector("#sharePopup");
     const closeBtn = document.querySelector("#popupCloseBtn");
-    const copyBtn = document.querySelector("#btn-copy-link"); // 获取 Copy 按钮
+    const copyBtn = document.querySelector("#btn-copy-link");
     
     let submittedEmail = "";
 
@@ -363,21 +388,21 @@
         });
     }
 
-    // ✅ 新增：Copy Link 逻辑
+    // Copy Link 逻辑
     if (copyBtn) {
         copyBtn.addEventListener("click", () => {
             const currentUrl = window.location.href;
             
             // 使用 Clipboard API
             navigator.clipboard.writeText(currentUrl).then(() => {
-                const originalHtml = copyBtn.innerHTML; // 保存原始图标和文字
+                const originalHtml = copyBtn.innerHTML; 
                 
                 // 变成 ✅ 图标和 Copied 文字
                 copyBtn.innerHTML = `
                     <svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                     <span style="color:#22c55e;">Copied!</span>
                 `;
-                copyBtn.style.borderColor = "#22c55e"; // 边框变绿
+                copyBtn.style.borderColor = "#22c55e"; 
 
                 // 2秒后恢复原状
                 setTimeout(() => {
