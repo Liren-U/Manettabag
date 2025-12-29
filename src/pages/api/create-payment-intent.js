@@ -21,10 +21,10 @@ export const POST = async (context) => {
 
   try {
     const params = new URLSearchParams({
-      amount: '500', // 单位是 “分”
+      amount: '100', // 单位是 “分”
       currency: 'usd',
       'automatic_payment_methods[enabled]': 'true',
-      description: 'Manetta VIP Subscription - $5 USD',
+      description: 'Manetta VIP Subscription - $1 USD',
     });
 
     const stripeRes = await fetch('https://api.stripe.com/v1/payment_intents', {

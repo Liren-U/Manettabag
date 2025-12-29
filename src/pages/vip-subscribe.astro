@@ -57,7 +57,7 @@ const BRAND_HEX = "#D46A22";
     fbq('track', 'InitiateCheckout', {
         content_name: 'VIP Access Reservation', 
         currency: 'USD', 
-        value: 5.00 
+        value: 1.00 
     });
 
     // 2. ✅ 新增 GA4 Event: begin_checkout (对应 FB 的 InitiateCheckout)
@@ -65,12 +65,12 @@ const BRAND_HEX = "#D46A22";
     if (typeof gtag === 'function') {
         gtag('event', 'begin_checkout', {
           currency: 'USD',
-          value: 5.00,
+          value: 1.00,
           items: [
             {
               item_id: 'vip-access-reservation', // 定义一个固定的商品ID
               item_name: 'VIP Access Reservation',
-              price: 5.00,
+              price: 1.00,
               quantity: 1
             }
           ]
@@ -107,7 +107,7 @@ const BRAND_HEX = "#D46A22";
                         <p class="text-sm text-gray-400 mt-1 font-light">Secure your early bird discount</p>
                     </div>
                     <div class="text-right">
-                        <span class="block text-3xl font-bold text-[var(--brandColor)] leading-none tracking-tight">$5.00</span>
+                        <span class="block text-3xl font-bold text-[var(--brandColor)] leading-none tracking-tight">$1.00</span>
                         <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">USD Total</span>
                     </div>
                 </div>
@@ -321,35 +321,35 @@ const BRAND_HEX = "#D46A22";
                 await subscribeToKlaviyo(emailVal, nameVal);
 
                 // =================================================================
-                // ✅ TRACKING: 触发 Facebook Pixel 'Subscribe' 事件 (含价值 5.00)
+                // ✅ TRACKING: 触发 Facebook Pixel 'Subscribe' 事件 (含价值 1.00)
                 // =================================================================
                 if (typeof fbq === 'function') {
                     fbq('track', 'Subscribe', {
-                        value: 5.00,       // 确认为 5.00 USD
+                        value: 1.00,       // 确认为 1.00 USD
                         currency: 'USD',   // 货币单位
                         content_name: 'VIP Access Reservation', // 添加内容名称以便区分
                     });
-                    console.log("Pixel 'Subscribe' event fired for $5.00");
+                    console.log("Pixel 'Subscribe' event fired for $1.00");
                 }
 
                 // =================================================================
-                // ✅ TRACKING: 新增 GA4 'purchase' 事件 (含价值 5.00 和交易 ID)
+                // ✅ TRACKING: 新增 GA4 'purchase' 事件 (含价值 1.00 和交易 ID)
                 // =================================================================
                 if (typeof gtag === 'function') {
                     gtag('event', 'purchase', {
                         transaction_id: paymentIntent.id, // 使用 Stripe 的交易 ID 进行去重
                         currency: 'USD',
-                        value: 5.00,
+                        value: 1.00,
                         items: [
                             {
                                 item_id: 'vip-access-reservation',
                                 item_name: 'VIP Access Reservation',
-                                price: 5.00,
+                                price: 1.00,
                                 quantity: 1
                             }
                         ]
                     });
-                    console.log("GA4 'purchase' event fired for $5.00, ID:", paymentIntent.id);
+                    console.log("GA4 'purchase' event fired for $1.00, ID:", paymentIntent.id);
                 }
                 // =================================================================
 
