@@ -1,239 +1,344 @@
 ---
 // src/pages/reservation.astro
-import Footer from '../components/Footer.astro';
-import '../styles/global.css'; 
-import ManettaBagHeader from '../components/ManettaBag-Header-other.astro';
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+import ManettaBagHeader from "../components/ManettaBag-Header-other.astro";
 
 const PAGE_TITLE = "Reserve Your VIP Spot - Manetta";
 // 品牌色常量
-const BRAND_HEX = "#D46A22"; 
+const BRAND_HEX = "#D46A22";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{PAGE_TITLE}</title>
-  <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
-  <link rel="stylesheet" href="/tailwind.css" />
-  
-  <style define:vars={{ brandColor: BRAND_HEX }}>
-    /* 1. 物理弹簧曲线 (Spring Physics)
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{PAGE_TITLE}</title>
+    <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
+    <link rel="stylesheet" href="/tailwind.css" />
+
+    <style define:vars={{ brandColor: BRAND_HEX }}>
+      /* 1. 物理弹簧曲线 (Spring Physics)
       这是让交互感觉“高级”、“灵动”的核心，模拟真实物体的回弹。
     */
-    .island-spring {
-      transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+      .island-spring {
+        transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
 
-    /* 2. 品牌色选中 */
-    ::selection {
-      background-color: var(--brandColor);
-      color: white;
-    }
-  </style>
+      /* 2. 品牌色选中 */
+      ::selection {
+        background-color: var(--brandColor);
+        color: white;
+      }
+    </style>
 
-  <script is:inline>
-    /**
-     * 为 PageView 和转化事件生成独立的去重 ID
-     */
-    window.stape_pv_id = 'pv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    window.stape_reg_id = 'reg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  </script>
-  <!-- Meta Pixel Code -->
-  <script is:inline>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  
-  fbq('init', '2248339528989623');
-  // 使用 stape_pv_id 进行 PageView 去重
-  fbq('track', 'PageView', {}, { eventID: window.stape_pv_id });
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_pv_id}`}
-  /></noscript>
-  <!-- End Meta Pixel Code -->
+    <script is:inline>
+      /**
+       * 1. 生成独立的去重 ID
+       * 分别用于 PageView 和 CompleteRegistration 事件
+       */
+      if (!window.stape_pv_id) {
+        window.stape_pv_id =
+          "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      }
+      if (!window.stape_reg_id) {
+        window.stape_reg_id =
+          "reg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      }
+    </script>
 
-  <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
-  <script is:inline>
+    <script is:inline>
+      /**
+       * 2. Meta Pixel & CAPIG 核心逻辑
+       */
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        // 使用你的自定义 CAPIG 域名
+        t.src = "https://capig.manettabag.com/events.js";
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, "script");
+
+      fbq("init", "2248339528989623");
+      // PageView 带上 Event ID 用于去重
+      fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
+    </script>
+
+    <noscript>
+      <img
+        height="1"
+        width="1"
+        style="display:none"
+        src="https://capig.manettabag.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+      />
+    </noscript>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
+    ></script>
+    <script is:inline>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-      // 配置数据发往 Stape 服务器
-      gtag('config', 'G-6D5EX8ZZ35', {
-          'transport_url': 'https://ss.manettabag.com', // 替换为你的 Stape 域名
-          'event_id': window.stape_pv_id,
-          'first_party_collection': true
+      // 【修正】：删除了 transport_url 和 event_id，确保 GA4 数据直接发往 Google
+      gtag("config", "G-6D5EX8ZZ35", {
+        first_party_collection: true,
       });
-  </script>
-    <!-- End Google tag (gtag.js) -->
-  <script is:inline>
-  (function() {
-    // 1. 获取 URL 中的 email 参数 (保留你的原逻辑)
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email');
+    </script>
 
-    // 2. 如果 email 存在，说明是刚从首页订阅成功跳转过来的
-    if (email) {
-      // 保留你原本的调试日志
-      console.log("[Conversion] Subscription successful for:", email);
-
-      // --- Facebook Pixel (已升级适配 Stape) ---
-      if (typeof fbq === 'function') {
-        fbq('track', 'CompleteRegistration', {
-          content_name: 'Hero Banner Subscription',
-          currency: 'USD',
-          value: 0.00,
-          em: email // 【新增】提升匹配率
-        }, { eventID: window.stape_reg_id }); // 【新增】用于去重
-      }
-
-      // --- Stape / Google Tag 服务端转发 (【新增】核心点) ---
-      if (typeof gtag === 'function') {
-        gtag('event', 'complete_registration', {
-          'event_id': window.stape_reg_id,
-          'user_email': email
-        });
-      }
-      
-      // 你可以在这里添加其他平台的代码...
-    }
-  })();
-</script>
-  </head>
-
-<body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased overflow-x-hidden">
-
-  <ManettaBagHeader />
-
-  <main class="flex-1 w-full pt-32 pb-20 lg:pt-40 lg:pb-32 relative overflow-hidden">
-
-    <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[var(--brandColor)] opacity-15 blur-[150px] rounded-full pointer-events-none"></div>
-    <div class="absolute bottom-0 left-[-10%] w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none"></div>
-    
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none mix-blend-overlay"></div>
-
-
-    <div class="max-w-[1200px] mx-auto px-6 lg:px-14 relative z-10">
-      
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center mb-24 lg:mb-32">
-        
-        <div class="relative group order-2 lg:order-1 mt-8 lg:mt-0">
-          <div class="absolute inset-0 bg-[var(--brandColor)] opacity-10 blur-[80px] rounded-full group-hover:opacity-30 transition-opacity duration-1000"></div>
-          
-          <div class="relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl bg-[#0A0A0A]">
-             <img 
-               src="images/ManettaBag-reservation-2.png" 
-               alt="Product Image" 
-               class="w-full h-auto object-cover transform transition-transform duration-[1.5s] island-spring group-hover:scale-105 opacity-90 group-hover:opacity-100"
-             />
-             <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent pointer-events-none"></div>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-start order-1 lg:order-2 w-full">
-          
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md shadow-lg">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--brandColor)] opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--brandColor)]"></span>
-            </span>
-            <span class="text-[10px] font-bold tracking-[0.2em] text-gray-300 uppercase">Limited Time Offer</span>
-          </div>
-
-          <h1 class="font-display font-bold text-3xl lg:text-6xl leading-[1.1] lg:leading-[1.1] mb-6 text-white tracking-tight">
-            Save $50
-            <span class="text-[#666] lg:text-2xl">vs Early Bird</span><br/>
-            <span class="text-[#666] lg:text-5xl">as a VIP backer.</span>
-          </h1>
-
-          <p class="text-lg lg:text-xl text-gray-300 leading-relaxed mb-12 max-w-lg font-light">
-            Become a VIP for only $1. VIP backers receive priority shipping, a free lens protection Velcro cloth, and an S-size camera bag. On launch day, you'll get a private email link with an exclusive VIP discount.
-          </p>
-
-          <div class="w-full relative group z-20">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[102%] h-[120%] bg-[var(--brandColor)] opacity-20 blur-[40px] rounded-full group-hover:opacity-40 transition-opacity duration-500 island-spring"></div>
-
-            <a href="/vip-subscribe" class="relative w-full flex items-center justify-between p-2 pl-8 pr-2 h-16 sm:h-[72px] rounded-full overflow-hidden transition-all duration-500 island-spring hover:scale-[1.02] active:scale-[0.97] bg-[var(--brandColor)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] border-t border-white/20">
-              
-              <div class="flex flex-col justify-center z-10">
-                <span class="font-display font-bold text-lg sm:text-xl tracking-[0.2em] uppercase text-white leading-none text-shadow-sm">
-                  RESERVE NOW
-                </span>
-              </div>
-
-              <div class="h-12 w-12 sm:h-14 sm:w-14 bg-white rounded-full flex items-center justify-center text-[var(--brandColor)] shadow-inner transition-transform duration-500 island-spring group-hover:rotate-45 group-hover:scale-110 z-10">
-                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-              </div>
-
-            </a>
-          </div>
-
-        </div>
-
-      </section>
-
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <div class="bg-[#141414] border border-white/10 rounded-3xl p-8 hover:bg-[#1A1A1A] hover:border-[var(--brandColor)]/40 transition-all duration-500 group/card">
-          <div class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 group-hover/card:text-[var(--brandColor)] transition-colors island-spring group-hover/card:scale-110 border border-white/5">
-             <img src="/images/100-Refund-Guarantee.png" class="w-6 h-6 object-contain opacity-70 group-hover/card:opacity-100 transition-opacity" alt="Refund Guarantee"/>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">100% Refund Guarantee</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">
-            "If you're not satisfied, we'll offer a full refund at any time before the project moves into production. Your satisfaction is our priority."
-          </p>
-        </div>
-
-        <div class="bg-[#141414] border border-white/10 rounded-3xl p-8 hover:bg-[#1A1A1A] hover:border-[var(--brandColor)]/40 transition-all duration-500 group/card">
-          <div class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 island-spring group-hover/card:scale-110 border border-white/5">
-             <img src="/images/Transparency-Guarantee.png" class="w-6 h-6 object-contain opacity-70 group-hover/card:opacity-100 transition-opacity" alt="Transparency"/>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Transparency Guarantee</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">
-            "We'll keep you informed about the progress of our project throughout the entire campaign."
-          </p>
-        </div>
-
-        <div class="bg-[#141414] border border-white/10 rounded-3xl p-8 hover:bg-[#1A1A1A] hover:border-[var(--brandColor)]/40 transition-all duration-500 group/card">
-          <div class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 island-spring group-hover/card:scale-110 border border-white/5">
-             <img src="/images/Secure-Payment.png" class="w-6 h-6 object-contain opacity-70 group-hover/card:opacity-100 transition-opacity" alt="Secure Payment"/>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Secure Payment</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">
-            "All transactions are processed through a secure network. Your credit card information is never stored, and we respect your privacy."
-          </p>
-        </div>
-
-      </section>
-
-    </div>
-  </main>
-
-  <Footer />
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const url = new URL(window.location.href);
-        const email = url.searchParams.get('email');
+    <script is:inline>
+      /**
+       * 4. 转化追踪：捕获 Email 并发送给 Facebook CAPI
+       */
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get("email");
 
         if (email) {
-          localStorage.setItem('manetta_email', email);
-        }
-      } catch (err) { console.warn(err); }
-    });
-  </script>
+          console.log("[CAPI] 成功捕获订阅 Email:", email);
 
-</body>
+          // --- 仅发送给 Facebook ---
+          if (typeof fbq === "function") {
+            fbq(
+              "track",
+              "CompleteRegistration",
+              {
+                content_name: "Hero Banner Subscription",
+                currency: "USD",
+                value: 0.0,
+                em: email, // Meta 脚本会自动加密
+              },
+              { eventID: window.stape_reg_id }
+            );
+          }
+
+          // 【注意】：这里移除了原有的 gtag("event", "complete_registration", ...) 服务端转发逻辑
+          // 因为你没有配置 sGTM，保留它会导致报错且无数据产出
+        }
+      })();
+    </script>
+  </head>
+
+  <body
+    class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased overflow-x-hidden"
+  >
+    <ManettaBagHeader />
+
+    <main
+      class="flex-1 w-full pt-32 pb-20 lg:pt-40 lg:pb-32 relative overflow-hidden"
+    >
+      <div
+        class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[var(--brandColor)] opacity-15 blur-[150px] rounded-full pointer-events-none"
+      >
+      </div>
+      <div
+        class="absolute bottom-0 left-[-10%] w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none"
+      >
+      </div>
+
+      <div
+        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none mix-blend-overlay"
+      >
+      </div>
+
+      <div class="max-w-[1200px] mx-auto px-6 lg:px-14 relative z-10">
+        <section
+          class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center mb-24 lg:mb-32"
+        >
+          <div class="relative group order-2 lg:order-1 mt-8 lg:mt-0">
+            <div
+              class="absolute inset-0 bg-[var(--brandColor)] opacity-10 blur-[80px] rounded-full group-hover:opacity-30 transition-opacity duration-1000"
+            >
+            </div>
+
+            <div
+              class="relative rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl bg-[#0A0A0A]"
+            >
+              <img
+                src="images/ManettaBag-reservation-2.png"
+                alt="Product Image"
+                class="w-full h-auto object-cover transform transition-transform duration-[1.5s] island-spring group-hover:scale-105 opacity-90 group-hover:opacity-100"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent pointer-events-none"
+              >
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-start order-1 lg:order-2 w-full">
+            <div
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md shadow-lg"
+            >
+              <span class="relative flex h-2 w-2">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--brandColor)] opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex rounded-full h-2 w-2 bg-[var(--brandColor)]"
+                ></span>
+              </span>
+              <span
+                class="text-[10px] font-bold tracking-[0.2em] text-gray-300 uppercase"
+                >Limited Time Offer</span
+              >
+            </div>
+
+            <h1
+              class="font-display font-bold text-3xl lg:text-6xl leading-[1.1] lg:leading-[1.1] mb-6 text-white tracking-tight"
+            >
+              Save $50
+              <span class="text-[#666] lg:text-2xl">vs Early Bird</span><br />
+              <span class="text-[#666] lg:text-5xl">as a VIP backer.</span>
+            </h1>
+
+            <p
+              class="text-lg lg:text-xl text-gray-300 leading-relaxed mb-12 max-w-lg font-light"
+            >
+              Become a VIP for only $1. VIP backers receive priority shipping, a
+              free lens protection Velcro cloth, and an S-size camera bag. On
+              launch day, you'll get a private email link with an exclusive VIP
+              discount.
+            </p>
+
+            <div class="w-full relative group z-20">
+              <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[102%] h-[120%] bg-[var(--brandColor)] opacity-20 blur-[40px] rounded-full group-hover:opacity-40 transition-opacity duration-500 island-spring"
+              >
+              </div>
+
+              <a
+                href="/vip-subscribe"
+                class="relative w-full flex items-center justify-between p-2 pl-8 pr-2 h-16 sm:h-[72px] rounded-full overflow-hidden transition-all duration-500 island-spring hover:scale-[1.02] active:scale-[0.97] bg-[var(--brandColor)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] border-t border-white/20"
+              >
+                <div class="flex flex-col justify-center z-10">
+                  <span
+                    class="font-display font-bold text-lg sm:text-xl tracking-[0.2em] uppercase text-white leading-none text-shadow-sm"
+                  >
+                    RESERVE NOW
+                  </span>
+                </div>
+
+                <div
+                  class="h-12 w-12 sm:h-14 sm:w-14 bg-white rounded-full flex items-center justify-center text-[var(--brandColor)] shadow-inner transition-transform duration-500 island-spring group-hover:rotate-45 group-hover:scale-110 z-10"
+                >
+                  <svg
+                    class="w-6 h-6 sm:w-7 sm:h-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            class="bg-[#141414] border border-white/10 rounded-3xl p-8 hover:bg-[#1A1A1A] hover:border-[var(--brandColor)]/40 transition-all duration-500 group/card"
+          >
+            <div
+              class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 group-hover/card:text-[var(--brandColor)] transition-colors island-spring group-hover/card:scale-110 border border-white/5"
+            >
+              <img
+                src="/images/100-Refund-Guarantee.png"
+                class="w-6 h-6 object-contain opacity-70 group-hover/card:opacity-100 transition-opacity"
+                alt="Refund Guarantee"
+              />
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2">
+              100% Refund Guarantee
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              "If you're not satisfied, we'll offer a full refund at any time
+              before the project moves into production. Your satisfaction is our
+              priority."
+            </p>
+          </div>
+
+          <div
+            class="bg-[#141414] border border-white/10 rounded-3xl p-8 hover:bg-[#1A1A1A] hover:border-[var(--brandColor)]/40 transition-all duration-500 group/card"
+          >
+            <div
+              class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 island-spring group-hover/card:scale-110 border border-white/5"
+            >
+              <img
+                src="/images/Transparency-Guarantee.png"
+                class="w-6 h-6 object-contain opacity-70 group-hover/card:opacity-100 transition-opacity"
+                alt="Transparency"
+              />
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2">
+              Transparency Guarantee
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              "We'll keep you informed about the progress of our project
+              throughout the entire campaign."
+            </p>
+          </div>
+
+          <div
+            class="bg-[#141414] border border-white/10 rounded-3xl p-8 hover:bg-[#1A1A1A] hover:border-[var(--brandColor)]/40 transition-all duration-500 group/card"
+          >
+            <div
+              class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 island-spring group-hover/card:scale-110 border border-white/5"
+            >
+              <img
+                src="/images/Secure-Payment.png"
+                class="w-6 h-6 object-contain opacity-70 group-hover/card:opacity-100 transition-opacity"
+                alt="Secure Payment"
+              />
+            </div>
+            <h3 class="font-display font-bold text-lg text-white mb-2">
+              Secure Payment
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              "All transactions are processed through a secure network. Your
+              credit card information is never stored, and we respect your
+              privacy."
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <Footer />
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          const url = new URL(window.location.href);
+          const email = url.searchParams.get("email");
+
+          if (email) {
+            localStorage.setItem("manetta_email", email);
+          }
+        } catch (err) {
+          console.warn(err);
+        }
+      });
+    </script>
+  </body>
 </html>

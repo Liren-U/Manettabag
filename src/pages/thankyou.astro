@@ -18,14 +18,19 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
 
     <script is:inline>
       /**
-       * 为 PageView 和 Purchase 分别生成独立的去重 ID
+       * 1. 生成独立的去重 ID
+       * 分别用于 PageView 和 Purchase 事件
        */
-      window.stape_pv_id =
-        "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      window.stape_purchase_id =
-        "pur_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      if (!window.stape_pv_id) {
+        window.stape_pv_id =
+          "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      }
+      if (!window.stape_purchase_id) {
+        window.stape_purchase_id =
+          "pur_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      }
     </script>
-    <!-- Meta Pixel Code -->
+
     <script is:inline>
       !(function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
@@ -41,31 +46,27 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
         n.queue = [];
         t = b.createElement(e);
         t.async = !0;
-        t.src = v;
+
+        // 【修改】：统一使用你的 CAPIG 域名，这才是连接服务端的关键
+        t.src = "https://capig.manettabag.com/events.js";
+
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
-      })(
-        window,
-        document,
-        "script",
-        "https://connect.facebook.net/en_US/fbevents.js"
-      );
+      })(window, document, "script");
 
       fbq("init", "2248339528989623");
-      // PageView 去重
       fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
     </script>
-    <noscript
-      ><img
+
+    <noscript>
+      <img
         height="1"
         width="1"
         style="display:none"
-        src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_pv_id}`}
-      /></noscript
-    >
-    <!-- End Meta Pixel Code -->
+        src="https://capig.manettabag.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+      />
+    </noscript>
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
     ></script>
     <script is:inline>
@@ -75,27 +76,20 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
       }
       gtag("js", new Date());
 
-      // 配置发送到 Stape 服务器
-      gtag("config", "G-6D5EX8ZZ35", {
-        transport_url: "https://ss.manettabag.com", // 替换为你的 Stape 自定义域名
-        event_id: window.stape_pv_id,
-        first_party_collection: true,
-      });
+      // 【修正】：删除了 transport_url 和 event_id，GA4 数据直接发给 Google
+      gtag("config", "G-6D5EX8ZZ35");
     </script>
-    <!-- End Google tag (gtag.js) -->
+
     <script is:inline>
       document.addEventListener("DOMContentLoaded", function () {
-        // 1. 获取 URL 中的 email 参数 (保留原逻辑)
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get("email");
 
-        // 2. 核心判断 (保留原逻辑)
         if (email) {
-          console.log("[Conversion] VIP Purchase condition met for:", email);
+          console.log("[CAPI] 确认 VIP 购买，用户:", email);
 
-          // --- 3. Meta Pixel 触发 (升级：加入 eventID 用于 Stape 去重) ---
           if (typeof fbq === "function") {
-            console.log("[Pixel] Sending Purchase event to Meta...");
+            // 发送 Purchase 事件到 CAPIG
             fbq(
               "track",
               "Purchase",
@@ -103,30 +97,14 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
                 content_name: "VIP Access Reservation",
                 currency: "USD",
                 value: 5.0,
-                em: email, // 传入 email 增加 CAPI 匹配率
+                em: email, // 传入 email 提高 CAPI 匹配率
               },
               { eventID: window.stape_purchase_id }
-            ); // 对应 Stape 配置中的 ID
-          } else {
-            console.warn("[Pixel] Error: fbq is not defined yet.");
+            );
           }
 
-          // --- 4. Stape 服务端转发 (新增：必须通过 gtag 告知服务器) ---
-          if (typeof gtag === "function") {
-            console.log("[Stape] Forwarding Purchase to Server-side CAPI...");
-            gtag("event", "purchase", {
-              event_id: window.stape_purchase_id,
-              transaction_id: window.stape_purchase_id, // 对应 FB 的 ID
-              value: 5.0,
-              currency: "USD",
-              user_email: email, // 传给 Stape，由其处理后发给 FB CAPI
-              items: [{ item_name: "VIP Access Reservation" }],
-            });
-          }
-        } else {
-          console.log(
-            "[Conversion] No email param found, skipping Purchase event."
-          );
+          // 【删除】：删除了 gtag("event", "purchase", ...)
+          // 因为你没有 sGTM，保留它会导致报错，且 CAPIG 不需要这个。
         }
       });
     </script>

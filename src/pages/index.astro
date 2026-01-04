@@ -1,8 +1,7 @@
 ---
 // src/pages/index.astro
-import Footer from '../components/Footer.astro';
-import '../styles/global.css';
-
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
 
 import ManettaBagHeader from "../components/ManettaBag-Header.astro";
 import ManettaBagHeroBanner from "../components/ManettaBag-Hero-Banner.astro";
@@ -14,72 +13,96 @@ import ManettaBagFeatureVideo from "../components/ManettaBag-Feature-Video.astro
 import ManettaBagSpecsIslands from "../components/ManettaBag-Specs-Islands.astro";
 import ManettaBagSpecsIslandsTablet from "../components/ManettaBag-Specs-Islands-tablet.astro";
 import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
-
 ---
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manetta Modular Bag</title>
 
     <link rel="canonical" href="https://manettabag.com/" />
     <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
     <!-- 引用编译好的 Tailwind + 全局样式 -->
     <link rel="stylesheet" href="/tailwind.css" />
-    <!-- Meta stape Code -->
     <script is:inline>
-        /**
-         * 生成唯一的 Event ID (用于浏览器与服务端去重)
-         * 必须在 Meta 和 Google 脚本运行前定义
-         */
-        window.stape_event_id = 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      /**
+       * 1. 生成独立的去重 ID
+       */
+      if (!window.stape_pv_id) {
+        window.stape_pv_id =
+          "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      }
+      if (!window.stape_reg_id) {
+        window.stape_reg_id =
+          "reg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      }
     </script>
-    <!-- End stape Code -->
 
-    <!-- Meta Pixel Code -->
     <script is:inline>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
+      /**
+       * 2. Meta Pixel (使用 CAPIG 域名)
+       */
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = "https://capig.manettabag.com/events.js";
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, "script");
 
-        fbq('init', '2248339528989623');
-
-        // 关键：发送 PageView 时带上 eventID 供 Facebook CAPI 去重
-        fbq('track', 'PageView', {}, { eventID: window.stape_event_id });
+      fbq("init", "2248339528989623");
+      fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
     </script>
-    <noscript>
-        <img height="1" width="1" style="display:none" 
-        src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_event_id}`} />
-    </noscript>
-    <!-- End Meta Pixel Code -->
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
     <script is:inline>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+      /**
+       * 3. 转化逻辑：捕获 Email 并发送 CompleteRegistration
+       */
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get("email");
 
-        /**
-         * transport_url: 填入你在 Stape 设置的自定义域名 (例如 ss.manettabag.com)
-         * event_id: 传递 ID 给 Stape 转发至 Facebook CAPI
-         */
-        gtag('config', 'G-6D5EX8ZZ35', {
-            'transport_url': 'https://ss.manettabag.com', 
-            'event_id': window.stape_event_id,
-            'first_party_collection': true
-        });
+        if (email && typeof fbq === "function") {
+          fbq(
+            "track",
+            "CompleteRegistration",
+            {
+              content_name: "Subscription",
+              currency: "USD",
+              value: 0.0,
+              em: email, // Meta 脚本会自动对 Email 进行加密
+            },
+            { eventID: window.stape_reg_id }
+          );
+        }
+      })();
     </script>
-    <!-- End Google tag (gtag.js) -->
-</head>
-<body>
 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
+    ></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-6D5EX8ZZ35");
+    </script>
+  </head>
+  <body>
     {/*<Header />*/}
 
     <div id="top"></div>
@@ -92,22 +115,20 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
     <ManettaBagMarqueeBanner />
 
     <main id="features" class="relative z-10 bg-dark-main pt-20">
-        <ManettaBagFeaturePackLikePro />
+      <ManettaBagFeaturePackLikePro />
 
-        <ManettaBagFeatureComfort />
+      <ManettaBagFeatureComfort />
 
-        <ManettaBagFeatureVideo />
+      <ManettaBagFeatureVideo />
 
-        <ManettaBagSpecsIslands />
+      <ManettaBagSpecsIslands />
 
-        <ManettaBagSpecsIslandsTablet />
+      <ManettaBagSpecsIslandsTablet />
 
-        <ManettaBagFAQ />
-        {/* 其他众筹模块将在这里添加，这些模块可能需要宽度限制 */}
-
+      <ManettaBagFAQ />
+      {/* 其他众筹模块将在这里添加，这些模块可能需要宽度限制 */}
     </main>
 
     <Footer />
-
-</body>
+  </body>
 </html>
