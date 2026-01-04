@@ -1,13 +1,13 @@
 ---
 // src/pages/thankyou.astro
-import Footer from '../components/Footer.astro';
-import '../styles/global.css';
-import ManettaBagHeaderOther from '../components/ManettaBag-Header-other.astro';
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+import ManettaBagHeaderOther from "../components/ManettaBag-Header-other.astro";
 
 const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -15,155 +15,279 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
     <title>{PAGE_TITLE}</title>
     <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
     <link rel="stylesheet" href="/tailwind.css" />
-    
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2248339528989623');
-    fbq('track', 'PageView');
+
+    <script is:inline>
+      /**
+       * 为 PageView 和 Purchase 分别生成独立的去重 ID
+       */
+      window.stape_pv_id =
+        "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      window.stape_purchase_id =
+        "pur_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
     </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-    /></noscript>
+    <!-- Meta Pixel Code -->
+    <script is:inline>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js"
+      );
+
+      fbq("init", "2248339528989623");
+      // PageView 去重
+      fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display:none"
+        src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_pv_id}`}
+      /></noscript
+    >
+    <!-- End Meta Pixel Code -->
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
+    ></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-        gtag('config', 'G-6D5EX8ZZ35');
+      // 配置发送到 Stape 服务器
+      gtag("config", "G-6D5EX8ZZ35", {
+        transport_url: "https://ss.manettabag.com", // 替换为你的 Stape 自定义域名
+        event_id: window.stape_pv_id,
+        first_party_collection: true,
+      });
     </script>
     <!-- End Google tag (gtag.js) -->
     <script is:inline>
-      // 使用 DOMContentLoaded 确保在页面加载完毕后再执行，避免 Pixel 未就绪的问题
-      document.addEventListener('DOMContentLoaded', function() {
-        // 1. 获取 URL 中的 email 参数
+      document.addEventListener("DOMContentLoaded", function () {
+        // 1. 获取 URL 中的 email 参数 (保留原逻辑)
         const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
+        const email = urlParams.get("email");
 
-        // 2. 核心判断：只有当 URL 里有 email 参数时，才认为是购买成功
+        // 2. 核心判断 (保留原逻辑)
         if (email) {
           console.log("[Conversion] VIP Purchase condition met for:", email);
 
-          // 3. 再次检查 fbq 是否就绪 (双重保险)
-          if (typeof fbq === 'function') {
-            console.log("[Pixel] Sending Purchase event...");
-            // 发送购买事件
-            fbq('track', 'Purchase', {
-              content_name: 'VIP Access Reservation', // 产品名称
-              currency: 'USD', // 货币单位
-              value: 5.00,     // 支付金额
-            });
+          // --- 3. Meta Pixel 触发 (升级：加入 eventID 用于 Stape 去重) ---
+          if (typeof fbq === "function") {
+            console.log("[Pixel] Sending Purchase event to Meta...");
+            fbq(
+              "track",
+              "Purchase",
+              {
+                content_name: "VIP Access Reservation",
+                currency: "USD",
+                value: 5.0,
+                em: email, // 传入 email 增加 CAPI 匹配率
+              },
+              { eventID: window.stape_purchase_id }
+            ); // 对应 Stape 配置中的 ID
           } else {
             console.warn("[Pixel] Error: fbq is not defined yet.");
           }
+
+          // --- 4. Stape 服务端转发 (新增：必须通过 gtag 告知服务器) ---
+          if (typeof gtag === "function") {
+            console.log("[Stape] Forwarding Purchase to Server-side CAPI...");
+            gtag("event", "purchase", {
+              event_id: window.stape_purchase_id,
+              transaction_id: window.stape_purchase_id, // 对应 FB 的 ID
+              value: 5.0,
+              currency: "USD",
+              user_email: email, // 传给 Stape，由其处理后发给 FB CAPI
+              items: [{ item_name: "VIP Access Reservation" }],
+            });
+          }
         } else {
-            // 如果没有 email 参数，说明可能不是支付跳转过来的，仅记录日志
-            console.log("[Conversion] No email param found, skipping Purchase event.");
+          console.log(
+            "[Conversion] No email param found, skipping Purchase event."
+          );
         }
       });
     </script>
-    </head>
-  
-  <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased selection:bg-[#D46A22] selection:text-white">
-    
+  </head>
+
+  <body
+    class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased selection:bg-[#D46A22] selection:text-white"
+  >
     <ManettaBagHeaderOther />
 
-    <main class="flex-1 w-full pt-32 pb-20 relative overflow-hidden flex items-center justify-center">
-
-      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D46A22]/10 blur-[120px] rounded-full pointer-events-none"></div>
-      <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none"></div>
-      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none"></div>
+    <main
+      class="flex-1 w-full pt-32 pb-20 relative overflow-hidden flex items-center justify-center"
+    >
+      <div
+        class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D46A22]/10 blur-[120px] rounded-full pointer-events-none"
+      >
+      </div>
+      <div
+        class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none"
+      >
+      </div>
+      <div
+        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none"
+      >
+      </div>
 
       <div class="w-full max-w-[1200px] mx-auto px-6 lg:px-12 relative z-10">
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          
+        <div
+          class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center"
+        >
           <div class="hidden lg:block relative group animate-float-slow">
-             <div class="absolute inset-0 bg-[#D46A22]/20 blur-[60px] rounded-full opacity-60"></div>
-             
-             <div class="relative rounded-3xl overflow-hidden border border-white/20 shadow-2xl bg-[#141414]">
-                <img
-                  src="/images/Manetta-thankyou.png" 
-                  alt="Manetta VIP"
-                  class="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700 hover:scale-105"
-                  loading="lazy"
-                />
-             </div>
+            <div
+              class="absolute inset-0 bg-[#D46A22]/20 blur-[60px] rounded-full opacity-60"
+            >
+            </div>
+
+            <div
+              class="relative rounded-3xl overflow-hidden border border-white/20 shadow-2xl bg-[#141414]"
+            >
+              <img
+                src="/images/Manetta-thankyou.png"
+                alt="Manetta VIP"
+                class="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700 hover:scale-105"
+                loading="lazy"
+              />
+            </div>
           </div>
 
           <div class="flex flex-col w-full">
-            
             <div class="mb-8 text-center lg:text-left">
-                <span class="text-[#D46A22] font-bold tracking-[0.2em] uppercase text-xs mb-3 block animate-pulse">
-                    Reservation Confirmed
-                </span>
-                <h1 class="font-display font-bold text-4xl lg:text-5xl text-white leading-tight">
-                  Congrats! <br />
-                  <span class="text-gray-400">You're a VIP.</span>
-                </h1>
+              <span
+                class="text-[#D46A22] font-bold tracking-[0.2em] uppercase text-xs mb-3 block animate-pulse"
+              >
+                Reservation Confirmed
+              </span>
+              <h1
+                class="font-display font-bold text-4xl lg:text-5xl text-white leading-tight"
+              >
+                Congrats! <br />
+                <span class="text-gray-400">You're a VIP.</span>
+              </h1>
             </div>
 
-            <section class="bg-[#171717] border border-white/10 rounded-2xl p-8 mb-8 shadow-2xl relative w-full overflow-hidden">
-              
-              <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D46A22] to-[#171717]"></div>
+            <section
+              class="bg-[#171717] border border-white/10 rounded-2xl p-8 mb-8 shadow-2xl relative w-full overflow-hidden"
+            >
+              <div
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D46A22] to-[#171717]"
+              >
+              </div>
 
-              <h2 class="font-display font-bold text-xl text-white mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-[#D46A22]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <h2
+                class="font-display font-bold text-xl text-white mb-4 flex items-center gap-2"
+              >
+                <svg
+                  class="w-5 h-5 text-[#D46A22]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path></svg
+                >
                 Reservation Details
               </h2>
-              
+
               <p class="text-gray-300 text-sm mb-6 leading-relaxed">
-                We've received your VIP deposit and saved your spot for the MANETTA modular camera bag launch.
+                We've received your VIP deposit and saved your spot for the
+                MANETTA modular camera bag launch.
               </p>
 
               <div class="space-y-4 border-t border-white/10 pt-6">
-                
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1"
+                >
                   <span class="text-gray-500 font-medium text-sm">Email:</span>
-                  <span id="vip-email" class="text-white font-bold text-lg break-all sm:text-right">(checking...)</span>
+                  <span
+                    id="vip-email"
+                    class="text-white font-bold text-lg break-all sm:text-right"
+                    >(checking...)</span
+                  >
                 </div>
-                
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1"
+                >
                   <span class="text-gray-500 font-medium text-sm">Name:</span>
-                  <span id="vip-name" class="text-white font-bold text-lg sm:text-right">(optional)</span>
+                  <span
+                    id="vip-name"
+                    class="text-white font-bold text-lg sm:text-right"
+                    >(optional)</span
+                  >
                 </div>
-                
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
-                  <span class="text-gray-500 font-medium text-sm">Deposit:</span>
-                  <span class="text-[#D46A22] font-bold text-lg sm:text-right">$5.00 USD</span>
+
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1"
+                >
+                  <span class="text-gray-500 font-medium text-sm">Deposit:</span
+                  >
+                  <span class="text-[#D46A22] font-bold text-lg sm:text-right"
+                    >$5.00 USD</span
+                  >
                 </div>
 
                 <div class="pt-2">
-                   <span class="inline-flex items-center bg-[#D46A22]/10 border border-[#D46A22]/30 text-[#D46A22] text-xs px-3 py-1 rounded font-bold uppercase tracking-wider">
-                     VIP Status Active
-                   </span>
+                  <span
+                    class="inline-flex items-center bg-[#D46A22]/10 border border-[#D46A22]/30 text-[#D46A22] text-xs px-3 py-1 rounded font-bold uppercase tracking-wider"
+                  >
+                    VIP Status Active
+                  </span>
                 </div>
               </div>
 
               <p class="text-xs text-gray-500 mt-6 italic">
-                * You'll receive VIP updates and an exclusive early-bird discount link in your inbox.
+                * You'll receive VIP updates and an exclusive early-bird
+                discount link in your inbox.
               </p>
             </section>
 
             <a
-              href="https://www.kickstarter.com" 
+              href="https://www.kickstarter.com"
               target="_blank"
               rel="noopener noreferrer"
               class="group relative w-full bg-[#D46A22] hover:bg-[#b5581b] text-white font-bold py-4 lg:py-5 rounded-xl text-center transition-all duration-300 shadow-[0_0_30px_-10px_rgba(212,106,34,0.5)] hover:shadow-[0_0_40px_-5px_rgba(212,106,34,0.7)] hover:-translate-y-1 flex items-center justify-center gap-2 text-sm lg:text-base tracking-wide"
             >
               <span>FOLLOW US ON KICKSTARTER NOW</span>
-              <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              <svg
+                class="w-4 h-4 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg
+              >
             </a>
-
           </div>
         </div>
       </div>
@@ -173,24 +297,24 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
 
     <script>
       // @ts-nocheck
-      document.addEventListener('DOMContentLoaded', function () {
-        var emailSpan = document.getElementById('vip-email');
-        var nameSpan = document.getElementById('vip-name');
+      document.addEventListener("DOMContentLoaded", function () {
+        var emailSpan = document.getElementById("vip-email");
+        var nameSpan = document.getElementById("vip-name");
 
         var params = new URLSearchParams(window.location.search);
-        var emailFromUrl = params.get('email');
-        var nameFromUrl = params.get('name');
+        var emailFromUrl = params.get("email");
+        var nameFromUrl = params.get("name");
 
         var finalEmail =
           (emailFromUrl && emailFromUrl.trim()) ||
-          (localStorage.getItem('manetta_email') || '').trim();
+          (localStorage.getItem("manetta_email") || "").trim();
 
         if (emailSpan) {
           if (finalEmail) {
             emailSpan.textContent = finalEmail;
-            emailSpan.classList.add('text-white'); // 确认后显示高亮白
+            emailSpan.classList.add("text-white"); // 确认后显示高亮白
           } else {
-            emailSpan.textContent = 'your email inbox';
+            emailSpan.textContent = "your email inbox";
           }
         }
 
@@ -198,7 +322,7 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
           if (nameFromUrl && nameFromUrl.trim()) {
             nameSpan.textContent = nameFromUrl.trim();
           } else {
-            nameSpan.textContent = '-';
+            nameSpan.textContent = "-";
           }
         }
       });

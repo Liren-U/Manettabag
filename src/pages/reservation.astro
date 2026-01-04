@@ -33,7 +33,15 @@ const BRAND_HEX = "#D46A22";
     }
   </style>
 
-  <script>
+  <script is:inline>
+    /**
+     * 为 PageView 和转化事件生成独立的去重 ID
+     */
+    window.stape_pv_id = 'pv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    window.stape_reg_id = 'reg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  </script>
+  <!-- Meta Pixel Code -->
+  <script is:inline>
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
   n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -42,52 +50,64 @@ const BRAND_HEX = "#D46A22";
   t.src=v;s=b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
+  
   fbq('init', '2248339528989623');
-  fbq('track', 'PageView');
+  // 使用 stape_pv_id 进行 PageView 去重
+  fbq('track', 'PageView', {}, { eventID: window.stape_pv_id });
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+  src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_pv_id}`}
   /></noscript>
+  <!-- End Meta Pixel Code -->
 
   <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+  <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-        gtag('config', 'G-6D5EX8ZZ35');
-    </script>
+      // 配置数据发往 Stape 服务器
+      gtag('config', 'G-6D5EX8ZZ35', {
+          'transport_url': 'https://ss.manettabag.com', // 替换为你的 Stape 域名
+          'event_id': window.stape_pv_id,
+          'first_party_collection': true
+      });
+  </script>
     <!-- End Google tag (gtag.js) -->
   <script is:inline>
-    (function() {
-      // 1. 获取 URL 中的 email 参数
-      const urlParams = new URLSearchParams(window.location.search);
-      const email = urlParams.get('email');
+  (function() {
+    // 1. 获取 URL 中的 email 参数 (保留你的原逻辑)
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email');
 
-      // 2. 如果 email 存在，说明是刚从首页订阅成功跳转过来的
-      if (email) {
-        console.log("[Conversion] Subscription successful for:", email);
+    // 2. 如果 email 存在，说明是刚从首页订阅成功跳转过来的
+    if (email) {
+      // 保留你原本的调试日志
+      console.log("[Conversion] Subscription successful for:", email);
 
-        // --- Facebook Pixel ---
-        // 检查 fbq 函数是否存在，防止报错
-        if (typeof fbq === 'function') {
-          // 使用 'CompleteRegistration' 事件记录订阅成功
-          fbq('track', 'CompleteRegistration', {
-            content_name: 'Hero Banner Subscription', // 标记来源
-            currency: 'USD',
-            value: 0.00 // 订阅本身没有直接价值，设为 0
-          });
-        }
-
-        // 你可以在这里添加其他平台的 Pixel 代码 (Google Ads, TikTok 等)
-        
-        // 可选：为了保持 URL 整洁，追踪完成后可以移除 URL 中的 email 参数
-        // const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        // window.history.replaceState({path: newUrl}, '', newUrl);
+      // --- Facebook Pixel (已升级适配 Stape) ---
+      if (typeof fbq === 'function') {
+        fbq('track', 'CompleteRegistration', {
+          content_name: 'Hero Banner Subscription',
+          currency: 'USD',
+          value: 0.00,
+          em: email // 【新增】提升匹配率
+        }, { eventID: window.stape_reg_id }); // 【新增】用于去重
       }
-    })();
-  </script>
+
+      // --- Stape / Google Tag 服务端转发 (【新增】核心点) ---
+      if (typeof gtag === 'function') {
+        gtag('event', 'complete_registration', {
+          'event_id': window.stape_reg_id,
+          'user_email': email
+        });
+      }
+      
+      // 你可以在这里添加其他平台的代码...
+    }
+  })();
+</script>
   </head>
 
 <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased overflow-x-hidden">

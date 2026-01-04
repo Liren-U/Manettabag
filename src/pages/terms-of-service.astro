@@ -15,32 +15,54 @@ const title = "Terms of Service - MANETTA";
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
     <link rel="stylesheet" href="/tailwind.css" />
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2248339528989623');
-    fbq('track', 'PageView');
+
+    <script is:inline>
+        /**
+         * 1. 生成唯一的 Event ID
+         * 所有的 Stape 服务端追踪都必须依靠这个 ID 来防止数据重复统计
+         */
+        window.stape_event_id = 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-    /></noscript>
+
+    <!-- Meta Pixel Code -->
+    <script is:inline>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+
+        fbq('init', '2248339528989623');
+        
+        // 关键点：在 PageView 中插入 eventID 供 Facebook CAPI 去重
+        fbq('track', 'PageView', {}, { eventID: window.stape_event_id });
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none" 
+        src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_event_id}`} />
+    </noscript>
     <!-- End Meta Pixel Code -->
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
-    <script>
+    <script is:inline>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', 'G-6D5EX8ZZ35');
+        /**
+         * 关键点说明：
+         * transport_url: 填入你的 Stape 自定义域名 (例如 https://ss.manettabag.com)
+         * event_id: 传递此 ID 供 Stape 转发给 Facebook CAPI
+         */
+        gtag('config', 'G-6D5EX8ZZ35', {
+            'transport_url': 'https://ss.manettabag.com', 
+            'event_id': window.stape_event_id,
+            'first_party_collection': true
+        });
     </script>
     <!-- End Google tag (gtag.js) -->
 </head>

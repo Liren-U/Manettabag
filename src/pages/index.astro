@@ -27,32 +27,54 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
     <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
     <!-- 引用编译好的 Tailwind + 全局样式 -->
     <link rel="stylesheet" href="/tailwind.css" />
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2248339528989623');
-    fbq('track', 'PageView');
+    <!-- Meta stape Code -->
+    <script is:inline>
+        /**
+         * 生成唯一的 Event ID (用于浏览器与服务端去重)
+         * 必须在 Meta 和 Google 脚本运行前定义
+         */
+        window.stape_event_id = 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     </script>
-    <noscript><img height="1" width="1" style="display:none"   
-    src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-    /></noscript>
+    <!-- End stape Code -->
+
+    <!-- Meta Pixel Code -->
+    <script is:inline>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+
+        fbq('init', '2248339528989623');
+
+        // 关键：发送 PageView 时带上 eventID 供 Facebook CAPI 去重
+        fbq('track', 'PageView', {}, { eventID: window.stape_event_id });
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none" 
+        src={`https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1&eid=${window.stape_event_id}`} />
+    </noscript>
     <!-- End Meta Pixel Code -->
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"></script>
-    <script>
+    <script is:inline>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', 'G-6D5EX8ZZ35');
+        /**
+         * transport_url: 填入你在 Stape 设置的自定义域名 (例如 ss.manettabag.com)
+         * event_id: 传递 ID 给 Stape 转发至 Facebook CAPI
+         */
+        gtag('config', 'G-6D5EX8ZZ35', {
+            'transport_url': 'https://ss.manettabag.com', 
+            'event_id': window.stape_event_id,
+            'first_party_collection': true
+        });
     </script>
     <!-- End Google tag (gtag.js) -->
 </head>
