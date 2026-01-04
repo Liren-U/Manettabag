@@ -27,9 +27,7 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
     <!-- 引用编译好的 Tailwind + 全局样式 -->
     <link rel="stylesheet" href="/tailwind.css" />
     <script is:inline>
-      /**
-       * 1. 生成独立的去重 ID
-       */
+      // 1. 立即生成 ID，确保全局可用
       if (!window.stape_pv_id) {
         window.stape_pv_id =
           "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
@@ -41,9 +39,7 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
     </script>
 
     <script is:inline>
-      /**
-       * 2. Meta Pixel (使用 CAPIG 域名)
-       */
+      // 2. Meta Pixel & CAPIG 核心逻辑
       !(function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
         n = f.fbq = function () {
@@ -58,6 +54,7 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
         n.queue = [];
         t = b.createElement(e);
         t.async = !0;
+        // 必须确保这个链接在浏览器能直接打开
         t.src = "https://capig.manettabag.com/events.js";
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
@@ -65,17 +62,14 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
 
       fbq("init", "2248339528989623");
       fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
-    </script>
 
-    <script is:inline>
-      /**
-       * 3. 转化逻辑：捕获 Email 并发送 CompleteRegistration
-       */
-      (function () {
+      // 3. 首页转化逻辑（封装在函数中，确保在 DOM 加载后运行）
+      window.addEventListener("load", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const email = urlParams.get("email");
 
         if (email && typeof fbq === "function") {
+          console.log("[CAPI] 检测到 Email 参数，发送 CompleteRegistration");
           fbq(
             "track",
             "CompleteRegistration",
@@ -83,12 +77,12 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
               content_name: "Subscription",
               currency: "USD",
               value: 0.0,
-              em: email, // Meta 脚本会自动对 Email 进行加密
+              em: email,
             },
             { eventID: window.stape_reg_id }
           );
         }
-      })();
+      });
     </script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
