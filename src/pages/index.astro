@@ -27,19 +27,20 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
     <!-- 引用编译好的 Tailwind + 全局样式 -->
     <link rel="stylesheet" href="/tailwind.css" />
     <script is:inline>
-      // 1. 立即生成 ID，确保全局可用
-      if (!window.stape_pv_id) {
-        window.stape_pv_id =
-          "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      }
-      if (!window.stape_reg_id) {
-        window.stape_reg_id =
-          "reg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      /**
+       * 1. 生成唯一的 Event ID (去重核心)
+       * 必须在 Meta 脚本运行前定义
+       */
+      if (!window.stape_event_id) {
+        window.stape_event_id =
+          "id_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
       }
     </script>
 
     <script is:inline>
-      // 2. Meta Pixel & CAPIG 核心逻辑
+      /**
+       * 2. Meta Pixel & CAPIG 适配版
+       */
       !(function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
         n = f.fbq = function () {
@@ -54,36 +55,28 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
         n.queue = [];
         t = b.createElement(e);
         t.async = !0;
-        // 必须确保这个链接在浏览器能直接打开
+
+        // 【关键修改】：将脚本源指向你的 Stape CAPIG 域名
         t.src = "https://capig.manettabag.com/events.js";
+
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
       })(window, document, "script");
 
       fbq("init", "2248339528989623");
-      fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
 
-      // 3. 首页转化逻辑（封装在函数中，确保在 DOM 加载后运行）
-      window.addEventListener("load", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get("email");
-
-        if (email && typeof fbq === "function") {
-          console.log("[CAPI] 检测到 Email 参数，发送 CompleteRegistration");
-          fbq(
-            "track",
-            "CompleteRegistration",
-            {
-              content_name: "Subscription",
-              currency: "USD",
-              value: 0.0,
-              em: email,
-            },
-            { eventID: window.stape_reg_id }
-          );
-        }
-      });
+      // 【关键修改】：发送 PageView 时带上 eventID 参数
+      fbq("track", "PageView", {}, { eventID: window.stape_event_id });
     </script>
+
+    <noscript>
+      <img
+        height="1"
+        width="1"
+        style="display:none"
+        src="https://capig.manettabag.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+      />
+    </noscript>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
     ></script>
