@@ -16,56 +16,61 @@ const PAGE_TITLE = "Thank You - You're a VIP | Manetta";
     <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
     <link rel="stylesheet" href="/tailwind.css" />
 
-    <script is:inline>
-      /**
-       * 1. 生成独立的去重 ID
-       * 分别用于 PageView 和 Purchase 事件
-       */
-      if (!window.stape_pv_id) {
-        window.stape_pv_id =
-          "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      }
-      if (!window.stape_purchase_id) {
-        window.stape_purchase_id =
-          "pur_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      }
-    </script>
+    <!-- Meta Pixel Code -->
+<script>
+  !(function (f, b, e, v, n, t, s) {
+    if (f.fbq) return;
+    n = f.fbq = function () {
+      n.callMethod
+        ? n.callMethod.apply(n, arguments)
+        : n.queue.push(arguments);
+    };
+    if (!f._fbq) f._fbq = n;
+    n.push = n;
+    n.loaded = !0;
+    n.version = "2.0";
+    n.queue = [];
+    t = b.createElement(e);
+    t.async = !0;
+    t.src = v;
+    s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s);
+  })(
+    window,
+    document,
+    "script",
+    "https://connect.facebook.net/en_US/fbevents.js"
+  );
 
-    <script is:inline>
-      !(function (f, b, e, v, n, t, s) {
-        if (f.fbq) return;
-        n = f.fbq = function () {
-          n.callMethod
-            ? n.callMethod.apply(n, arguments)
-            : n.queue.push(arguments);
-        };
-        if (!f._fbq) f._fbq = n;
-        n.push = n;
-        n.loaded = !0;
-        n.version = "2.0";
-        n.queue = [];
-        t = b.createElement(e);
-        t.async = !0;
+  fbq("init", "2248339528989623");
 
-        // 【修改】：统一使用你的 CAPIG 域名，这才是连接服务端的关键
-        t.src = "https://capig.manettabag.com/events.js";
+  // 页面浏览
+  fbq("track", "PageView");
 
-        s = b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t, s);
-      })(window, document, "script");
+  // ===============================
+  // 支付成功（Purchase）
+  // 固定金额：1 USD
+  // 防止刷新重复统计
+  // ===============================
+  if (!sessionStorage.getItem("meta_purchase_fired")) {
+    fbq("track", "Purchase", {
+      value: 1.0,
+      currency: "USD"
+    });
+    sessionStorage.setItem("meta_purchase_fired", "1");
+  }
+</script>
 
-      fbq("init", "2248339528989623");
-      fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
-    </script>
+<noscript>
+  <img
+    height="1"
+    width="1"
+    style="display:none"
+    src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+  />
+</noscript>
+<!-- End Meta Pixel Code -->
 
-    <noscript>
-      <img
-        height="1"
-        width="1"
-        style="display:none"
-        src="https://capig.manettabag.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-      />
-    </noscript>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
     ></script>

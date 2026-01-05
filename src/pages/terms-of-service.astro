@@ -16,18 +16,8 @@ const title = "Terms of Service - MANETTA";
     <link rel="icon" type="image/svg+xml" href="/manettabag-web-icon.svg" />
     <link rel="stylesheet" href="/tailwind.css" />
 
-    <script is:inline>
-      /**
-       * 1. 生成唯一的 Event ID
-       * 仅供 Meta Pixel (浏览器) 和 Facebook CAPIG (服务器) 之间去重使用
-       */
-      if (!window.stape_event_id) {
-        window.stape_event_id =
-          "id_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      }
-    </script>
-
-    <script is:inline>
+    <!-- Meta Pixel Code -->
+    <script>
       !(function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
         n = f.fbq = function () {
@@ -42,31 +32,27 @@ const title = "Terms of Service - MANETTA";
         n.queue = [];
         t = b.createElement(e);
         t.async = !0;
-
-        /**
-         * 【核心修改】：使用你的 CAPIG 自定义域名加载脚本
-         * 这样所有的 Pixel 请求都会直接经过你的 Stape CAPIG 路由
-         */
-        t.src = "https://capig.manettabag.com/events.js";
-
+        t.src = v;
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
-      })(window, document, "script");
-
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js"
+      );
       fbq("init", "2248339528989623");
-
-      // 发送 PageView 时带上 eventID 用于去重
-      fbq("track", "PageView", {}, { eventID: window.stape_event_id });
+      fbq("track", "PageView");
     </script>
-
-    <noscript>
-      <img
+    <noscript
+      ><img
         height="1"
         width="1"
         style="display:none"
-        src="https://capig.manettabag.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-      />
-    </noscript>
+        src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+      /></noscript
+    >
+    <!-- End Meta Pixel Code -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
     ></script>
     <script is:inline>

@@ -33,25 +33,8 @@ const BRAND_HEX = "#D46A22";
       }
     </style>
 
-    <script is:inline>
-      /**
-       * 1. 生成独立的去重 ID
-       * 分别用于 PageView 和 CompleteRegistration 事件
-       */
-      if (!window.stape_pv_id) {
-        window.stape_pv_id =
-          "pv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      }
-      if (!window.stape_reg_id) {
-        window.stape_reg_id =
-          "reg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-      }
-    </script>
-
-    <script is:inline>
-      /**
-       * 2. Meta Pixel & CAPIG 核心逻辑
-       */
+    <!-- Meta Pixel Code -->
+    <script>
       !(function (f, b, e, v, n, t, s) {
         if (f.fbq) return;
         n = f.fbq = function () {
@@ -66,25 +49,27 @@ const BRAND_HEX = "#D46A22";
         n.queue = [];
         t = b.createElement(e);
         t.async = !0;
-        // 使用你的自定义 CAPIG 域名
-        t.src = "https://capig.manettabag.com/events.js";
+        t.src = v;
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
-      })(window, document, "script");
-
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js"
+      );
       fbq("init", "2248339528989623");
-      // PageView 带上 Event ID 用于去重
-      fbq("track", "PageView", {}, { eventID: window.stape_pv_id });
+      fbq("track", "PageView");
     </script>
-
-    <noscript>
-      <img
+    <noscript
+      ><img
         height="1"
         width="1"
         style="display:none"
-        src="https://capig.manettabag.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-      />
-    </noscript>
+        src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
+      /></noscript
+    >
+    <!-- End Meta Pixel Code -->
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6D5EX8ZZ35"
     ></script>

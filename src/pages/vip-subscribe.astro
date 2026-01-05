@@ -39,47 +39,57 @@ const BRAND_HEX = "#D46A22";
 
         gtag('config', 'G-6D5EX8ZZ35');
     </script>
-    <script>
-    // --- Meta Pixel Init ---
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '2248339528989623');
+    <!-- Meta Pixel Code -->
+<script>
+  !(function (f, b, e, v, n, t, s) {
+    if (f.fbq) return;
+    n = f.fbq = function () {
+      n.callMethod
+        ? n.callMethod.apply(n, arguments)
+        : n.queue.push(arguments);
+    };
+    if (!f._fbq) f._fbq = n;
+    n.push = n;
+    n.loaded = !0;
+    n.version = "2.0";
+    n.queue = [];
+    t = b.createElement(e);
+    t.async = !0;
+    t.src = v;
+    s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s);
+  })(
+    window,
+    document,
+    "script",
+    "https://connect.facebook.net/en_US/fbevents.js"
+  );
 
-    // --- Page Load Events ---
+  fbq("init", "2248339528989623");
 
-    // 1. Meta Pixel: InitiateCheckout (保持不变)
-    fbq('track', 'InitiateCheckout', {
-        content_name: 'VIP Access Reservation', 
-        currency: 'USD', 
-        value: 1.00 
-    });
+  // 页面浏览
+  fbq("track", "PageView");
 
-    // 2. ✅ 新增 GA4 Event: begin_checkout (对应 FB 的 InitiateCheckout)
-    // 确保 gtag 已定义
-    if (typeof gtag === 'function') {
-        gtag('event', 'begin_checkout', {
-          currency: 'USD',
-          value: 1.00,
-          items: [
-            {
-              item_id: 'vip-access-reservation', // 定义一个固定的商品ID
-              item_name: 'VIP Access Reservation',
-              price: 1.00,
-              quantity: 1
-            }
-          ]
-        });
-    }
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
+  // ===============================
+  // 发起结账（InitiateCheckout）
+  // 只触发一次，防止刷新重复统计
+  // ===============================
+  if (!sessionStorage.getItem("meta_initiate_checkout_fired")) {
+    fbq("track", "InitiateCheckout");
+    sessionStorage.setItem("meta_initiate_checkout_fired", "1");
+  }
+</script>
+
+<noscript>
+  <img
+    height="1"
+    width="1"
+    style="display:none"
     src="https://www.facebook.com/tr?id=2248339528989623&ev=PageView&noscript=1"
-    /></noscript>
+  />
+</noscript>
+<!-- End Meta Pixel Code -->
+
     </head>
 
 <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased">
