@@ -249,6 +249,16 @@
     }
     .action-group > :last-child svg { margin-bottom: 0; }
   }
+
+  /* --- 红色成功提示文本 --- */
+  .popup-success-text {
+    color: #dc2626; /* 鲜明的红色 */
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 5px; /* 与下方标题保持一点距离 */
+    text-transform: uppercase; /* 可选：大写看起来更像提示 */
+    letter-spacing: 0.02em;
+  }
 </style>
 
 <section
@@ -335,6 +345,8 @@
       </div>
 
       <div class="popup-right">
+        <p class="popup-success-text">Congratulations you have subscribed.</p>
+        
         <h2>Share & Get a Free Lens Protector</h2>
         <p class="reward-intro">
             A versatile wrap to store and protect any device.
