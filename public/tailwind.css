@@ -831,6 +831,10 @@ video {
   margin-top: 2rem;
 }
 
+.mr-3{
+  margin-right: 0.75rem;
+}
+
 .block{
   display: block;
 }
@@ -1341,6 +1345,12 @@ video {
 
 .scroll-smooth{
   scroll-behavior: smooth;
+}
+
+.truncate{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .whitespace-nowrap{
@@ -2720,6 +2730,10 @@ a {
   border-color: rgb(212 106 34 / 0.3);
 }
 
+.hover\:border-brand\/50:hover{
+  border-color: rgb(212 106 34 / 0.5);
+}
+
 .hover\:bg-\[\#1A1A1A\]:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(26 26 26 / var(--tw-bg-opacity, 1));
@@ -2737,6 +2751,10 @@ a {
 
 .hover\:bg-brand\/90:hover{
   background-color: rgb(212 106 34 / 0.9);
+}
+
+.hover\:bg-white\/10:hover{
+  background-color: rgb(255 255 255 / 0.1);
 }
 
 .hover\:text-brand:hover{
@@ -2894,6 +2912,10 @@ a {
   background-color: rgb(212 106 34 / 0.1);
 }
 
+.group:hover .group-hover\:bg-brand\/90{
+  background-color: rgb(212 106 34 / 0.9);
+}
+
 .group\/card:hover .group-hover\/card\:text-\[var\(--brandColor\)\]{
   color: var(--brandColor);
 }
@@ -2992,6 +3014,11 @@ a {
   .sm\:text-xl{
     font-size: 1.25rem;
     line-height: 1.75rem;
+  }
+
+  .sm\:text-base{
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 }
 
