@@ -2,7 +2,7 @@
 /**
  * ManettaBag-Hero-Banner.astro
  * Hero banner 模块
- * ✅ 功能更新：点击按钮 -> 弹出订阅框 -> 提交成功 -> 弹出分享框
+ * ✅ 逻辑更新：Hero仅保留按钮 -> 点击出黑色磨砂弹窗(填邮箱) -> 提交成功出白色分享弹窗
  */
 ---
 
@@ -25,7 +25,7 @@
     border-width: 0;
   }
 
-  /* --- 弹窗核心样式 (通用) --- */
+  /* --- 弹窗核心样式 --- */
   .popup-overlay {
     display: none;
     position: fixed;
@@ -36,6 +36,7 @@
     animation: popupFadeIn 0.4s ease;
   }
 
+  /* 通用弹窗容器 (主要用于第二个白色弹窗) */
   .popup-container {
     position: absolute;
     top: 50%; left: 50%;
@@ -50,7 +51,25 @@
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
   }
 
-  /* 左侧图片区 */
+  /* * ✅ 特殊处理：第一个弹窗 (订阅弹窗)
+   * 我们需要它看起来像原本的黑色磨砂卡片，所以要去掉默认的白色背景和阴影
+   */
+  #subscribePopup .popup-container {
+    background: transparent; /* 透明背景，让内部的卡片样式生效 */
+    box-shadow: none;        /* 去掉默认阴影，使用卡片自带阴影 */
+    max-width: 600px;        /* 稍微窄一点，聚焦内容 */
+    overflow: visible;       /* 允许光晕溢出 */
+  }
+  
+  /* 隐藏订阅弹窗的关闭按钮默认样式，我们需要自定义或者放在卡片内 */
+  #subscribePopup .close-x {
+    color: rgba(255,255,255,0.5);
+    top: -40px; /* 移到卡片上方，或者放在卡片角落 */
+    right: 0;
+  }
+  #subscribePopup .close-x:hover { color: #fff; }
+
+  /* 左侧图片区 (第二个弹窗用) */
   .popup-left {
     flex: 1;
     background: #2a2a2a;
@@ -77,7 +96,7 @@
     z-index: 2;
   }
 
-  /* 右侧内容区 */
+  /* 右侧内容区 (第二个弹窗用) */
   .popup-right {
     flex: 1.3;
     padding: 40px 50px;
@@ -95,20 +114,20 @@
     text-transform: uppercase;
     color: #1a1a1a;
     font-weight: bold;
-    line-height: 1.2;
+    line-height: 1.2; 
   }
 
-  /* --- 红色成功提示文本 --- */
+  /* --- ✅ 修改：红色成功提示文本 --- */
   .popup-success-text {
     font-family: 'Optima', 'Palatino', serif;
-    color: #dc2626;
+    color: #dc2626; /* 鲜明的红色 */
     font-size: 26px;
     font-weight: bold;
-    margin-top: 0;      
+    margin-top: 0;       
     margin-bottom: 10px; 
     text-transform: uppercase; 
     letter-spacing: 0.02em;
-    line-height: 1.2;
+    line-height: 1.2;    
   }
 
   .reward-intro {
@@ -119,7 +138,6 @@
     font-weight: 500;
   }
 
-  /* --- 步骤列表 --- */
   .step-list {
     margin: 0 0 25px 0;
     padding: 0;
@@ -149,10 +167,10 @@
     flex-shrink: 0;
   }
 
-  /* --- 按钮组 (Share Popup) --- */
+  /* --- 按钮组 (桌面默认) --- */
   .action-group {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr); /* 电脑端：一行5个均匀分布 */
     gap: 10px;
     margin-bottom: 15px;
   }
@@ -183,18 +201,28 @@
   }
 
   .btn-share svg {
-    width: 20px; height: 20px; margin-bottom: 6px; fill: currentColor;
+    width: 20px;
+    height: 20px;
+    margin-bottom: 6px;
+    fill: currentColor;
   }
   
+  /* 防止文字换行 */
   .btn-share span {
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
   }
 
   .popup-footer {
-    font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 15px; margin-top: 5px;
+    font-size: 11px; 
+    color: #999; 
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 5px;
   }
 
-  /* 关闭按钮 */
   .close-x {
     position: absolute;
     right: 15px; top: 10px;
@@ -204,7 +232,7 @@
     border: none; background: none;
     z-index: 10;
     line-height: 1;
-    padding: 10px;
+    padding: 10px; /* 增加点击区域 */
   }
   .close-x:hover { color: #1a1a1a; }
 
@@ -213,60 +241,28 @@
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* --- ✅ 新增：订阅弹窗内部样式 --- */
-  .subscribe-form-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-  }
-  
-  .subscribe-input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-    outline: none;
-    transition: 0.3s;
-    background: #f9f9f9;
-  }
-  .subscribe-input:focus {
-    border-color: #c6a35d;
-    background: #fff;
-  }
-
-  .subscribe-btn {
-    width: 100%;
-    padding: 14px;
-    background: #1a1a1a;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: 0.3s;
-  }
-  .subscribe-btn:hover {
-    background: #c6a35d;
-  }
-
   /* ========================================= */
-  /* ✅ 手机端深度适配 */
+  /* ✅ 手机端深度适配 (Mobile Optimization) */
   /* ========================================= */
   @media (max-width: 768px) {
+    /* 通用容器适配 */
     .popup-container { 
         flex-direction: column; 
         width: 90%; 
-        max-height: 90vh; 
-        overflow: hidden; 
+        max-height: 90vh; /* 防止超过屏幕高度 */
+        overflow: hidden; /* 容器本身不滚动 */
+    }
+    
+    /* 订阅弹窗特殊适配 */
+    #subscribePopup .popup-container {
+        max-height: none;
+        overflow: visible;
     }
 
     /* 手机端隐藏左侧大图 */
-    .popup-left { display: none; }
+    .popup-left { 
+        display: none; 
+    }
 
     /* 右侧内容区增加滚动 */
     .popup-right { 
@@ -278,11 +274,13 @@
     .popup-right h2 { font-size: 22px; }
     .step-item { font-size: 12px; }
 
+    /* ✅ 按钮组改为 2列布局 */
     .action-group { 
         grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
     
+    /* ✅ Copy Link 按钮横跨两列 */
     .action-group > :last-child {
         grid-column: span 2; 
         background-color: #f3f3f3;
@@ -331,14 +329,13 @@
 
           <div class="flex flex-col sm:flex-row gap-3 relative">
             <button
-              id="hero-trigger-btn"
+              id="open-subscribe-popup" 
               type="button"
-              class="w-full bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center whitespace-nowrap text-lg"
+              class="w-full bg-brand hover:bg-brand/90 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center whitespace-nowrap shrink-0 text-lg"
             >
-              Reserve now
+              Reserve Now
             </button>
           </div>
-
           <br>
           <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">
             We'll notify you the moment we go live.
@@ -361,39 +358,42 @@
 
   <div id="subscribePopup" class="popup-overlay">
     <div class="popup-container">
-      <button id="subscribeCloseBtn" class="close-x">&times;</button>
+      <button id="subPopupCloseBtn" class="close-x">&times;</button>
       
-      <div class="popup-left">
-         <div class="popup-badge">Early Bird</div>
-         <img src="/images/Manettabag-pop-desktop.png" alt="Manetta Bag">
-      </div>
+      <div class="w-full p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
+        <div class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"></div>
 
-      <div class="popup-right">
-        <h2>Join the Revolution</h2>
-        <p class="reward-intro">
-            Sign up now to secure your <strong>34% Super Early Bird Discount</strong> when we launch on Kickstarter.
-        </p>
-        
-        <form id="popup-subscribe-form" class="subscribe-form-stack">
+          <div class="mb-8 relative">
+            <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">Super Early Bird Access</div>
+            <div class="text-4xl font-display font-bold text-white">Get 34% OFF</div>
+          </div>
+
+          <form id="hero-form" class="flex flex-col gap-3 relative">
             <input
-              id="popup-email"
+              id="hero-email"
               type="email"
               inputmode="email"
               autocomplete="email"
-              placeholder="Enter your email address"
-              class="subscribe-input"
+              placeholder="Your email address"
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-light-muted/50 focus:outline-none focus:border-brand/50 focus:bg-white/10 transition-all min-w-0"
               required
             />
-            <button type="submit" class="subscribe-btn">
-                Unlock My Discount
+            <button
+              id="hero-submit-btn"
+              type="submit"
+              class="w-full bg-brand hover:bg-brand/90 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center whitespace-nowrap shrink-0"
+            >
+              Subscribe Now
             </button>
-        </form>
-
-        <div class="popup-footer">
-            No spam. Unsubscribe anytime.
+          </form>
+          <br>
+          <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">
+            We'll notify you the moment we go live.
+          </div>
         </div>
       </div>
-    </div>
+      </div>
   </div>
 
   <div id="sharePopup" class="popup-overlay">
@@ -406,14 +406,14 @@
       </div>
 
       <div class="popup-right">
-        <p class="popup-success-text">Congratulations!</p>
+        <p class="popup-success-text">Congratulations you have subscribed.</p>
 
         <h2>Share & Get a Free Lens Protector</h2>
         <p class="reward-intro">
-            You've secured your discount. Now, want a free gift?
+            A versatile wrap to store and protect any device.
         </p>
 
-        <p style="font-size:13px; font-weight:bold; margin-bottom:10px;">
+        <p>
           How to unlock your gift:
         </p>
         
@@ -428,7 +428,8 @@
             </li>
             <li class="step-item">
                 <div class="step-num">3</div>
-                <div>We'll add a free lens protection Velcro cloth to your order.</div>
+                <div>We'll add a free lens protection Velcro cloth to your order — on us.
+                  It only takes a moment, and it helps us reach more creators like you.</div>
             </li>
         </ul>
 
@@ -470,128 +471,55 @@
 
 <script is:inline>
   (function () {
-    // 元素获取
-    const heroTriggerBtn = document.querySelector("#hero-trigger-btn");
+    // --- 元素获取 ---
+    // Hero 区域的按钮
+    const openSubPopupBtn = document.querySelector("#open-subscribe-popup");
     
-    // 订阅弹窗相关
-    const subscribePopup = document.querySelector("#subscribePopup");
-    const subscribeCloseBtn = document.querySelector("#subscribeCloseBtn");
-    const subscribeForm = document.querySelector("#popup-subscribe-form");
-    const subscribeInput = document.querySelector("#popup-email");
-
-    // 分享弹窗相关
+    // 弹窗1：订阅弹窗
+    const subPopup = document.querySelector("#subscribePopup");
+    const subPopupCloseBtn = document.querySelector("#subPopupCloseBtn");
+    const form = document.querySelector("#hero-form"); // 这里的 ID 还是保留了原本 form 的 ID
+    
+    // 弹窗2：分享弹窗
     const sharePopup = document.querySelector("#sharePopup");
-    const shareCloseBtn = document.querySelector("#popupCloseBtn");
+    const sharePopupCloseBtn = document.querySelector("#popupCloseBtn");
     const copyBtn = document.querySelector("#btn-copy-link");
     
     let submittedEmail = "";
 
-    /* ===========================
-       1. 弹窗控制逻辑
-       =========================== */
-    
-    // 打开订阅弹窗
-    if (heroTriggerBtn && subscribePopup) {
-        heroTriggerBtn.addEventListener("click", () => {
-            subscribePopup.style.display = "block";
-            // 自动聚焦输入框，体验更好
-            if(subscribeInput) setTimeout(() => subscribeInput.focus(), 100);
+    // --- 逻辑1：点击 Hero 按钮打开订阅弹窗 ---
+    if (openSubPopupBtn && subPopup) {
+        openSubPopupBtn.addEventListener("click", () => {
+            subPopup.style.display = "block";
         });
     }
 
-    // 关闭订阅弹窗
-    if (subscribeCloseBtn) {
-        subscribeCloseBtn.addEventListener("click", () => {
-            subscribePopup.style.display = "none";
+    // --- 逻辑2：关闭订阅弹窗 ---
+    if (subPopupCloseBtn) {
+        subPopupCloseBtn.addEventListener("click", () => {
+            subPopup.style.display = "none";
+        });
+    }
+    // 点击背景关闭
+    if (subPopup) {
+        subPopup.addEventListener("click", (e) => {
+            if (e.target === subPopup) subPopup.style.display = "none";
         });
     }
 
-    // 点击订阅弹窗背景关闭
-    if (subscribePopup) {
-        subscribePopup.addEventListener("click", (e) => {
-            if (e.target === subscribePopup) subscribePopup.style.display = "none";
-        });
-    }
-
-    // 分享弹窗关闭逻辑 -> 跳转到下一页
+    // --- 逻辑3：跳转逻辑 (用于分享弹窗关闭后) ---
     const proceedToNextPage = () => {
         window.location.href = "/reservation?email=" + encodeURIComponent(submittedEmail);
     };
 
-    if (shareCloseBtn) shareCloseBtn.addEventListener("click", proceedToNextPage);
+    if (sharePopupCloseBtn) sharePopupCloseBtn.addEventListener("click", proceedToNextPage);
     if (sharePopup) {
         sharePopup.addEventListener("click", (e) => {
             if (e.target === sharePopup) proceedToNextPage();
         });
     }
 
-    /* ===========================
-       2. 表单提交逻辑 (核心修改)
-       =========================== */
-    if (subscribeForm) {
-        subscribeForm.addEventListener("submit", async (event) => {
-          event.preventDefault();
-
-          const email = (subscribeInput?.value || "").trim();
-          const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          
-          if (!emailPattern.test(email)) {
-            alert("Please enter a valid email address.");
-            subscribeInput && subscribeInput.focus();
-            return;
-          }
-
-          try {
-            localStorage.setItem("manetta_email", email);
-          } catch (e) {}
-
-          // 按钮加载状态 (可选)
-          const submitBtn = subscribeForm.querySelector("button[type='submit']");
-          const originalBtnText = submitBtn.innerText;
-          submitBtn.innerText = "Processing...";
-          submitBtn.disabled = true;
-
-          try {
-            const res = await fetch("/api/klaviyo-subscribe", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email }),
-            });
-
-            const data = await res.json().catch(() => ({}));
-
-            if (!res.ok || !data.success) {
-              alert(data.error || "Subscription failed, please try again.");
-              submitBtn.innerText = originalBtnText;
-              submitBtn.disabled = false;
-              return;
-            }
-
-            if (typeof fbq === 'function') {
-              fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
-            }
-            
-            submittedEmail = email;
-
-            // ✅ 核心逻辑变动：
-            // 1. 关闭订阅弹窗
-            subscribePopup.style.display = "none";
-            // 2. 打开分享弹窗
-            if (sharePopup) sharePopup.style.display = "block";
-            else proceedToNextPage(); // 如果没有分享弹窗，直接跳转
-
-          } catch (err) {
-            console.error(err);
-            alert("Network error, please try again.");
-            submitBtn.innerText = originalBtnText;
-            submitBtn.disabled = false;
-          }
-        });
-    }
-
-    /* ===========================
-       3. Copy Link 逻辑 (保持不变)
-       =========================== */
+    // --- 逻辑4：Copy Link ---
     if (copyBtn) {
         copyBtn.addEventListener("click", () => {
             const currentUrl = window.location.href;
@@ -617,5 +545,58 @@
         });
     }
 
+    // --- 逻辑5：表单提交 (核心流程) ---
+    if (!form) return;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const input = form.querySelector("#hero-email");
+      const email = (input?.value || "").trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        input && input.focus();
+        return;
+      }
+
+      try {
+        localStorage.setItem("manetta_email", email);
+      } catch (e) {}
+
+      try {
+        const res = await fetch("/api/klaviyo-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+          alert(data.error || "Subscription failed, please try again.");
+          return;
+        }
+
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
+        }
+        
+        submittedEmail = email;
+        
+        // 关键步骤：关闭订阅弹窗，打开分享弹窗
+        if (subPopup) subPopup.style.display = "none";
+        
+        if (sharePopup) {
+            sharePopup.style.display = "block";
+        } else {
+            proceedToNextPage();
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("Network error, please try again.");
+      }
+    });
   })();
 </script>
