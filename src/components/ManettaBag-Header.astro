@@ -5,6 +5,7 @@
   1. JS: 使用 requestAnimationFrame 优化滚动监听，防止掉帧。
   2. JS: 启用 { passive: true } 提升移动端滚动性能。
   3. CSS: 将 transition-all 改为具体属性，减少浏览器重绘负担。
+  4. ✅ 新增功能：点击 Reserve Now 按钮触发 Hero 区域定义的弹窗
 */
 ---
 
@@ -24,9 +25,10 @@
     </a>
 
     <div class="flex items-center gap-6">
-      <a
-        href="#top"
-        class="relative overflow-hidden bg-brand text-white px-8 py-3 rounded-full text-sm font-bold shadow-glow hover:shadow-brand/60 transition-all duration-300 hover:-translate-y-0.5 group"
+      <button
+        id="header-reserve-btn"
+        type="button"
+        class="relative overflow-hidden bg-brand text-white px-8 py-3 rounded-full text-sm font-bold shadow-glow hover:shadow-brand/60 transition-all duration-300 hover:-translate-y-0.5 group cursor-pointer"
       >
         <span class="relative z-10 flex items-center gap-2">
           Reserve Now
@@ -48,17 +50,19 @@
         <div
           class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
         ></div>
-      </a>
+      </button>
     </div>
   </div>
 </header>
 
 <script is:inline>
+  // 1. 获取元素
   const navbar = document.getElementById("navbar");
+  const headerBtn = document.getElementById("header-reserve-btn");
   let ticking = false; // 节流锁
 
   if (navbar) {
-    // 定义滚动处理逻辑
+    // --- 原有功能：滚动处理逻辑 ---
     const onScroll = () => {
       if (window.scrollY > 50) {
         navbar.classList.add("nav-scrolled");
@@ -77,5 +81,37 @@
         ticking = true; // 上锁
       }
     }, { passive: true }); // ⭐ 关键：告诉浏览器不阻止默认滚动，提升移动端流畅度
+  }
+
+  // --- ✅ 新增功能：点击 Header 按钮打开弹窗 ---
+  if (headerBtn) {
+    headerBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // 获取 Hero 组件里的弹窗元素
+      // 桌面端弹窗
+      const desktopPopup = document.querySelector("#subscribePopup");
+      const desktopInput = document.querySelector("#hero-email"); // 假设 Hero 里的输入框 ID
+      
+      // 移动端弹窗
+      const mobilePopup = document.querySelector("#mobileSubscribePopup");
+      const mobileInput = document.querySelector("#mobile-popup-email");
+
+      // 判断当前屏幕宽度，决定打开哪个弹窗
+      if (window.innerWidth < 1024 && mobilePopup) {
+        // --- 移动端逻辑 ---
+        mobilePopup.classList.add('active'); // 移动端使用 class 控制显示
+        if (mobileInput) setTimeout(() => mobileInput.focus(), 100);
+      } else if (desktopPopup) {
+        // --- 桌面端逻辑 ---
+        desktopPopup.style.display = "block"; // 桌面端使用 style 控制显示
+        // 如果订阅弹窗里有输入框，聚焦它 (假设 ID 为 popup-email，根据你之前的代码)
+        const popupInput = document.querySelector("#popup-email");
+        if (popupInput) setTimeout(() => popupInput.focus(), 100);
+      } else {
+        // 如果找不到弹窗（比如不在首页），则回退到滚动到顶部
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
   }
 </script>
