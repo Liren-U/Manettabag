@@ -1,0 +1,93 @@
+---
+// 品牌色常量
+const BRAND_HEX = "#D46A22";
+---
+
+<style define:vars={{ brandColor: BRAND_HEX }}>
+  /* 品牌色选中效果 */
+  .reservation-container ::selection {
+    background-color: var(--brandColor);
+    color: white;
+  }
+</style>
+
+<section class="reservation-container flex-1 w-full pt-32 pb-20 lg:pt-40 lg:pb-32 relative overflow-hidden bg-[#050505] text-white antialiased">
+  <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[var(--brandColor)] opacity-15 blur-[150px] rounded-full pointer-events-none"></div>
+  <div class="absolute bottom-0 left-[-10%] w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none"></div>
+  <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbjI9IlNvdXJjZUdyYXBoaWMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjYSkiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+  <div class="max-w-[1200px] mx-auto px-6 lg:px-14 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center mb-24 lg:mb-18">
+      
+      <div class="order-2 lg:order-1 mt-8 lg:mt-0">
+        <img
+          src="/images/ManettaBag-reservation-2.png"
+          alt="Manetta Bag"
+          class="w-full h-auto object-cover block"
+        />
+      </div>
+
+      <div class="flex flex-col items-start order-1 lg:order-2 w-full">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--brandColor)] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--brandColor)]"></span>
+          </span>
+          <span class="text-[10px] font-bold tracking-[0.2em] text-gray-300">LIMITED TIME OFFER</span>
+        </div>
+
+        <h1 class="font-display font-bold text-3xl lg:text-6xl leading-[1.1] mb-6 text-white tracking-tight">
+          Save $50 <span class="text-[#666] lg:text-2xl">vs Early Bird</span><br />
+          <span class="text-[#666] lg:text-5xl">as a VIP backer.</span>
+        </h1>
+
+        <p class="text-lg lg:text-xl text-gray-300 leading-relaxed mb-10 max-w-lg font-light">
+            Become a VIP for only $1. VIP backers receive priority shipping, a
+            free lens protection Velcro cloth, and an S-size camera bag. On
+            launch day, you'll get a private email link with an exclusive VIP
+            discount.
+        </p>
+
+        <div class="w-full p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
+          <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-full bg-[var(--brandColor)] flex items-center justify-center shadow-lg shadow-[var(--brandColor)]/20">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400 font-medium tracking-wide uppercase">Exclusive Status</p>
+              <p class="text-xl font-bold text-white">VIP Rewards Included</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-[#141414] border border-white/10 rounded-3xl p-8">
+        <div class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 border border-white/5">
+          <img src="/images/100-Refund-Guarantee.png" class="w-6 h-6 object-contain opacity-70" alt="Refund" />
+        </div>
+        <h3 class="font-display font-bold text-lg text-white mb-2">100% Refund Guarantee</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">If you're not satisfied, we'll offer a full refund at any time.</p>
+      </div>
+
+      <div class="bg-[#141414] border border-white/10 rounded-3xl p-8">
+        <div class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 border border-white/5">
+          <img src="/images/Transparency-Guarantee.png" class="w-6 h-6 object-contain opacity-70" alt="Transparency" />
+        </div>
+        <h3 class="font-display font-bold text-lg text-white mb-2">Transparency Guarantee</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Stay informed about every project milestone and production stage.</p>
+      </div>
+
+      <div class="bg-[#141414] border border-white/10 rounded-3xl p-8">
+        <div class="w-12 h-12 rounded-2xl bg-[#0A0A0A] flex items-center justify-center mb-6 border border-white/5">
+          <img src="/images/Secure-Payment.png" class="w-6 h-6 object-contain opacity-70" alt="Payment" />
+        </div>
+        <h3 class="font-display font-bold text-lg text-white mb-2">Secure Payment</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">All transactions are encrypted. We prioritize and respect your privacy.</p>
+      </div>
+    </div>
+  </div>
+</section>

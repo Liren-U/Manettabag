@@ -13,6 +13,8 @@ import ManettaBagFeatureVideo from "../components/ManettaBag-Feature-Video.astro
 import ManettaBagSpecsIslands from "../components/ManettaBag-Specs-Islands.astro";
 import ManettaBagSpecsIslandsTablet from "../components/ManettaBag-Specs-Islands-tablet.astro";
 import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
+import ReservationSection from "../components/reservation-section.astro";
+import Formsection from "../components/Form-section.astro";
 ---
 
 <!doctype html>
@@ -88,18 +90,20 @@ import ManettaBagFAQ from "../components/ManettaBag-FAQ.astro";
     <ManettaBagMarqueeBanner />
 
     <main id="features" class="relative z-10 bg-dark-main pt-20">
-      <ManettaBagFeaturePackLikePro />
+        <ManettaBagFeaturePackLikePro />
 
-      <ManettaBagFeatureComfort />
+        <ManettaBagFeatureComfort />
 
-      <ManettaBagFeatureVideo />
+        <ManettaBagFeatureVideo />
 
-      <ManettaBagSpecsIslands />
+        <ManettaBagSpecsIslands />
 
-      <ManettaBagSpecsIslandsTablet />
+        <ManettaBagSpecsIslandsTablet />
 
-      <ManettaBagFAQ />
-      {/* 其他众筹模块将在这里添加，这些模块可能需要宽度限制 */}
+        <Formsection />
+
+        <ManettaBagFAQ />
+        {/* 其他众筹模块将在这里添加，这些模块可能需要宽度限制 */}
     </main>
 
     <Footer />
