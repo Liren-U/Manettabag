@@ -378,7 +378,7 @@
     let submittedEmail = "";
 
     const proceedToNextPage = () => {
-        window.location.href = "/reservation?email=" + encodeURIComponent(submittedEmail);
+        window.location.href = "/vip-subscribe?email=" + encodeURIComponent(submittedEmail);
     };
 
     if (closeBtn) closeBtn.addEventListener("click", proceedToNextPage);
