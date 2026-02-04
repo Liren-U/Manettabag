@@ -3,6 +3,8 @@
 import ManettaBagHeaderOther from "../components/ManettaBag-Header-other.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
+import GTMHeader from "../components/GTM-Header.astro";
+import GTMBody from "../components/GTM-Body.astro";
 
 const title = "Privacy Policy - MANETTA";
 ---
@@ -10,6 +12,7 @@ const title = "Privacy Policy - MANETTA";
 <!doctype html>
 <html lang="en" class="scroll-smooth dark">
   <head>
+    <GTMHeader />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
@@ -73,9 +76,11 @@ const title = "Privacy Policy - MANETTA";
     </script>
   </head>
   <body
+    
     class="bg-dark-main text-white antialiased selection:bg-brand selection:text-white flex flex-col min-h-screen overflow-x-hidden"
   >
     <div class="print:hidden">
+      <GTMBody />
       <ManettaBagHeaderOther />
     </div>
 

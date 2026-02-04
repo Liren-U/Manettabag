@@ -3,6 +3,8 @@
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 import ManettaBagHeaderOther from '../components/ManettaBag-Header-other.astro';
+import GTMHeader from '../components/GTM-Header.astro';
+import GTMBody from '../components/GTM-Body.astro';
 
 const PAGE_TITLE = "Secure Checkout - Manetta Bag";
 const BRAND_HEX = "#D46A22";
@@ -11,6 +13,7 @@ const BRAND_HEX = "#D46A22";
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <GTMHeader />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{PAGE_TITLE}</title>
@@ -93,7 +96,7 @@ const BRAND_HEX = "#D46A22";
     </head>
 
 <body class="min-h-screen flex flex-col bg-[#050505] text-white font-sans antialiased">
-
+    <GTMBody />
     <ManettaBagHeaderOther />
 
     <main class="flex-1 w-full px-4 pt-32 pb-20 relative flex items-center justify-center overflow-hidden">
