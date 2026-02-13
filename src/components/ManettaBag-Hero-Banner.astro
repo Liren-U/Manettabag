@@ -2,7 +2,6 @@
 /**
  * ManettaBag-Hero-Banner.astro
  * Hero banner 模块
- * ✅ 修复：H2 标题和红色提示语的行间距 (line-height) 统一为 1.2
  */
 ---
 
@@ -87,7 +86,6 @@
     justify-content: center;
   }
 
-  /* ✅ H2 标题样式 */
   .popup-right h2 {
     font-family: 'Optima', 'Palatino', serif;
     font-size: 26px;
@@ -95,20 +93,19 @@
     text-transform: uppercase;
     color: #1a1a1a;
     font-weight: bold;
-    line-height: 1.2; /* ✅ 设置为 1.2 */
+    line-height: 1.2;
   }
 
-  /* --- ✅ 修改：红色成功提示文本 --- */
   .popup-success-text {
     font-family: 'Optima', 'Palatino', serif;
-    color: #dc2626; /* 鲜明的红色 */
+    color: #dc2626;
     font-size: 26px;
     font-weight: bold;
     margin-top: 0;
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    line-height: 1.2;    /* ✅ 修改：从 1.1 改为 1.2，与 H2 一致 */
+    line-height: 1.2;
   }
 
   .reward-intro {
@@ -148,10 +145,9 @@
     flex-shrink: 0;
   }
 
-  /* --- 按钮组 (桌面默认) --- */
   .action-group {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 电脑端：一行5个均匀分布 */
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     margin-bottom: 15px;
   }
@@ -188,7 +184,6 @@
     fill: currentColor;
   }
 
-  /* 防止文字换行 */
   .btn-share span {
       white-space: nowrap;
       overflow: hidden;
@@ -213,7 +208,7 @@
     border: none; background: none;
     z-index: 10;
     line-height: 1;
-    padding: 10px; /* 增加点击区域 */
+    padding: 10px;
   }
   .close-x:hover { color: #1a1a1a; }
 
@@ -222,39 +217,25 @@
     to { opacity: 1; transform: scale(1); }
   }
 
-  /* ========================================= */
-  /* ✅ 手机端深度适配 (Mobile Optimization) */
-  /* ========================================= */
   @media (max-width: 768px) {
     .popup-container { 
         flex-direction: column; 
         width: 90%; 
-        max-height: 90vh; /* 防止超过屏幕高度 */
-        overflow: hidden; /* 容器本身不滚动 */
+        max-height: 90vh;
+        overflow: hidden;
     }
-
-    /* 手机端隐藏左侧大图 */
-    .popup-left { 
-        display: none; 
-    }
-
-    /* 右侧内容区增加滚动 */
+    .popup-left { display: none; }
     .popup-right { 
         padding: 35px 20px 25px 20px; 
         overflow-y: auto; 
         width: 100%;
     }
-
     .popup-right h2 { font-size: 22px; }
     .step-item { font-size: 12px; }
-
-    /* ✅ 按钮组改为 2列布局 */
     .action-group { 
         grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
-
-    /* ✅ Copy Link 按钮横跨两列 */
     .action-group > :last-child {
         grid-column: span 2; 
         background-color: #f3f3f3;
@@ -297,10 +278,10 @@
           <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"></div>
 
           <div class="mb-2 relative">
-            <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">Super Early Bird Access</div>
-            <div class="text-4xl font-display font-bold text-white">Get 34% OFF</div>
+            <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">Super Early Access Only</div>
+            <div class="text-4xl font-display font-bold text-white">Get Over $100 OFF</div>
           </div>
-          <div class="text-white font-bold text-xs tracking-wider mb-2">Enter your email to unlock the massive discount right now</div>
+          <div class="text-white font-bold text-xs tracking-wider mb-2">Enter your email to get in our Super Early Bird Deal.</div>
           <form id="hero-form" class="flex flex-col sm:flex-row gap-3 relative">
             <input
               id="hero-email"
@@ -316,7 +297,7 @@
               type="submit"
               class="w-full sm:w-auto bg-brand hover:bg-brand/90 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center whitespace-nowrap shrink-0"
             >
-              Subscribe Now
+              Reserve Now
             </button>
           </form>
           <br>
@@ -353,12 +334,10 @@
 
         <h2>Share & Get a Free Lens Protector</h2>
         <p class="reward-intro">
-            A versatile wrap to store and protect any device.
+            Valid for backers only after supporting the campaign at launch.
         </p>
 
-        <p>
-          How to unlock your gift:
-        </p>
+        <p>How to unlock your gift:</p>
 
         <ul class="step-list">
             <li class="step-item">
@@ -371,8 +350,7 @@
             </li>
             <li class="step-item">
                 <div class="step-num">3</div>
-                <div>We'll add a free lens protection Velcro cloth to your order — on us.
-                  It only takes a moment, and it helps us reach more creators like you.</div>
+                <div>We'll add a free lens protection Velcro cloth to your order — on us. It only takes a moment.</div>
             </li>
         </ul>
 
@@ -409,7 +387,6 @@
       </div>
     </div>
   </div>
-
 </section>
 
 <script is:inline>
@@ -419,42 +396,41 @@
     const closeBtn = document.querySelector("#popupCloseBtn");
     const copyBtn = document.querySelector("#btn-copy-link");
 
-    let submittedEmail = "";
-
-    // 跳转逻辑
-    const proceedToNextPage = () => {
-        window.location.href = "/vip-subscribe?email=" + encodeURIComponent(submittedEmail);
+    // ✅ 修改点 1：关闭逻辑仅隐藏弹窗，不执行任何跳转
+    const closePopupOnly = () => {
+        if (popup) {
+            popup.style.display = "none";
+        }
     };
 
-    if (closeBtn) closeBtn.addEventListener("click", proceedToNextPage);
+    if (closeBtn) closeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closePopupOnly();
+    });
+
     if (popup) {
         popup.addEventListener("click", (e) => {
-            if (e.target === popup) proceedToNextPage();
+            if (e.target === popup) closePopupOnly();
         });
     }
 
-    // Copy Link 逻辑
+    // Copy Link 逻辑 (原有)
     if (copyBtn) {
         copyBtn.addEventListener("click", () => {
             const currentUrl = window.location.href;
-
             navigator.clipboard.writeText(currentUrl).then(() => {
                 const originalHtml = copyBtn.innerHTML;
-
-                // 变成 ✅ 图标和 Copied 文字
                 copyBtn.innerHTML = `
                     <svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                     <span style="color:#22c55e;">Copied!</span>
                 `;
                 copyBtn.style.borderColor = "#22c55e";
-
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHtml;
                     copyBtn.style.borderColor = "#ddd";
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy: ', err);
-                alert("Please manually copy the URL from your browser address bar.");
             });
         });
     }
@@ -474,11 +450,14 @@
         return;
       }
 
-      try {
-        localStorage.setItem("manetta_email", email);
-      } catch (e) {}
+      // 获取提交按钮用于显示加载状态
+      const submitBtn = form.querySelector("#hero-submit-btn");
+      const originalText = submitBtn.innerText;
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Subscribing...";
 
       try {
+        // 1. 先进行订阅请求
         const res = await fetch("/api/klaviyo-subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -489,20 +468,42 @@
 
         if (!res.ok || !data.success) {
           alert(data.error || "Subscription failed, please try again.");
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalText;
           return;
         }
 
+        // ========================================================
+        // ✅ 对接 GTM + Meta CAPI 逻辑
+        // ========================================================
+        const eventId = crypto.randomUUID();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          'event': 'lead',               // 匹配 Stape 助手
+          'user_email': email,           // 传给 Stape 自动哈希
+          'event_id': eventId            // 去重 ID
+        });
+
+        // 兼容传统 FB Pixel (如果有)
         if (typeof fbq === 'function') {
-          fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
+          fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', eventID: eventId });
         }
 
-        submittedEmail = email;
-        if (popup) popup.style.display = "block";
-        else proceedToNextPage();
+        // 2. 订阅成功，显示弹窗，不跳转
+        if (popup) {
+            popup.style.display = "block";
+        }
+
+        // 恢复按钮状态并重置表单
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
+        form.reset();
 
       } catch (err) {
         console.error(err);
         alert("Network error, please try again.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
       }
     });
   })();
