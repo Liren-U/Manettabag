@@ -396,46 +396,60 @@
 
 <script is:inline>
   (function () {
+    // 1. 获取原始元素
     const form = document.querySelector("#hero-form");
-    const popup = document.querySelector("#sharePopup");
-    const closeBtn = document.querySelector("#popupCloseBtn");
-    const copyBtn = document.querySelector("#btn-copy-link");
-
+    let popup = document.querySelector("#sharePopup");
+    
     // ============================================================
-    // ✅ 核心修复：防止旧代码干扰的“克隆覆盖法”
+    // 🛑 核心修复：彻底清除“幽灵跳转”代码
     // ============================================================
-    // 如果存在关闭按钮，通过克隆节点来清除之前可能残留的“跳转”监听器
-    if (closeBtn) {
-        const newCloseBtn = closeBtn.cloneNode(true);
-        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-        
-        // 给新按钮绑定纯粹的关闭逻辑
-        newCloseBtn.addEventListener("click", (e) => {
-            e.preventDefault(); // 阻止默认行为
-            e.stopPropagation(); // 阻止冒泡
-            if (popup) popup.style.display = "none";
-        });
+    // 如果弹窗存在，我们把它克隆一份，用新的替换旧的。
+    // 这一步会强制断开所有之前（包括缓存中）绑定在弹窗、关闭按钮、背景上的旧事件监听器。
+    if (popup) {
+        const newPopup = popup.cloneNode(true);
+        popup.parentNode.replaceChild(newPopup, popup);
+        popup = newPopup; // 更新引用，接下来的操作都针对这个纯净的新弹窗
     }
 
-    // 处理点击背景关闭（同样逻辑）
+    // 2. 在这个“新弹窗”里重新获取按钮 (必须重新获取，因为DOM变了)
+    const closeBtn = popup ? popup.querySelector("#popupCloseBtn") : null;
+    const copyBtn = popup ? popup.querySelector("#btn-copy-link") : null;
+
+    // 🛑 防御性修复：强制把关闭按钮改成普通按钮，防止它触发表单提交
+    if (closeBtn) {
+        closeBtn.setAttribute("type", "button");
+    }
+
+    // ============================================================
+    // ✅ 定义纯净的关闭逻辑：只有隐藏，绝对没有跳转
+    // ============================================================
+    const closePopupOnly = (e) => {
+        if (e) {
+            e.preventDefault(); 
+            e.stopPropagation(); // 阻止事件冒泡
+        }
+        if (popup) popup.style.display = "none";
+    };
+
+    // 3. 重新绑定关闭事件 (在新元素上绑定)
+    if (closeBtn) {
+        // 使用 onclick 确保单一职责
+        closeBtn.onclick = closePopupOnly;
+    }
+
     if (popup) {
-        // 先移除旧的 click 事件（虽然 removeEventListener 很难移除匿名函数，但我们下面用新逻辑覆盖）
-        // 这里直接重新绑定 click，并在内部判断
         popup.onclick = (e) => {
-            if (e.target === popup) {
-                e.preventDefault();
-                popup.style.display = "none";
-            }
+            // 点击背景层时关闭
+            if (e.target === popup) closePopupOnly(e);
         };
     }
 
     // ============================================================
-    // 下面是原有的 Copy Link 和 表单提交逻辑 (保持不变)
+    // 📋 重新绑定 Copy Link 逻辑 (因为旧的被克隆清除了)
     // ============================================================
-
-    // Copy Link 逻辑
     if (copyBtn) {
-        copyBtn.addEventListener("click", () => {
+        copyBtn.onclick = (e) => {
+            e.preventDefault();
             const currentUrl = window.location.href;
             navigator.clipboard.writeText(currentUrl).then(() => {
                 const originalHtml = copyBtn.innerHTML;
@@ -448,57 +462,70 @@
                     copyBtn.innerHTML = originalHtml;
                     copyBtn.style.borderColor = "#ddd";
                 }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                alert("Please manually copy the URL from your browser address bar.");
-            });
-        });
+            }).catch(err => console.error(err));
+        };
     }
 
-    // 表单提交逻辑
-    if (!form) return;
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    // ============================================================
+    // 🚀 表单提交逻辑 (GTM + Meta CAPI)
+    // ============================================================
+    if (form) {
+        // 为了保险，也对 Form 做一次“克隆清洗”，防止旧的 submit 跳转还在
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
 
-      const input = form.querySelector("#hero-email");
-      const email = (input?.value || "").trim();
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        newForm.addEventListener("submit", async (event) => {
+            event.preventDefault(); // 🛑 第一行代码就是阻止跳转
 
-      if (!emailPattern.test(email)) {
-        alert("Please enter a valid email address.");
-        input && input.focus();
-        return;
-      }
+            const input = newForm.querySelector("#hero-email");
+            const email = (input?.value || "").trim();
+            const submitBtn = newForm.querySelector("#hero-submit-btn");
 
-      try {
-        const res = await fetch("/api/klaviyo-subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+            if (!email) return; // 简单校验
+
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Subscribing...";
+
+            try {
+                const res = await fetch("/api/klaviyo-subscribe", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                    // ✅ 1. 触发 GTM 信号
+                    const eventId = crypto.randomUUID();
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        'event': 'lead',
+                        'user_email': email,
+                        'event_id': eventId
+                    });
+
+                    // 兼容旧 Pixel
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
+                    }
+
+                    // ✅ 2. 仅显示弹窗 (引用的是那个新克隆的 popup)
+                    if (popup) popup.style.display = "block";
+                    
+                    newForm.reset();
+                } else {
+                    alert(data.error || "Subscription failed.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network error.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
         });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok || !data.success) {
-          alert(data.error || "Subscription failed, please try again.");
-          return;
-        }
-
-        if (typeof fbq === 'function') {
-          fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
-        }
-
-        // ✅ 提交成功后仅显示弹窗
-        if (popup) {
-            popup.style.display = "block";
-        }
-        
-        form.reset();
-
-      } catch (err) {
-        console.error(err);
-        alert("Network error, please try again.");
-      }
-    });
+    }
   })();
 </script>
