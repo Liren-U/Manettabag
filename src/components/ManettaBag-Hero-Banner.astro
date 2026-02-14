@@ -185,10 +185,10 @@
   }
 
   .btn-share span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
   }
 
   .popup-footer {
@@ -391,32 +391,55 @@
 
 <script is:inline>
   (function () {
+    // 1. 获取表单（表单在弹窗外面，不受影响）
     const form = document.querySelector("#hero-form");
-    const popup = document.querySelector("#sharePopup");
-    const closeBtn = document.querySelector("#popupCloseBtn");
-    const copyBtn = document.querySelector("#btn-copy-link");
+    
+    // 2. 获取旧弹窗
+    let popup = document.querySelector("#sharePopup");
 
-    // ✅ 修改核心：关闭函数仅操作 display: none，确保不包含跳转路径
-    const handleClose = (e) => {
-        if (e) e.preventDefault();
+    // ============================================================
+    // 🛑 核弹级修复：强制清除旧代码残留
+    // 原理：通过克隆节点并替换，彻底抹除旧代码绑定的“跳转事件”
+    // ============================================================
+    if (popup) {
+        const newPopup = popup.cloneNode(true);
+        popup.parentNode.replaceChild(newPopup, popup);
+        popup = newPopup; // 更新引用，接下来的操作都针对这个干净的新弹窗
+        console.log("DOM Cleaned: Old event listeners removed.");
+    }
+
+    // 3. 在这个“新弹窗”里重新获取按钮 (必须重新获取，因为是新元素)
+    const closeBtn = popup ? popup.querySelector("#popupCloseBtn") : null;
+    const copyBtn = popup ? popup.querySelector("#btn-copy-link") : null;
+
+    // ============================================================
+    // ✅ 新的关闭逻辑：绝对没有跳转，只有隐藏
+    // ============================================================
+    const closePopupOnly = (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation(); // 防止冒泡到可能存在的父级链接
+        }
         if (popup) popup.style.display = "none";
     };
 
     // 绑定关闭按钮
     if (closeBtn) {
-        closeBtn.addEventListener("click", handleClose);
+        closeBtn.onclick = closePopupOnly; // 使用 onclick 覆盖方式更安全
     }
 
     // 绑定点击背景关闭
     if (popup) {
-        popup.addEventListener("click", (e) => {
-            if (e.target === popup) handleClose(e);
-        });
+        popup.onclick = (e) => {
+            if (e.target === popup) closePopupOnly(e);
+        };
     }
 
-    // Copy Link 逻辑 (原有)
+    // ============================================================
+    // 📋 Copy Link 逻辑 (重新绑定)
+    // ============================================================
     if (copyBtn) {
-        copyBtn.addEventListener("click", (e) => {
+        copyBtn.onclick = (e) => {
             e.preventDefault();
             const currentUrl = window.location.href;
             navigator.clipboard.writeText(currentUrl).then(() => {
@@ -430,57 +453,66 @@
                     copyBtn.innerHTML = originalHtml;
                     copyBtn.style.borderColor = "#ddd";
                 }, 2000);
-            });
-        });
+            }).catch(err => console.error(err));
+        };
     }
 
-    // 表单提交逻辑
-    if (!form) return;
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    // ============================================================
+    // 🚀 表单提交逻辑 (GTM + Meta CAPI)
+    // ============================================================
+    if (form) {
+        // 先移除旧的监听器（防止重复绑定）
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // 绑定新表单逻辑
+        newForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
 
-      const input = form.querySelector("#hero-email");
-      const email = (input?.value || "").trim();
-      const submitBtn = form.querySelector("#hero-submit-btn");
+            const input = newForm.querySelector("#hero-email");
+            const email = (input?.value || "").trim();
+            const submitBtn = newForm.querySelector("#hero-submit-btn");
 
-      if (!email) return;
+            if (!email) return;
 
-      const originalText = submitBtn.innerText;
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Subscribing...";
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Subscribing...";
 
-      try {
-        const res = await fetch("/api/klaviyo-subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+            try {
+                const res = await fetch("/api/klaviyo-subscribe", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                    // ✅ 1. 触发 GTM 信号
+                    const eventId = crypto.randomUUID();
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        'event': 'lead',
+                        'user_email': email,
+                        'event_id': eventId
+                    });
+
+                    // ✅ 2. 弹出弹窗 (不跳转)
+                    if (popup) popup.style.display = "block";
+                    
+                    newForm.reset();
+                } else {
+                    alert(data.error || "Subscription failed.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network error.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
         });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (res.ok && data.success) {
-          // ✅ 对接 GTM 信号
-          const eventId = crypto.randomUUID();
-          window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({
-            'event': 'lead',
-            'user_email': email,
-            'event_id': eventId
-          });
-
-          // ✅ 显示弹窗，无后续跳转动作
-          if (popup) popup.style.display = "block";
-          
-          form.reset();
-        } else {
-          alert(data.error || "Subscription failed.");
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalText;
-      }
-    });
+    }
   })();
 </script>
