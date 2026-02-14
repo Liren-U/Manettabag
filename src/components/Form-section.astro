@@ -1,9 +1,9 @@
 ---
 /**
  * Form-section.astro
- * ✅ 容器 1: 电脑端 (无背景/边框/圆角, 左右并排, 输入框色值 rgba(163, 163, 163, 0.5))
- * ✅ 容器 2: 非电脑端 (独立卡片, 自然左对齐, 输入框同色)
- * ✅ 按钮文字: Subscribe Now
+ * ✅ 修复版：订阅成功弹窗，不跳转
+ * ✅ 关闭弹窗不跳转（点击 X / 点击背景都只是关闭）
+ * ✅ 保持：POST /api/klaviyo-subscribe + 弹窗 + Copy Link
  */
 ---
 
@@ -37,11 +37,10 @@
     width: 100%;
     max-width: 1400px;
     display: flex;
-    justify-content: center; 
-    gap: 8rem; 
+    justify-content: center;
+    gap: 8rem;
     align-items: center;
     padding: 2rem 0;
-    /* 彻底移除大容器装饰 */
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
@@ -66,7 +65,6 @@
 
   /* --- 3. 输入框与按钮细节 --- */
   .input-custom {
-    /* 核心修改：使用 rgba(163, 163, 163, 0.5) */
     background-color: rgba(163, 163, 163, 0.5) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     color: white;
@@ -123,7 +121,7 @@
       </div>
 
       <div class="right-form-zone relative z-10">
-        <form class="hero-form desktop-form-row">
+        <form class="hero-form desktop-form-row" action="javascript:void(0)" novalidate>
           <input
             type="email"
             placeholder="Your email address"
@@ -149,15 +147,19 @@
           <h2 class="text-4xl font-bold text-white mb-4 leading-tight tracking-tight">Get 34% OFF</h2>
           <p class="text-white/70 text-sm leading-relaxed">Enter your email to unlock the massive discount right now.</p>
         </div>
-        <form class="hero-form flex flex-col gap-3 w-full">
+
+        <form class="hero-form flex flex-col gap-3 w-full" action="javascript:void(0)" novalidate>
           <input
             type="email"
             placeholder="Your email address"
             class="hero-email input-custom w-full rounded-xl px-5 py-4 text-white transition-all"
             required
           />
-          <button type="submit" class="hero-submit-btn w-full bg-[#D46A22] text-white py-4 rounded-xl font-bold uppercase tracking-wider text-sm">Subscribe Now</button>
+          <button type="submit" class="hero-submit-btn w-full bg-[#D46A22] text-white py-4 rounded-xl font-bold uppercase tracking-wider text-sm">
+            Subscribe Now
+          </button>
         </form>
+
         <div class="text-[#D46A22] font-bold text-[10px] uppercase tracking-widest">We'll notify you the moment we go live.</div>
       </div>
     </div>
@@ -165,13 +167,20 @@
 
   <div id="sharePopup" class="popup-overlay">
     <div class="popup-container">
-      <button id="popupCloseBtn" class="close-x">&times;</button>
-      <div class="popup-left"><img src="/images/Manettabag-pop-desktop.png" alt="Free Gift" style="width:100%; height:100%; object-fit:cover;"></div>
+      <button id="popupCloseBtn" class="close-x" type="button">&times;</button>
+
+      <div class="popup-left">
+        <img src="/images/Manettabag-pop-desktop.png" alt="Free Gift" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+
       <div class="popup-right">
         <p style="color:#dc2626; font-weight:bold; font-size:24px; text-transform:uppercase; margin:0;">Success!</p>
         <h2 style="font-size:24px; margin:10px 0;">Share & Get a Free Gift</h2>
         <p style="color:#666; font-size:14px; margin-bottom:20px;">A versatile wrap to protect any device.</p>
-        <button id="btn-copy-link" style="padding:15px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold; cursor:pointer; border-radius:6px;">Copy Link</button>
+
+        <button id="btn-copy-link" type="button" style="padding:15px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold; cursor:pointer; border-radius:6px;">
+          Copy Link
+        </button>
       </div>
     </div>
   </div>
@@ -183,43 +192,77 @@
     const popup = document.querySelector("#sharePopup");
     const closeBtn = document.querySelector("#popupCloseBtn");
     const copyBtn = document.querySelector("#btn-copy-link");
-    let submittedEmail = "";
 
-    const proceedToNextPage = () => {
-      window.location.href = "/vip-subscribe?email=" + encodeURIComponent(submittedEmail);
+    const closePopupOnly = () => {
+      if (popup) popup.style.display = "none";
     };
 
-    if (closeBtn) closeBtn.addEventListener("click", proceedToNextPage);
-    if (popup) popup.addEventListener("click", (e) => { if (e.target === popup) proceedToNextPage(); });
+    // ✅ 关闭弹窗：只关闭，不跳转
+    if (closeBtn) {
+      closeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closePopupOnly();
+      }, true);
+    }
 
+    // ✅ 点击遮罩关闭：只关闭，不跳转
+    if (popup) {
+      popup.addEventListener("click", (e) => {
+        if (e.target === popup) closePopupOnly();
+      }, true);
+    }
+
+    // ✅ Copy Link：复制当前页面链接
     if (copyBtn) {
       copyBtn.addEventListener("click", () => {
         navigator.clipboard.writeText(window.location.href).then(() => {
           const original = copyBtn.innerText;
           copyBtn.innerText = "Copied!";
           setTimeout(() => { copyBtn.innerText = original; }, 2000);
+        }).catch(() => {
+          alert("Copy failed. Please copy the URL from your browser address bar.");
         });
       });
     }
 
-    forms.forEach(form => {
+    // ✅ 表单提交：只请求 API + 弹窗，不跳转
+    forms.forEach((form) => {
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
         const input = form.querySelector(".hero-email");
         const email = (input?.value || "").trim();
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+          alert("Please enter a valid email address.");
+          input && input.focus();
+          return;
+        }
+
         try {
           const res = await fetch("/api/klaviyo-subscribe", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email }),
           });
+
           const data = await res.json().catch(() => ({}));
-          if (!res.ok || !data.success) { alert("Subscription failed."); return; }
-          submittedEmail = email;
+
+          if (!res.ok || !data.success) {
+            alert(data.error || "Subscription failed.");
+            return;
+          }
+
           if (popup) popup.style.display = "block";
-          else proceedToNextPage();
-        } catch (err) { alert("Network error."); }
-      });
+          form.reset();
+        } catch (err) {
+          alert("Network error.");
+        }
+      }, true);
     });
   })();
 </script>
