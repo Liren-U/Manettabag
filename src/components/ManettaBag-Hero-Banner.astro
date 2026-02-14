@@ -185,10 +185,10 @@
   }
 
   .btn-share span {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .popup-footer {
@@ -396,27 +396,28 @@
     const closeBtn = document.querySelector("#popupCloseBtn");
     const copyBtn = document.querySelector("#btn-copy-link");
 
-    // ✅ 修改点 1：关闭逻辑仅隐藏弹窗，不执行任何跳转
-    const closePopupOnly = () => {
-        if (popup) {
-            popup.style.display = "none";
-        }
+    // ✅ 修改核心：关闭函数仅操作 display: none，确保不包含跳转路径
+    const handleClose = (e) => {
+        if (e) e.preventDefault();
+        if (popup) popup.style.display = "none";
     };
 
-    if (closeBtn) closeBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        closePopupOnly();
-    });
+    // 绑定关闭按钮
+    if (closeBtn) {
+        closeBtn.addEventListener("click", handleClose);
+    }
 
+    // 绑定点击背景关闭
     if (popup) {
         popup.addEventListener("click", (e) => {
-            if (e.target === popup) closePopupOnly();
+            if (e.target === popup) handleClose(e);
         });
     }
 
     // Copy Link 逻辑 (原有)
     if (copyBtn) {
-        copyBtn.addEventListener("click", () => {
+        copyBtn.addEventListener("click", (e) => {
+            e.preventDefault();
             const currentUrl = window.location.href;
             navigator.clipboard.writeText(currentUrl).then(() => {
                 const originalHtml = copyBtn.innerHTML;
@@ -429,8 +430,6 @@
                     copyBtn.innerHTML = originalHtml;
                     copyBtn.style.borderColor = "#ddd";
                 }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
             });
         });
     }
@@ -442,22 +441,15 @@
 
       const input = form.querySelector("#hero-email");
       const email = (input?.value || "").trim();
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailPattern.test(email)) {
-        alert("Please enter a valid email address.");
-        input && input.focus();
-        return;
-      }
-
-      // 获取提交按钮用于显示加载状态
       const submitBtn = form.querySelector("#hero-submit-btn");
+
+      if (!email) return;
+
       const originalText = submitBtn.innerText;
       submitBtn.disabled = true;
       submitBtn.innerText = "Subscribing...";
 
       try {
-        // 1. 先进行订阅请求
         const res = await fetch("/api/klaviyo-subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -466,42 +458,26 @@
 
         const data = await res.json().catch(() => ({}));
 
-        if (!res.ok || !data.success) {
-          alert(data.error || "Subscription failed, please try again.");
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalText;
-          return;
+        if (res.ok && data.success) {
+          // ✅ 对接 GTM 信号
+          const eventId = crypto.randomUUID();
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            'event': 'lead',
+            'user_email': email,
+            'event_id': eventId
+          });
+
+          // ✅ 显示弹窗，无后续跳转动作
+          if (popup) popup.style.display = "block";
+          
+          form.reset();
+        } else {
+          alert(data.error || "Subscription failed.");
         }
-
-        // ========================================================
-        // ✅ 对接 GTM + Meta CAPI 逻辑
-        // ========================================================
-        const eventId = crypto.randomUUID();
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          'event': 'lead',               // 匹配 Stape 助手
-          'user_email': email,           // 传给 Stape 自动哈希
-          'event_id': eventId            // 去重 ID
-        });
-
-        // 兼容传统 FB Pixel (如果有)
-        if (typeof fbq === 'function') {
-          fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', eventID: eventId });
-        }
-
-        // 2. 订阅成功，显示弹窗，不跳转
-        if (popup) {
-            popup.style.display = "block";
-        }
-
-        // 恢复按钮状态并重置表单
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalText;
-        form.reset();
-
       } catch (err) {
         console.error(err);
-        alert("Network error, please try again.");
+      } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = originalText;
       }
