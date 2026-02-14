@@ -389,226 +389,130 @@
   </div>
 </section>
 
----
-/**
- * ManettaBag-Hero-Banner.astro
- * ✅ 修复跳转问题的终极版本
- * ✅ 核心改动：更改了 form ID 以避开浏览器缓存的旧脚本
- */
----
-
-<style is:inline>
-  /* --- 保持原有 CSS 不变 --- */
-  @media (max-width: 767px) { #reserve { display: none !important; } }
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-  .popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; animation: popupFadeIn 0.4s ease; }
-  .popup-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 850px; background: #fff; color: #1a1a1a; display: flex; border-radius: 8px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-  .popup-left { flex: 1; background: #2a2a2a; position: relative; min-height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .popup-left img { width: 100%; height: 100%; object-fit: cover; }
-  .popup-badge { position: absolute; top: 20px; left: 20px; background: #c6a35d; color: white; padding: 5px 12px; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; z-index: 2; }
-  .popup-right { flex: 1.3; padding: 40px 50px; text-align: left; display: flex; flex-direction: column; justify-content: center; }
-  .popup-right h2 { font-family: 'Optima', 'Palatino', serif; font-size: 26px; margin: 0 0 10px 0; text-transform: uppercase; color: #1a1a1a; font-weight: bold; line-height: 1.2; }
-  .popup-success-text { font-family: 'Optima', 'Palatino', serif; color: #dc2626; font-size: 26px; font-weight: bold; margin-top: 0; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.2; }
-  .reward-intro { color: #555; font-size: 14px; line-height: 1.5; margin-bottom: 20px; font-weight: 500; }
-  .step-list { margin: 0 0 25px 0; padding: 0; list-style: none; }
-  .step-item { display: flex; align-items: flex-start; margin-bottom: 12px; font-size: 13px; color: #333; line-height: 1.4; }
-  .step-num { width: 20px; height: 20px; background: #1a1a1a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; margin-right: 10px; margin-top: 1px; flex-shrink: 0; }
-  .action-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px; }
-  .btn-share { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 5px; border: 1px solid #ddd; text-decoration: none; color: #555; font-size: 10px; font-weight: bold; transition: 0.2s; border-radius: 6px; text-transform: uppercase; background: #fcfcfc; cursor: pointer; min-width: 0; }
-  .btn-share:hover { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-  .btn-share svg { width: 20px; height: 20px; margin-bottom: 6px; fill: currentColor; }
-  .btn-share span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-  .popup-footer { font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 15px; margin-top: 5px; }
-  .close-x { position: absolute; right: 15px; top: 10px; font-size: 28px; cursor: pointer; color: #999; border: none; background: none; z-index: 10; line-height: 1; padding: 10px; }
-  .close-x:hover { color: #1a1a1a; }
-  @keyframes popupFadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-  @media (max-width: 768px) {
-    .popup-container { flex-direction: column; width: 90%; max-height: 90vh; overflow: hidden; }
-    .popup-left { display: none; }
-    .popup-right { padding: 35px 20px 25px 20px; overflow-y: auto; width: 100%; }
-    .popup-right h2 { font-size: 22px; }
-    .step-item { font-size: 12px; }
-    .action-group { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .action-group > :last-child { grid-column: span 2; background-color: #f3f3f3; flex-direction: row; gap: 8px; }
-    .action-group > :last-child svg { margin-bottom: 0; }
-  }
-</style>
-
-<section id="reserve" class="relative w-full min-h-screen pt-32 pb-20 lg:pt-0 lg:pb-0 flex items-center overflow-hidden bg-dark-main">
-  <div class="absolute top-[-30%] right-[-20%] w-[1000px] h-[1000px] bg-gradient-radial from-brand/20 to-transparent rounded-full blur-[150px] pointer-events-none opacity-60"></div>
-  <div class="absolute bottom-[-20%] left-[-10%] w-[800px] h-[800px] bg-gradient-radial from-[#333]/30 to-transparent rounded-full blur-[120px] pointer-events-none"></div>
-  <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJYdWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii44IiBudW1PY3RhdmVzPSI0IiByZXN1bHQ9Im5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlXz0iMCIvPjxmZUNvbXBvbmVudFRyYW5zZmVyPjxmZUZ1bmHSPVR5cGU9ImxpbmVhciIgc2xvcGU9Ii4xIi8+PC9mZUNvbXBvbmVudFRyYW5zZmVyPjxmZUJsZW5kIG1vZGU9Im11bHRpcGx5IiBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==')] opacity-20 pointer-events-none"></div>
-
-  <div class="max-w-limit mx-auto px-6 lg:px-gutter w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-    <div class="reveal active flex flex-col items-start">
-      <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-md">
-        <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-brand"></span></span>
-        <span class="text-xs font-bold tracking-widest text-light-muted uppercase">Kickstarter Launching Soon</span>
-      </div>
-
-      <h1 class="font-display font-bold text-6xl lg:text-[6.5rem] leading-[0.9] tracking-tight mb-8 text-white">Redefine Your <br /><span class="text-white/40">Camera Bag</span></h1>
-      <p class="text-xl text-light-muted mb-12 max-w-md leading-relaxed">Meet <strong class="text-white">MANETTA</strong> — a 3-in-1 modular system that expands from 22L to 42L in seconds. One bag, built for every shoot.</p>
-
-      <div class="w-full max-w-md lg:max-w-lg xl:max-w-xl p-[1px] rounded-2xl bg-gradient-to-br from-white/20 to-white/0">
-        <div class="bg-dark-card/90 backdrop-blur-xl rounded-2xl p-8 relative overflow-hidden">
-          <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand/30 rounded-full blur-[60px]"></div>
-          <div class="mb-2 relative">
-            <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">Super Early Access Only</div>
-            <div class="text-4xl font-display font-bold text-white">Get Over $100 OFF</div>
-          </div>
-          <div class="text-white font-bold text-xs tracking-wider mb-2">Enter your email to get in our Super Early Bird Deal.</div>
-          
-          <form id="hero-form-secure" class="flex flex-col sm:flex-row gap-3 relative" onsubmit="event.preventDefault()">
-            <input
-              id="hero-email-secure"
-              type="email"
-              inputmode="email"
-              autocomplete="email"
-              placeholder="Your email address"
-              class="w-full sm:flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-light-muted/50 focus:outline-none focus:border-brand/50 focus:bg-white/10 transition-all min-w-0"
-              required
-            />
-            <button
-              id="hero-submit-btn-secure"
-              type="submit"
-              class="w-full sm:w-auto bg-brand hover:bg-brand/90 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center whitespace-nowrap shrink-0"
-            >
-              Reserve Now
-            </button>
-          </form>
-
-          <br><div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">We'll notify you the moment we go live.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="reveal delay-200 relative lg:h-screen flex items-center justify-center perspective-1000 active">
-      <div class="relative w-full max-w-[750px] transform-style-3d animate-float-slow">
-        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-brand/20 blur-[80px] rounded-full"></div>
-        <img src="/images/Manetta-hero-banner-product.png" alt="Manetta Backpack" class="w-full h-auto object-contain drop-shadow-[0_50px_80px_rgba(0,0,0,0.5)]" />
-      </div>
-    </div>
-  </div>
-
-  <div id="sharePopup" class="popup-overlay">
-    <div class="popup-container">
-      <button id="popupCloseBtn" class="close-x">&times;</button>
-      <div class="popup-left"><div class="popup-badge">FREE GIFT</div><img src="/images/Manettabag-pop-desktop.png" alt="Custom ID Tag"></div>
-      <div class="popup-right">
-        <p class="popup-success-text">Congratulations you have subscribed.</p>
-        <h2>Share & Get a Free Lens Protector</h2>
-        <p class="reward-intro">Valid for backers only after supporting the campaign at launch.</p>
-        <p>How to unlock your gift:</p>
-        <ul class="step-list">
-            <li class="step-item"><div class="step-num">1</div><div>Share this page with friends or on social media.</div></li>
-            <li class="step-item"><div class="step-num">2</div><div>Email us a screenshot of your share.</div></li>
-            <li class="step-item"><div class="step-num">3</div><div>We'll add a free lens protection Velcro cloth to your order — on us.</div></li>
-        </ul>
-        <div class="action-group">
-            <a href="https://www.facebook.com/sharer/sharer.php?u=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.39 6.08V8.7H14.86C13.65 8.7 13.41 9.27 13.41 10.1V12.06H16.32L15.86 14.96H13.41V21.96C18.19 21.21 21.86 17.06 21.86 12.06C21.86 6.53 17.36 2.04 12 2.04Z"/></svg><span>Facebook</span></a>
-            <a href="https://twitter.com/intent/tweet?text=Check%20out%20Manetta%20Bag&url=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>Twitter</span></a>
-            <a href="https://www.instagram.com/" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg><span>Instagram</span></a>
-            <a href="http://pinterest.com/pin/create/button/?url=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 4.99 3.125 9.255 7.502 11.047-.104-.943-.197-2.396.042-3.428.217-.937 1.402-5.938 1.402-5.938s-.358-.716-.358-1.774c0-1.663.964-2.903 2.163-2.903 1.021 0 1.513.766 1.513 1.685 0 1.026-.653 2.56-.99 3.982-.283 1.19.596 2.158 1.769 2.158 2.123 0 3.757-2.238 3.757-5.47 0-2.852-2.057-4.854-4.992-4.854-3.633 0-5.771 2.724-5.771 5.54 0 1.098.423 2.277.948 2.918.104.124.119.235.088.429l-.353 1.423c-.057.235-.213.285-.49.172-1.832-.852-2.977-3.514-2.977-5.68 0-4.627 3.366-8.883 9.704-8.883 5.093 0 9.048 3.632 9.048 8.502 0 5.074-3.2 9.155-7.645 9.155-1.493 0-2.899-.775-3.381-1.69l-.92 3.507c-.34 1.302-1.264 2.931-1.885 3.924 1.414.416 2.91.635 4.452.635 6.6 0 11.963-5.363 11.963-11.963S18.6 0 12 0z"/></svg><span>Pinterest</span></a>
-            <button id="btn-copy-link" class="btn-share" type="button"><svg viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg><span id="copy-text">Copy Link</span></button>
-        </div>
-        <div class="popup-footer">It only takes a moment, and it helps us reach more creators like you.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <script is:inline>
   (function () {
-    // ✅ 修改点 2：使用新的 ID 获取元素
-    const form = document.querySelector("#hero-form-secure");
-    const popup = document.querySelector("#sharePopup");
-    const closeBtn = document.querySelector("#popupCloseBtn");
-    const copyBtn = document.querySelector("#btn-copy-link");
+    // 1. 获取表单（表单在弹窗外面，不受影响）
+    const form = document.querySelector("#hero-form");
+    
+    // 2. 获取旧弹窗
+    let popup = document.querySelector("#sharePopup");
 
-    // =========================================================
-    // ✅ 纯净的关闭逻辑 (无跳转)
-    // =========================================================
+    // ============================================================
+    // 🛑 核弹级修复：强制清除旧代码残留
+    // 原理：通过克隆节点并替换，彻底抹除旧代码绑定的“跳转事件”
+    // ============================================================
+    if (popup) {
+        const newPopup = popup.cloneNode(true);
+        popup.parentNode.replaceChild(newPopup, popup);
+        popup = newPopup; // 更新引用，接下来的操作都针对这个干净的新弹窗
+        console.log("DOM Cleaned: Old event listeners removed.");
+    }
+
+    // 3. 在这个“新弹窗”里重新获取按钮 (必须重新获取，因为是新元素)
+    const closeBtn = popup ? popup.querySelector("#popupCloseBtn") : null;
+    const copyBtn = popup ? popup.querySelector("#btn-copy-link") : null;
+
+    // ============================================================
+    // ✅ 新的关闭逻辑：绝对没有跳转，只有隐藏
+    // ============================================================
     const closePopupOnly = (e) => {
         if (e) {
-          e.preventDefault();
-          e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation(); // 防止冒泡到可能存在的父级链接
         }
         if (popup) popup.style.display = "none";
     };
 
-    // 绑定关闭
-    if (closeBtn) closeBtn.onclick = closePopupOnly;
+    // 绑定关闭按钮
+    if (closeBtn) {
+        closeBtn.onclick = closePopupOnly; // 使用 onclick 覆盖方式更安全
+    }
+
+    // 绑定点击背景关闭
     if (popup) {
         popup.onclick = (e) => {
             if (e.target === popup) closePopupOnly(e);
         };
     }
 
-    // Copy Link 逻辑
+    // ============================================================
+    // 📋 Copy Link 逻辑 (重新绑定)
+    // ============================================================
     if (copyBtn) {
         copyBtn.onclick = (e) => {
             e.preventDefault();
             const currentUrl = window.location.href;
             navigator.clipboard.writeText(currentUrl).then(() => {
                 const originalHtml = copyBtn.innerHTML;
-                copyBtn.innerHTML = `<svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span style="color:#22c55e;">Copied!</span>`;
+                copyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <span style="color:#22c55e;">Copied!</span>
+                `;
                 copyBtn.style.borderColor = "#22c55e";
-                setTimeout(() => { copyBtn.innerHTML = originalHtml; copyBtn.style.borderColor = "#ddd"; }, 2000);
-            });
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.style.borderColor = "#ddd";
+                }, 2000);
+            }).catch(err => console.error(err));
         };
     }
 
-    // =========================================================
-    // ✅ 表单提交逻辑 (纯净版)
-    // =========================================================
-    if (!form) return;
-    
-    // 使用 onsubmit 覆盖，避免多个监听器
-    form.onsubmit = async (event) => {
-      // 🚨 核心防御：停止浏览器默认行为
-      event.preventDefault();
+    // ============================================================
+    // 🚀 表单提交逻辑 (GTM + Meta CAPI)
+    // ============================================================
+    if (form) {
+        // 先移除旧的监听器（防止重复绑定）
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // 绑定新表单逻辑
+        newForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
 
-      const input = form.querySelector("#hero-email-secure");
-      const email = (input?.value || "").trim();
-      const submitBtn = form.querySelector("#hero-submit-btn-secure");
+            const input = newForm.querySelector("#hero-email");
+            const email = (input?.value || "").trim();
+            const submitBtn = newForm.querySelector("#hero-submit-btn");
 
-      if (!email) return;
+            if (!email) return;
 
-      const originalBtnText = submitBtn.innerText;
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Subscribing...";
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Subscribing...";
 
-      try {
-        const res = await fetch("/api/klaviyo-subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+            try {
+                const res = await fetch("/api/klaviyo-subscribe", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                    // ✅ 1. 触发 GTM 信号
+                    const eventId = crypto.randomUUID();
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        'event': 'lead',
+                        'user_email': email,
+                        'event_id': eventId
+                    });
+
+                    // ✅ 2. 弹出弹窗 (不跳转)
+                    if (popup) popup.style.display = "block";
+                    
+                    newForm.reset();
+                } else {
+                    alert(data.error || "Subscription failed.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network error.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
         });
-        const data = await res.json().catch(() => ({}));
-
-        if (res.ok && data.success) {
-          // 1. GTM 信号
-          const eventId = crypto.randomUUID();
-          window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({
-            'event': 'lead',
-            'user_email': email,
-            'event_id': eventId
-          });
-
-          // 2. 仅弹窗，不跳转
-          if (popup) popup.style.display = "block";
-          
-          form.reset();
-        } else {
-          alert(data.error || "Subscription failed.");
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalBtnText;
-      }
-    };
+    }
   })();
 </script>
