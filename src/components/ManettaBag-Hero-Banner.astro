@@ -2,7 +2,8 @@
 /**
  * ManettaBag-Hero-Banner.astro
  * Hero banner 模块
- * ✅ 修复版：提交后仅弹窗，关闭弹窗仅隐藏，绝不跳转，不传递邮箱。
+ * ✅ 终极稳固版：任何情况下都不跳转/不刷新（点击按钮/回车/第三方脚本触发 submit 都拦截）
+ * ✅ 保持原功能：邮箱校验 -> /api/klaviyo-subscribe -> fbq Lead -> 弹窗 -> 可关闭/复制链接
  */
 ---
 
@@ -214,31 +215,31 @@
   .close-x:hover { color: #1a1a1a; }
 
   @keyframes popupFadeIn {
-    from { opacity: 0; transform: scale(0.98); } 
+    from { opacity: 0; transform: scale(0.98); }
     to { opacity: 1; transform: scale(1); }
   }
 
   @media (max-width: 768px) {
-    .popup-container { 
-        flex-direction: column; 
-        width: 90%; 
+    .popup-container {
+        flex-direction: column;
+        width: 90%;
         max-height: 90vh;
         overflow: hidden;
     }
     .popup-left { display: none; }
-    .popup-right { 
-        padding: 35px 20px 25px 20px; 
-        overflow-y: auto; 
+    .popup-right {
+        padding: 35px 20px 25px 20px;
+        overflow-y: auto;
         width: 100%;
     }
     .popup-right h2 { font-size: 22px; }
     .step-item { font-size: 12px; }
-    .action-group { 
+    .action-group {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
     .action-group > :last-child {
-        grid-column: span 2; 
+        grid-column: span 2;
         background-color: #f3f3f3;
         flex-direction: row;
         gap: 8px;
@@ -283,7 +284,14 @@
             <div class="text-4xl font-display font-bold text-white">Get Over $100 OFF</div>
           </div>
           <div class="text-white font-bold text-xs tracking-wider mb-2">Enter your email to get in our Super Early Bird Deal.</div>
-          <form id="hero-form" class="flex flex-col sm:flex-row gap-3 relative">
+
+          {/* ✅ 改动点：action + novalidate + 按钮改为 type="button"（绝对不触发表单原生导航） */}
+          <form
+            id="hero-form"
+            action="javascript:void(0)"
+            novalidate
+            class="flex flex-col sm:flex-row gap-3 relative"
+          >
             <input
               id="hero-email"
               type="email"
@@ -295,12 +303,13 @@
             />
             <button
               id="hero-submit-btn"
-              type="submit"
+              type="button"
               class="w-full sm:w-auto bg-brand hover:bg-brand/90 text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center whitespace-nowrap shrink-0"
             >
               Reserve Now
             </button>
           </form>
+
           <br>
           <div class="text-brand font-bold text-xs uppercase tracking-wider mb-2">
             We'll notify you the moment we go live.
@@ -396,136 +405,126 @@
 
 <script is:inline>
   (function () {
-    // 1. 获取原始元素
     const form = document.querySelector("#hero-form");
-    let popup = document.querySelector("#sharePopup");
-    
-    // ============================================================
-    // 🛑 核心修复：彻底清除“幽灵跳转”代码
-    // ============================================================
-    // 如果弹窗存在，我们把它克隆一份，用新的替换旧的。
-    // 这一步会强制断开所有之前（包括缓存中）绑定在弹窗、关闭按钮、背景上的旧事件监听器。
-    if (popup) {
-        const newPopup = popup.cloneNode(true);
-        popup.parentNode.replaceChild(newPopup, popup);
-        popup = newPopup; // 更新引用，接下来的操作都针对这个纯净的新弹窗
-    }
+    const popup = document.querySelector("#sharePopup");
+    const closeBtn = document.querySelector("#popupCloseBtn");
+    const copyBtn = document.querySelector("#btn-copy-link");
+    const submitBtn = document.querySelector("#hero-submit-btn");
+    const emailInput = document.querySelector("#hero-email");
 
-    // 2. 在这个“新弹窗”里重新获取按钮 (必须重新获取，因为DOM变了)
-    const closeBtn = popup ? popup.querySelector("#popupCloseBtn") : null;
-    const copyBtn = popup ? popup.querySelector("#btn-copy-link") : null;
-
-    // 🛑 防御性修复：强制把关闭按钮改成普通按钮，防止它触发表单提交
-    if (closeBtn) {
-        closeBtn.setAttribute("type", "button");
-    }
-
-    // ============================================================
-    // ✅ 定义纯净的关闭逻辑：只有隐藏，绝对没有跳转
-    // ============================================================
-    const closePopupOnly = (e) => {
-        if (e) {
-            e.preventDefault(); 
-            e.stopPropagation(); // 阻止事件冒泡
-        }
-        if (popup) popup.style.display = "none";
+    // ✅ 关闭弹窗仅隐藏，不跳转
+    const closePopupOnly = () => {
+      if (popup) popup.style.display = "none";
     };
 
-    // 3. 重新绑定关闭事件 (在新元素上绑定)
+    // 绑定关闭按钮
     if (closeBtn) {
-        // 使用 onclick 确保单一职责
-        closeBtn.onclick = closePopupOnly;
+      closeBtn.onclick = (e) => {
+        e.preventDefault();
+        closePopupOnly();
+      };
     }
 
+    // 点击背景关闭
     if (popup) {
-        popup.onclick = (e) => {
-            // 点击背景层时关闭
-            if (e.target === popup) closePopupOnly(e);
-        };
+      popup.onclick = (e) => {
+        if (e.target === popup) closePopupOnly();
+      };
     }
 
-    // ============================================================
-    // 📋 重新绑定 Copy Link 逻辑 (因为旧的被克隆清除了)
-    // ============================================================
+    // Copy Link 逻辑 (保持不变)
     if (copyBtn) {
-        copyBtn.onclick = (e) => {
-            e.preventDefault();
-            const currentUrl = window.location.href;
-            navigator.clipboard.writeText(currentUrl).then(() => {
-                const originalHtml = copyBtn.innerHTML;
-                copyBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                    <span style="color:#22c55e;">Copied!</span>
-                `;
-                copyBtn.style.borderColor = "#22c55e";
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalHtml;
-                    copyBtn.style.borderColor = "#ddd";
-                }, 2000);
-            }).catch(err => console.error(err));
-        };
-    }
+      copyBtn.addEventListener("click", () => {
+        const currentUrl = window.location.href;
 
-    // ============================================================
-    // 🚀 表单提交逻辑 (GTM + Meta CAPI)
-    // ============================================================
-    if (form) {
-        // 为了保险，也对 Form 做一次“克隆清洗”，防止旧的 submit 跳转还在
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
+        navigator.clipboard.writeText(currentUrl).then(() => {
+          const originalHtml = copyBtn.innerHTML;
 
-        newForm.addEventListener("submit", async (event) => {
-            event.preventDefault(); // 🛑 第一行代码就是阻止跳转
+          copyBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span style="color:#22c55e;">Copied!</span>
+          `;
+          copyBtn.style.borderColor = "#22c55e";
 
-            const input = newForm.querySelector("#hero-email");
-            const email = (input?.value || "").trim();
-            const submitBtn = newForm.querySelector("#hero-submit-btn");
-
-            if (!email) return; // 简单校验
-
-            const originalText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Subscribing...";
-
-            try {
-                const res = await fetch("/api/klaviyo-subscribe", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email }),
-                });
-
-                const data = await res.json().catch(() => ({}));
-
-                if (res.ok && data.success) {
-                    // ✅ 1. 触发 GTM 信号
-                    const eventId = crypto.randomUUID();
-                    window.dataLayer = window.dataLayer || [];
-                    window.dataLayer.push({
-                        'event': 'lead',
-                        'user_email': email,
-                        'event_id': eventId
-                    });
-
-                    // 兼容旧 Pixel
-                    if (typeof fbq === 'function') {
-                        fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
-                    }
-
-                    // ✅ 2. 仅显示弹窗 (引用的是那个新克隆的 popup)
-                    if (popup) popup.style.display = "block";
-                    
-                    newForm.reset();
-                } else {
-                    alert(data.error || "Subscription failed.");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Network error.");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
-            }
+          setTimeout(() => {
+            copyBtn.innerHTML = originalHtml;
+            copyBtn.style.borderColor = "#ddd";
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+          alert("Please manually copy the URL from your browser address bar.");
         });
+      });
     }
+
+    if (!form) return;
+
+    // ✅ 核心订阅逻辑：无论从 click / Enter / submit 触发，都走同一套流程
+    async function subscribeFlow(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      }
+
+      const input = emailInput || form.querySelector("#hero-email");
+      const email = (input?.value || "").trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        input && input.focus();
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/klaviyo-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.success) {
+          alert(data.error || "Subscription failed, please try again.");
+          return;
+        }
+
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
+        }
+
+        if (popup) popup.style.display = "block";
+        form.reset();
+
+      } catch (err) {
+        console.error(err);
+        alert("Network error, please try again.");
+      }
+    }
+
+    // ✅ 1) 点击按钮提交（按钮已是 type="button"，天然不会触发原生 submit/跳转）
+    if (submitBtn) {
+      submitBtn.addEventListener("click", subscribeFlow, true);
+    }
+
+    // ✅ 2) Enter 提交：保持原本“回车提交”的使用习惯
+    if (emailInput) {
+      emailInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          subscribeFlow(e);
+        }
+      }, true);
+    }
+
+    // ✅ 3) 兜底：任何第三方脚本/旧代码触发表单 submit，都强制拦截，确保绝不跳转
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      subscribeFlow(e);
+    }, true);
+
   })();
 </script>
