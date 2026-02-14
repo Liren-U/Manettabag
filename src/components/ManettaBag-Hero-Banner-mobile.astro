@@ -1,19 +1,19 @@
 ---
 /**
  * ManettaBag-Hero-Banner-Mobile.astro
- * 🚀 极速性能版 - 最终修复
- * ✅ 修复：关闭弹窗仅隐藏，绝不跳转
- * ✅ 修复：通过更名 ID 彻底清除旧代码缓存干扰
- * ✅ 新增：GTM DataLayer 信号，确保不跳转也能被 Meta 抓取
+ * 🚀 极速性能版 - 终极稳固修复（移动端）
+ * ✅ 绝对不跳转：点击按钮 / 回车 / 第三方触发 submit 都不会去 /vip-subscribe
+ * ✅ 保持原功能：邮箱校验 -> /api/klaviyo-subscribe -> dataLayer + fbq -> 弹窗 -> 关闭/复制
+ * ✅ 修复点：把 submit 按钮改为 button，并用 click/Enter 触发同一订阅函数
+ * ✅ 兜底：捕获阶段拦截 submit，阻止其它脚本在 submit 后跳转
  */
 ---
 
 <style is:inline>
   /* 基础工具类 */
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
 
   /* --- 移动端弹窗样式 --- */
-  /* ✅ 修改：匹配新的 ID 选择器，确保样式生效 */
   #sharePopupMobile-v2.popup-overlay-mobile {
     display: none;
     position: fixed;
@@ -25,11 +25,7 @@
     align-items: center;
     justify-content: center;
   }
-
-  /* 激活状态 */
-  #sharePopupMobile-v2.popup-overlay-mobile.active {
-      display: flex;
-  }
+  #sharePopupMobile-v2.popup-overlay-mobile.active { display: flex; }
 
   .popup-container-mobile {
     position: relative;
@@ -39,12 +35,9 @@
     display: flex; flex-direction: column; overflow: hidden;
   }
 
-  .popup-header-img {
-    height: 200px; width: 100%;
-    background: #2a2a2a; position: relative; flex-shrink: 0;
-  }
+  .popup-header-img { height: 200px; width: 100%; background: #2a2a2a; position: relative; flex-shrink: 0; }
   .popup-header-img img { width: 100%; height: 100%; object-fit: cover; }
-  
+
   .popup-badge {
     position: absolute; top: 15px; left: 15px;
     background: #c6a35d; color: white;
@@ -53,13 +46,11 @@
     z-index: 2; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   }
 
-  /* 内容滚动区 */
   .popup-content-scroll {
     padding: 25px 20px; overflow-y: auto;
     -webkit-overflow-scrolling: touch; flex: 1;
   }
 
-  /* H2 标题样式 */
   .popup-content-scroll h2 {
     font-family: 'Optima', 'Palatino', serif; font-size: 22px;
     margin: 0 0 10px 0; text-transform: uppercase;
@@ -73,7 +64,6 @@
   }
 
   .reward-intro { color: #555; font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-
   .step-list { margin: 0 0 20px 0; padding: 0; list-style: none; }
   .step-item { display: flex; align-items: flex-start; margin-bottom: 10px; font-size: 12px; color: #333; line-height: 1.4; }
   .step-num {
@@ -82,7 +72,6 @@
     font-size: 10px; margin-right: 10px; margin-top: 1px; flex-shrink: 0;
   }
 
-  /* 按钮组 */
   .action-group-mobile { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
   .btn-share {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -94,8 +83,8 @@
   .btn-share svg { width: 20px; height: 20px; margin-bottom: 5px; fill: currentColor; }
 
   .action-group-mobile > :last-child {
-      grid-column: span 2; flex-direction: row; background-color: #f3f3f3;
-      padding: 14px; font-size: 11px; gap: 8px;
+    grid-column: span 2; flex-direction: row; background-color: #f3f3f3;
+    padding: 14px; font-size: 11px; gap: 8px;
   }
   .action-group-mobile > :last-child svg { margin-bottom: 0; }
 
@@ -151,8 +140,9 @@
             <div class="text-4xl font-display font-bold text-white">Get Over $100 OFF</div>
           </div>
           <div class="text-white font-bold text-xs tracking-wider mb-2">Enter your email to get in our Super Early Bird Deal.</div>
-          
-          <form id="hero-form-mobile-v2" class="flex flex-col lg:flex-row gap-3 relative">
+
+          {/* ✅ 改动点：action + novalidate + 按钮改为 type="button"（绝对不走原生 submit 导航） */}
+          <form id="hero-form-mobile-v2" action="javascript:void(0)" novalidate class="flex flex-col lg:flex-row gap-3 relative">
             <input
               id="hero-email-mobile-v2"
               type="email"
@@ -164,7 +154,7 @@
             />
             <button
               id="hero-submit-btn-mobile-v2"
-              type="submit"
+              type="button"
               class="w-full lg:w-auto bg-brand hover:bg-brand/90 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-glow flex items-center justify-center shrink-0 group whitespace-nowrap"
             >
               Reserve Now
@@ -179,9 +169,8 @@
 
   <div id="sharePopupMobile-v2" class="popup-overlay-mobile">
     <div class="popup-container-mobile">
-      
       <button id="popupCloseBtnMobile-v2" class="close-x-mobile" type="button">&times;</button>
-      
+
       <div class="popup-header-img">
         <div class="popup-badge">FREE GIFT</div>
         <img src="/images/Manettabag-pop-mobile-1.png" alt="Custom ID Tag">
@@ -193,22 +182,20 @@
         <p class="reward-intro">Valid for backers only after supporting the campaign at launch.</p>
         <p>How to unlock your gift:</p>
         <ul class="step-list">
-            <li class="step-item"><div class="step-num">1</div><div>Share this page with friends or on social media.</div></li>
-            <li class="step-item"><div class="step-num">2</div><div>Email us a screenshot of your share.</div></li>
-            <li class="step-item"><div class="step-num">3</div><div>We'll add a free lens protection Velcro cloth to your order — on us. It only takes a moment, and it helps us reach more creators like you.</div></li>
+          <li class="step-item"><div class="step-num">1</div><div>Share this page with friends or on social media.</div></li>
+          <li class="step-item"><div class="step-num">2</div><div>Email us a screenshot of your share.</div></li>
+          <li class="step-item"><div class="step-num">3</div><div>We'll add a free lens protection Velcro cloth to your order — on us. It only takes a moment, and it helps us reach more creators like you.</div></li>
         </ul>
 
         <div class="action-group-mobile">
-            <a href="https://www.facebook.com/sharer/sharer.php?u=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.39 6.08V8.7H14.86C13.65 8.7 13.41 9.27 13.41 10.1V12.06H16.32L15.86 14.96H13.41V21.96C18.19 21.21 21.86 17.06 21.86 12.06C21.86 6.53 17.36 2.04 12 2.04Z"/></svg><span>Facebook</span></a>
-            <a href="https://twitter.com/intent/tweet?text=Check%20out%20Manetta%20Bag&url=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>Twitter</span></a>
-            <a href="https://www.instagram.com/" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg><span>Instagram</span></a>
-            
-            <button id="btn-copy-link-mobile-v2" class="btn-share" type="button"><svg viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg><span id="copy-text-mobile">Copy Link</span></button>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.39 6.08V8.7H14.86C13.65 8.7 13.41 9.27 13.41 10.1V12.06H16.32L15.86 14.96H13.41V21.96C18.19 21.21 21.86 17.06 21.86 12.06C21.86 6.53 17.36 2.04 12 2.04Z"/></svg><span>Facebook</span></a>
+          <a href="https://twitter.com/intent/tweet?text=Check%20out%20Manetta%20Bag&url=manettabag.com" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>Twitter</span></a>
+          <a href="https://www.instagram.com/" target="_blank" class="btn-share"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg><span>Instagram</span></a>
+
+          <button id="btn-copy-link-mobile-v2" class="btn-share" type="button"><svg viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"/></svg><span id="copy-text-mobile">Copy Link</span></button>
         </div>
-        
-        <div class="popup-footer">
-            Helping us reach more creators like you.
-        </div>
+
+        <div class="popup-footer">Helping us reach more creators like you.</div>
       </div>
     </div>
   </div>
@@ -216,115 +203,129 @@
 
 <script is:inline>
   (function () {
-    // ✅ 核心修改4：获取全新的 ID，避开旧代码缓存
     const form = document.querySelector("#hero-form-mobile-v2");
     const popup = document.querySelector("#sharePopupMobile-v2");
     const closeBtn = document.querySelector("#popupCloseBtnMobile-v2");
     const copyBtn = document.querySelector("#btn-copy-link-mobile-v2");
-    
-    // --- 1. 绝对纯净的关闭功能 (只移除 active 类，绝不跳转) ---
+    const submitBtn = document.querySelector("#hero-submit-btn-mobile-v2");
+    const emailInput = document.querySelector("#hero-email-mobile-v2");
+
+    // --- 1) 关闭弹窗：只隐藏，不跳转 ---
     const closePopupOnly = (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        if (popup) popup.classList.remove('active');
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (popup) popup.classList.remove("active");
     };
 
     if (closeBtn) closeBtn.onclick = closePopupOnly;
-    
     if (popup) {
-        popup.onclick = (e) => {
-            if (e.target === popup) closePopupOnly(e);
-        };
+      popup.onclick = (e) => {
+        if (e.target === popup) closePopupOnly(e);
+      };
     }
 
-    // --- 2. Copy Link 逻辑 ---
+    // --- 2) Copy Link ---
     if (copyBtn) {
-        copyBtn.onclick = (e) => {
-            e.preventDefault();
-            const currentUrl = window.location.href;
-            navigator.clipboard.writeText(currentUrl).then(() => {
-                const originalHtml = copyBtn.innerHTML;
-                copyBtn.innerHTML = `<svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span style="color:#22c55e;">Copied!</span>`;
-                copyBtn.style.borderColor = "#22c55e";
-                setTimeout(() => { copyBtn.innerHTML = originalHtml; copyBtn.style.borderColor = "#ddd"; }, 2000);
-            }).catch(err => {
-                console.error("Copy failed", err);
-                alert("Please manually copy the URL.");
-            });
-        };
+      copyBtn.onclick = (e) => {
+        e.preventDefault();
+        const currentUrl = window.location.href;
+
+        navigator.clipboard.writeText(currentUrl).then(() => {
+          const originalHtml = copyBtn.innerHTML;
+          copyBtn.innerHTML = `<svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span style="color:#22c55e;">Copied!</span>`;
+          copyBtn.style.borderColor = "#22c55e";
+          setTimeout(() => { copyBtn.innerHTML = originalHtml; copyBtn.style.borderColor = "#ddd"; }, 2000);
+        }).catch(err => {
+          console.error("Copy failed", err);
+          alert("Please manually copy the URL.");
+        });
+      };
     }
 
-    // --- 3. 提交逻辑 ---
-    if (form) {
-        form.onsubmit = async (event) => {
-            // 🚨 核心防御：停止默认跳转
-            event.preventDefault();
+    if (!form) return;
 
-            const input = form.querySelector("#hero-email-mobile-v2");
-            const email = (input?.value || "").trim();
-            const submitBtn = form.querySelector("#hero-submit-btn-mobile-v2");
+    // --- 3) 统一订阅流程（click / Enter / submit 都走这里） ---
+    let isSubmitting = false;
 
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                alert("Please enter a valid email address.");
-                input && input.focus();
-                return;
-            }
+    async function subscribeFlow(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+      if (isSubmitting) return;
 
-            const originalBtnText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Subscribing...";
+      const input = emailInput || form.querySelector("#hero-email-mobile-v2");
+      const email = (input?.value || "").trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            try {
-                // 1. 发送请求给 Klaviyo
-                const res = await fetch("/api/klaviyo-subscribe", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email }),
-                });
+      if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        input && input.focus();
+        return;
+      }
 
-                const data = await res.json().catch(() => ({}));
+      const originalBtnText = submitBtn ? submitBtn.innerText : "";
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Subscribing..."; }
+      isSubmitting = true;
 
-                if (!res.ok || !data.success) {
-                    console.warn("[Hero subscribe mobile] failed:", data);
-                    alert(data.error || "Subscription failed, please try again.");
-                    return;
-                }
-                
-                // ✅ 2. 触发 GTM 信号 (确保不跳转也能被 Meta 抓取)
-                const eventId = crypto.randomUUID();
-                window.dataLayer = window.dataLayer || [];
-                window.dataLayer.push({
-                    'event': 'lead',
-                    'user_email': email,
-                    'event_id': eventId
-                });
+      try {
+        const res = await fetch("/api/klaviyo-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
 
-                // 保留原有的 FB Pixel 浏览器端触发 (可选，为了双重保险)
-                if (typeof fbq === 'function') {
-                    fbq('track', 'Lead', {
-                        content_name: 'Hero Banner Mobile Email Subscribe',
-                        source: 'HomePageHeroMobile',
-                        eventID: eventId
-                    });
-                }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) {
+          console.warn("[Hero subscribe mobile] failed:", data);
+          alert(data.error || "Subscription failed, please try again.");
+          return;
+        }
 
-                // ✅ 3. 仅显示弹窗 (使用 active 类)
-                if (popup) popup.classList.add('active');
-                
-                // 重置表单
-                form.reset();
+        // ✅ GTM / Meta 信号（不跳转也能抓到）
+        const eventId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: "lead", user_email: email, event_id: eventId });
 
-            } catch (err) {
-                console.error("[Hero subscribe mobile] error:", err);
-                alert("Network error, please try again.");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalBtnText;
-            }
-        };
+        // ✅ FB Pixel（可选，保留）
+        if (typeof fbq === "function") {
+          fbq("track", "Lead", {
+            content_name: "Hero Banner Mobile Email Subscribe",
+            source: "HomePageHeroMobile",
+            eventID: eventId
+          });
+        }
+
+        if (popup) popup.classList.add("active");
+        form.reset();
+
+      } catch (err) {
+        console.error("[Hero subscribe mobile] error:", err);
+        alert("Network error, please try again.");
+      } finally {
+        isSubmitting = false;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = originalBtnText; }
+      }
     }
+
+    // ✅ 点击按钮提交（按钮是 type="button"，天然不触发原生 submit）
+    if (submitBtn) {
+      submitBtn.addEventListener("click", subscribeFlow, true);
+    }
+
+    // ✅ Enter 提交（保持原功能）
+    if (emailInput) {
+      emailInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") subscribeFlow(e);
+      }, true);
+    }
+
+    // ✅ 兜底：任何人触发 submit 都拦住（防第三方脚本/旧逻辑）
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      subscribeFlow(e);
+    }, true);
   })();
 </script>
