@@ -401,42 +401,49 @@
     const closeBtn = document.querySelector("#popupCloseBtn");
     const copyBtn = document.querySelector("#btn-copy-link");
 
-    // ✅ 修改：关闭弹窗仅隐藏，不跳转，也不操作 location
-    const closePopupOnly = () => {
-        if (popup) popup.style.display = "none";
-    };
-
-    // 绑定关闭按钮 - 使用 onclick 覆盖可能存在的旧事件
+    // ============================================================
+    // ✅ 核心修复：防止旧代码干扰的“克隆覆盖法”
+    // ============================================================
+    // 如果存在关闭按钮，通过克隆节点来清除之前可能残留的“跳转”监听器
     if (closeBtn) {
-        closeBtn.onclick = (e) => {
-            e.preventDefault();
-            closePopupOnly();
-        };
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        // 给新按钮绑定纯粹的关闭逻辑
+        newCloseBtn.addEventListener("click", (e) => {
+            e.preventDefault(); // 阻止默认行为
+            e.stopPropagation(); // 阻止冒泡
+            if (popup) popup.style.display = "none";
+        });
     }
 
-    // 绑定点击背景关闭
+    // 处理点击背景关闭（同样逻辑）
     if (popup) {
+        // 先移除旧的 click 事件（虽然 removeEventListener 很难移除匿名函数，但我们下面用新逻辑覆盖）
+        // 这里直接重新绑定 click，并在内部判断
         popup.onclick = (e) => {
             if (e.target === popup) {
-                closePopupOnly();
+                e.preventDefault();
+                popup.style.display = "none";
             }
         };
     }
 
-    // Copy Link 逻辑 (保持不变)
+    // ============================================================
+    // 下面是原有的 Copy Link 和 表单提交逻辑 (保持不变)
+    // ============================================================
+
+    // Copy Link 逻辑
     if (copyBtn) {
         copyBtn.addEventListener("click", () => {
             const currentUrl = window.location.href;
-
             navigator.clipboard.writeText(currentUrl).then(() => {
                 const originalHtml = copyBtn.innerHTML;
-
                 copyBtn.innerHTML = `
                     <svg viewBox="0 0 24 24" style="fill:#22c55e;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                     <span style="color:#22c55e;">Copied!</span>
                 `;
                 copyBtn.style.borderColor = "#22c55e";
-
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHtml;
                     copyBtn.style.borderColor = "#ddd";
@@ -463,9 +470,6 @@
         return;
       }
 
-      // 移除 localStorage 存储逻辑，因为不传递了
-      // try { localStorage.setItem("manetta_email", email); } catch (e) {}
-
       try {
         const res = await fetch("/api/klaviyo-subscribe", {
           method: "POST",
@@ -484,12 +488,11 @@
           fbq('track', 'Lead', { content_name: 'Hero Banner Email Subscribe', source: 'HomePageHero' });
         }
 
-        // ✅ 修改：移除 submittedEmail 变量，提交成功后直接显示弹窗，不再有 else 跳转
+        // ✅ 提交成功后仅显示弹窗
         if (popup) {
             popup.style.display = "block";
         }
         
-        // 可选：重置表单
         form.reset();
 
       } catch (err) {
